@@ -1,0 +1,1446 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"MEMS_L3GD20.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.comm	L3GD20_Readings,20,4
+  19              		.bss
+  20              	L3GD20State:
+  21 0000 00       		.space	1
+  22 0001 000000   		.align	2
+  23              	ConfRegs:
+  24 0004 00000000 		.space	6
+  24      0000
+  25 000a 0000     		.align	2
+  26              	DataRegs:
+  27 000c 00000000 		.space	10
+  27      00000000 
+  27      0000
+  28              		.section	.rodata
+  29              		.align	2
+  32              	sens:
+  33 0000 295C0F3C 		.word	1007639593
+  34 0004 295C8F3C 		.word	1016028201
+  35 0008 295C8F3D 		.word	1032805417
+  36 000c 295C8F3D 		.word	1032805417
+  37              		.bss
+  38 0016 0000     		.align	2
+  39              	wBuff_GyroData:
+  40 0018 00000000 		.space	16
+  40      00000000 
+  40      00000000 
+  40      00000000 
+  41              	ssp_init:
+  42 0028 00       		.space	1
+  43              	data_init:
+  44 0029 00       		.space	1
+  45 002a 0000     		.text
+  46              		.align	2
+  47              		.global	MEMS_L3GD20_init
+  48              		.thumb
+  49              		.thumb_func
+  51              	MEMS_L3GD20_init:
+  52              	.LFB112:
+  53              		.file 1 "src/MEMS_L3GD20.c"
+   1:src/MEMS_L3GD20.c **** /*******************************************************************************
+   2:src/MEMS_L3GD20.c ****  *
+   3:src/MEMS_L3GD20.c ****  * Project  :	PCAN-GPS
+   4:src/MEMS_L3GD20.c ****  * Module   :
+   5:src/MEMS_L3GD20.c ****  * Filename :	MEMS_L3GD20.c
+   6:src/MEMS_L3GD20.c ****  * System   :
+   7:src/MEMS_L3GD20.c ****  * Compiler :
+   8:src/MEMS_L3GD20.c ****  * Switches :
+   9:src/MEMS_L3GD20.c ****  * Rights   : 	(c) PEAK-System Technik GmbH
+  10:src/MEMS_L3GD20.c ****  *            	www.peak-system.com
+  11:src/MEMS_L3GD20.c ****  *
+  12:src/MEMS_L3GD20.c ****  *******************************************************************************
+  13:src/MEMS_L3GD20.c ****  * Implementation description
+  14:src/MEMS_L3GD20.c ****  *
+  15:src/MEMS_L3GD20.c ****  *
+  16:src/MEMS_L3GD20.c ****  *
+  17:src/MEMS_L3GD20.c ****  *******************************************************************************
+  18:src/MEMS_L3GD20.c ****  * History: (newer entries first!)
+  19:src/MEMS_L3GD20.c ****  *------------------------------------------------------------------------------
+  20:src/MEMS_L3GD20.c ****  * Date / Name      Vers.   changes made
+  21:src/MEMS_L3GD20.c ****  *------------------------------------------------------------------------------
+  22:src/MEMS_L3GD20.c ****  * 2014 June 04/StM	0.0.2	clean-up
+  23:src/MEMS_L3GD20.c ****  * 2013 Sep xx/StS	0.0.1	Initial Version
+  24:src/MEMS_L3GD20.c ****  ******************************************************************************/
+  25:src/MEMS_L3GD20.c **** 
+  26:src/MEMS_L3GD20.c **** /*******************************************************************************
+  27:src/MEMS_L3GD20.c ****  include files
+  28:src/MEMS_L3GD20.c ****  ******************************************************************************/
+  29:src/MEMS_L3GD20.c **** //
+  30:src/MEMS_L3GD20.c **** // System header files
+  31:src/MEMS_L3GD20.c **** //
+  32:src/MEMS_L3GD20.c **** #include <lpc407x_8x_177x_8x.h>
+  33:src/MEMS_L3GD20.c **** #include <system_LPC407x_8x_177x_8x.h>
+  34:src/MEMS_L3GD20.c **** 
+  35:src/MEMS_L3GD20.c **** //
+  36:src/MEMS_L3GD20.c **** // Library header files
+  37:src/MEMS_L3GD20.c **** //
+  38:src/MEMS_L3GD20.c **** #include "typedefs.h"
+  39:src/MEMS_L3GD20.c **** #include "hardware.h"
+  40:src/MEMS_L3GD20.c **** #include "timer.h"
+  41:src/MEMS_L3GD20.c **** #include "ssp.h"
+  42:src/MEMS_L3GD20.c **** 
+  43:src/MEMS_L3GD20.c **** //
+  44:src/MEMS_L3GD20.c **** // Source code header files
+  45:src/MEMS_L3GD20.c **** //
+  46:src/MEMS_L3GD20.c **** #include "MEMS_L3GD20.h"
+  47:src/MEMS_L3GD20.c **** 
+  48:src/MEMS_L3GD20.c **** /*******************************************************************************
+  49:src/MEMS_L3GD20.c ****  global definitions
+  50:src/MEMS_L3GD20.c ****  ******************************************************************************/
+  51:src/MEMS_L3GD20.c **** 
+  52:src/MEMS_L3GD20.c **** // holds results of the L3GD20
+  53:src/MEMS_L3GD20.c **** MEMS_L3GD20_Result_Type L3GD20_Readings;
+  54:src/MEMS_L3GD20.c **** 
+  55:src/MEMS_L3GD20.c **** /*******************************************************************************
+  56:src/MEMS_L3GD20.c ****  local definitions
+  57:src/MEMS_L3GD20.c ****  ******************************************************************************/
+  58:src/MEMS_L3GD20.c **** typedef enum _L3GD20States {
+  59:src/MEMS_L3GD20.c **** 	readGyroDevID,
+  60:src/MEMS_L3GD20.c **** 	readGyroData,
+  61:src/MEMS_L3GD20.c **** 	processResults,
+  62:src/MEMS_L3GD20.c **** 	debugRegisters
+  63:src/MEMS_L3GD20.c **** } MEMS_L3GD20_States_Type;
+  64:src/MEMS_L3GD20.c **** 
+  65:src/MEMS_L3GD20.c **** // holds current state of state machine
+  66:src/MEMS_L3GD20.c **** static MEMS_L3GD20_States_Type L3GD20State = readGyroDevID;
+  67:src/MEMS_L3GD20.c **** 
+  68:src/MEMS_L3GD20.c **** static MEMS_L3GD20_Config_Register_Type ConfRegs;
+  69:src/MEMS_L3GD20.c **** static MEMS_L3GD20_Data_Register_Type DataRegs;
+  70:src/MEMS_L3GD20.c **** 
+  71:src/MEMS_L3GD20.c **** #define bufsize 16
+  72:src/MEMS_L3GD20.c **** 
+  73:src/MEMS_L3GD20.c **** #define L3GD20_ADDR_INC (1<<6)
+  74:src/MEMS_L3GD20.c **** #define L3GD20_WR		(0<<7)
+  75:src/MEMS_L3GD20.c **** #define L3GD20_RD		(1<<7)
+  76:src/MEMS_L3GD20.c **** 
+  77:src/MEMS_L3GD20.c **** //! multiplier for sensor values to have always the same scale in data
+  78:src/MEMS_L3GD20.c **** //! structure independent from sensors measurement range
+  79:src/MEMS_L3GD20.c **** const static float sens[4] = { 0.00875F, 0.0175F, 0.070F, 0.070F };
+  80:src/MEMS_L3GD20.c **** 
+  81:src/MEMS_L3GD20.c **** static u8_t wBuff_GyroData[bufsize];
+  82:src/MEMS_L3GD20.c **** 
+  83:src/MEMS_L3GD20.c **** static u8_t ssp_init=0;			//<! ssp initialized yet?
+  84:src/MEMS_L3GD20.c **** static u8_t data_init=0;		//<! data structure initialized yet?
+  85:src/MEMS_L3GD20.c **** 
+  86:src/MEMS_L3GD20.c **** 
+  87:src/MEMS_L3GD20.c **** /*******************************************************************************
+  88:src/MEMS_L3GD20.c ****  local function prototypes
+  89:src/MEMS_L3GD20.c ****  ******************************************************************************/
+  90:src/MEMS_L3GD20.c **** static void initData(void);
+  91:src/MEMS_L3GD20.c **** static HWStatus_t initSSP(void);
+  92:src/MEMS_L3GD20.c **** static void prcRawValues(MEMS_L3GD20_Data_Register_Type *pData,
+  93:src/MEMS_L3GD20.c **** 		MEMS_L3GD20_Config_Register_Type *pConf, MEMS_L3GD20_Result_Type *pRes);
+  94:src/MEMS_L3GD20.c **** static HWStatus_t rwL3GD20(u8_t *p_wBuff, u8_t *p_rBuff, u8_t len);
+  95:src/MEMS_L3GD20.c **** static HWStatus_t wL3GD20Reg(u8_t reg, u8_t val);
+  96:src/MEMS_L3GD20.c **** static HWStatus_t rL3GD20Reg(u8_t reg, u8_t *p_val);
+  97:src/MEMS_L3GD20.c **** 
+  98:src/MEMS_L3GD20.c **** 
+  99:src/MEMS_L3GD20.c **** /*******************************************************************************
+ 100:src/MEMS_L3GD20.c ****  global functions
+ 101:src/MEMS_L3GD20.c ****  ******************************************************************************/
+ 102:src/MEMS_L3GD20.c **** 
+ 103:src/MEMS_L3GD20.c **** 
+ 104:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 105:src/MEMS_L3GD20.c **** //! HWStatus_t MEMS_L3GD20_init(void)
+ 106:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 107:src/MEMS_L3GD20.c **** //! @brief	initializes L3GD20 sensor with default settings. If not done yet SSP
+ 108:src/MEMS_L3GD20.c **** //!			port is also initialized
+ 109:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 110:src/MEMS_L3GD20.c **** //! @return one of the default HW_ERR codes
+ 111:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 112:src/MEMS_L3GD20.c **** HWStatus_t MEMS_L3GD20_init(void){
+  54              		.loc 1 112 0
+  55              		.cfi_startproc
+  56              		@ args = 0, pretend = 0, frame = 0
+  57              		@ frame_needed = 1, uses_anonymous_args = 0
+  58 0000 80B5     		push	{r7, lr}
+  59              	.LCFI0:
+  60              		.cfi_def_cfa_offset 8
+  61              		.cfi_offset 7, -8
+  62              		.cfi_offset 14, -4
+  63 0002 00AF     		add	r7, sp, #0
+  64              	.LCFI1:
+  65              		.cfi_def_cfa_register 7
+ 113:src/MEMS_L3GD20.c **** 
+ 114:src/MEMS_L3GD20.c **** 	if(!ssp_init){
+  66              		.loc 1 114 0
+  67 0004 40F20003 		movw	r3, #:lower16:ssp_init
+  68 0008 C0F20003 		movt	r3, #:upper16:ssp_init
+  69 000c 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+  70 000e 002B     		cmp	r3, #0
+  71 0010 07D1     		bne	.L2
+ 115:src/MEMS_L3GD20.c **** 		if(initSSP() != HW_ERR_OK)
+  72              		.loc 1 115 0
+  73 0012 00F0B7F9 		bl	initSSP
+  74 0016 0346     		mov	r3, r0
+  75 0018 002B     		cmp	r3, #0
+  76 001a 02D0     		beq	.L2
+ 116:src/MEMS_L3GD20.c **** 			return HW_ERR_RESOURCE;
+  77              		.loc 1 116 0
+  78 001c 4FF00203 		mov	r3, #2
+  79 0020 09E1     		b	.L3
+  80              	.L2:
+ 117:src/MEMS_L3GD20.c **** 	}
+ 118:src/MEMS_L3GD20.c **** 
+ 119:src/MEMS_L3GD20.c **** 	if(!data_init)
+  81              		.loc 1 119 0
+  82 0022 40F20003 		movw	r3, #:lower16:data_init
+  83 0026 C0F20003 		movt	r3, #:upper16:data_init
+  84 002a 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+  85 002c 002B     		cmp	r3, #0
+  86 002e 01D1     		bne	.L4
+ 120:src/MEMS_L3GD20.c **** 		initData();
+  87              		.loc 1 120 0
+  88 0030 00F0E4F9 		bl	initData
+  89              	.L4:
+ 121:src/MEMS_L3GD20.c **** 
+ 122:src/MEMS_L3GD20.c **** 	// prepare write command to write from register 20h onward
+ 123:src/MEMS_L3GD20.c **** 	ConfRegs.dummy = L3GD20_WR | L3GD20_ADDR_INC | 0x20;
+  90              		.loc 1 123 0
+  91 0034 40F20003 		movw	r3, #:lower16:ConfRegs
+  92 0038 C0F20003 		movt	r3, #:upper16:ConfRegs
+  93 003c 4FF06002 		mov	r2, #96
+  94 0040 1A70     		strb	r2, [r3, #0]
+ 124:src/MEMS_L3GD20.c **** 
+ 125:src/MEMS_L3GD20.c **** 	// enable all axis, set ~power down, set cut-off 50 output data rate 380Hz
+ 126:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x20.Xen = 1;
+  95              		.loc 1 126 0
+  96 0042 40F20003 		movw	r3, #:lower16:ConfRegs
+  97 0046 C0F20003 		movt	r3, #:upper16:ConfRegs
+  98 004a 5A78     		ldrb	r2, [r3, #1]
+  99 004c 42F00102 		orr	r2, r2, #1
+ 100 0050 5A70     		strb	r2, [r3, #1]
+ 127:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x20.Yen = 1;
+ 101              		.loc 1 127 0
+ 102 0052 40F20003 		movw	r3, #:lower16:ConfRegs
+ 103 0056 C0F20003 		movt	r3, #:upper16:ConfRegs
+ 104 005a 5A78     		ldrb	r2, [r3, #1]
+ 105 005c 42F00202 		orr	r2, r2, #2
+ 106 0060 5A70     		strb	r2, [r3, #1]
+ 128:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x20.Zen = 1;
+ 107              		.loc 1 128 0
+ 108 0062 40F20003 		movw	r3, #:lower16:ConfRegs
+ 109 0066 C0F20003 		movt	r3, #:upper16:ConfRegs
+ 110 006a 5A78     		ldrb	r2, [r3, #1]
+ 111 006c 42F00402 		orr	r2, r2, #4
+ 112 0070 5A70     		strb	r2, [r3, #1]
+ 129:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x20.pd = 1;
+ 113              		.loc 1 129 0
+ 114 0072 40F20003 		movw	r3, #:lower16:ConfRegs
+ 115 0076 C0F20003 		movt	r3, #:upper16:ConfRegs
+ 116 007a 5A78     		ldrb	r2, [r3, #1]
+ 117 007c 42F00802 		orr	r2, r2, #8
+ 118 0080 5A70     		strb	r2, [r3, #1]
+ 130:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x20.bw = 2;
+ 119              		.loc 1 130 0
+ 120 0082 40F20003 		movw	r3, #:lower16:ConfRegs
+ 121 0086 C0F20003 		movt	r3, #:upper16:ConfRegs
+ 122 008a 5A78     		ldrb	r2, [r3, #1]
+ 123 008c 4FF00201 		mov	r1, #2
+ 124 0090 61F30512 		bfi	r2, r1, #4, #2
+ 125 0094 5A70     		strb	r2, [r3, #1]
+ 131:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x20.dr = 2;
+ 126              		.loc 1 131 0
+ 127 0096 40F20003 		movw	r3, #:lower16:ConfRegs
+ 128 009a C0F20003 		movt	r3, #:upper16:ConfRegs
+ 129 009e 5A78     		ldrb	r2, [r3, #1]
+ 130 00a0 4FF00201 		mov	r1, #2
+ 131 00a4 61F38712 		bfi	r2, r1, #6, #2
+ 132 00a8 5A70     		strb	r2, [r3, #1]
+ 132:src/MEMS_L3GD20.c **** 
+ 133:src/MEMS_L3GD20.c **** 	// disable high pass filter
+ 134:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x21.hpcf = 0;
+ 133              		.loc 1 134 0
+ 134 00aa 40F20003 		movw	r3, #:lower16:ConfRegs
+ 135 00ae C0F20003 		movt	r3, #:upper16:ConfRegs
+ 136 00b2 9A78     		ldrb	r2, [r3, #2]
+ 137 00b4 6FF30302 		bfc	r2, #0, #4
+ 138 00b8 9A70     		strb	r2, [r3, #2]
+ 135:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x21.hpm = 0;
+ 139              		.loc 1 135 0
+ 140 00ba 40F20003 		movw	r3, #:lower16:ConfRegs
+ 141 00be C0F20003 		movt	r3, #:upper16:ConfRegs
+ 142 00c2 9A78     		ldrb	r2, [r3, #2]
+ 143 00c4 6FF30512 		bfc	r2, #4, #2
+ 144 00c8 9A70     		strb	r2, [r3, #2]
+ 136:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x21.reserved = 0;
+ 145              		.loc 1 136 0
+ 146 00ca 40F20003 		movw	r3, #:lower16:ConfRegs
+ 147 00ce C0F20003 		movt	r3, #:upper16:ConfRegs
+ 148 00d2 9A78     		ldrb	r2, [r3, #2]
+ 149 00d4 6FF38712 		bfc	r2, #6, #2
+ 150 00d8 9A70     		strb	r2, [r3, #2]
+ 137:src/MEMS_L3GD20.c **** 
+ 138:src/MEMS_L3GD20.c **** 	// disable interrupts
+ 139:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x22.h_lactive = 0;
+ 151              		.loc 1 139 0
+ 152 00da 40F20003 		movw	r3, #:lower16:ConfRegs
+ 153 00de C0F20003 		movt	r3, #:upper16:ConfRegs
+ 154 00e2 DA78     		ldrb	r2, [r3, #3]
+ 155 00e4 6FF34512 		bfc	r2, #5, #1
+ 156 00e8 DA70     		strb	r2, [r3, #3]
+ 140:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x22.i1_boot = 0;
+ 157              		.loc 1 140 0
+ 158 00ea 40F20003 		movw	r3, #:lower16:ConfRegs
+ 159 00ee C0F20003 		movt	r3, #:upper16:ConfRegs
+ 160 00f2 DA78     		ldrb	r2, [r3, #3]
+ 161 00f4 6FF38612 		bfc	r2, #6, #1
+ 162 00f8 DA70     		strb	r2, [r3, #3]
+ 141:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x22.i1_int1 = 0;
+ 163              		.loc 1 141 0
+ 164 00fa 40F20003 		movw	r3, #:lower16:ConfRegs
+ 165 00fe C0F20003 		movt	r3, #:upper16:ConfRegs
+ 166 0102 DA78     		ldrb	r2, [r3, #3]
+ 167 0104 6FF3C712 		bfc	r2, #7, #1
+ 168 0108 DA70     		strb	r2, [r3, #3]
+ 142:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x22.i2_drdy = 0;
+ 169              		.loc 1 142 0
+ 170 010a 40F20003 		movw	r3, #:lower16:ConfRegs
+ 171 010e C0F20003 		movt	r3, #:upper16:ConfRegs
+ 172 0112 DA78     		ldrb	r2, [r3, #3]
+ 173 0114 6FF3C302 		bfc	r2, #3, #1
+ 174 0118 DA70     		strb	r2, [r3, #3]
+ 143:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x22.i2_empty = 0;
+ 175              		.loc 1 143 0
+ 176 011a 40F20003 		movw	r3, #:lower16:ConfRegs
+ 177 011e C0F20003 		movt	r3, #:upper16:ConfRegs
+ 178 0122 DA78     		ldrb	r2, [r3, #3]
+ 179 0124 6FF30002 		bfc	r2, #0, #1
+ 180 0128 DA70     		strb	r2, [r3, #3]
+ 144:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x22.i2_orun = 0;
+ 181              		.loc 1 144 0
+ 182 012a 40F20003 		movw	r3, #:lower16:ConfRegs
+ 183 012e C0F20003 		movt	r3, #:upper16:ConfRegs
+ 184 0132 DA78     		ldrb	r2, [r3, #3]
+ 185 0134 6FF34102 		bfc	r2, #1, #1
+ 186 0138 DA70     		strb	r2, [r3, #3]
+ 145:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x22.i2_wtm = 0;
+ 187              		.loc 1 145 0
+ 188 013a 40F20003 		movw	r3, #:lower16:ConfRegs
+ 189 013e C0F20003 		movt	r3, #:upper16:ConfRegs
+ 190 0142 DA78     		ldrb	r2, [r3, #3]
+ 191 0144 6FF38202 		bfc	r2, #2, #1
+ 192 0148 DA70     		strb	r2, [r3, #3]
+ 146:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x22.pp_od = 0;
+ 193              		.loc 1 146 0
+ 194 014a 40F20003 		movw	r3, #:lower16:ConfRegs
+ 195 014e C0F20003 		movt	r3, #:upper16:ConfRegs
+ 196 0152 DA78     		ldrb	r2, [r3, #3]
+ 197 0154 6FF30412 		bfc	r2, #4, #1
+ 198 0158 DA70     		strb	r2, [r3, #3]
+ 147:src/MEMS_L3GD20.c **** 
+ 148:src/MEMS_L3GD20.c **** 	// set block data update
+ 149:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x23.bdu = 1;
+ 199              		.loc 1 149 0
+ 200 015a 40F20003 		movw	r3, #:lower16:ConfRegs
+ 201 015e C0F20003 		movt	r3, #:upper16:ConfRegs
+ 202 0162 1A79     		ldrb	r2, [r3, #4]
+ 203 0164 42F08002 		orr	r2, r2, #128
+ 204 0168 1A71     		strb	r2, [r3, #4]
+ 150:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x23.ble = 0;
+ 205              		.loc 1 150 0
+ 206 016a 40F20003 		movw	r3, #:lower16:ConfRegs
+ 207 016e C0F20003 		movt	r3, #:upper16:ConfRegs
+ 208 0172 1A79     		ldrb	r2, [r3, #4]
+ 209 0174 6FF38612 		bfc	r2, #6, #1
+ 210 0178 1A71     		strb	r2, [r3, #4]
+ 151:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x23.fs = 0;
+ 211              		.loc 1 151 0
+ 212 017a 40F20003 		movw	r3, #:lower16:ConfRegs
+ 213 017e C0F20003 		movt	r3, #:upper16:ConfRegs
+ 214 0182 1A79     		ldrb	r2, [r3, #4]
+ 215 0184 6FF30512 		bfc	r2, #4, #2
+ 216 0188 1A71     		strb	r2, [r3, #4]
+ 152:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x23.reserved = 0;
+ 217              		.loc 1 152 0
+ 218 018a 40F20003 		movw	r3, #:lower16:ConfRegs
+ 219 018e C0F20003 		movt	r3, #:upper16:ConfRegs
+ 220 0192 1A79     		ldrb	r2, [r3, #4]
+ 221 0194 6FF34302 		bfc	r2, #1, #3
+ 222 0198 1A71     		strb	r2, [r3, #4]
+ 153:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x23.sim = 0;
+ 223              		.loc 1 153 0
+ 224 019a 40F20003 		movw	r3, #:lower16:ConfRegs
+ 225 019e C0F20003 		movt	r3, #:upper16:ConfRegs
+ 226 01a2 1A79     		ldrb	r2, [r3, #4]
+ 227 01a4 6FF30002 		bfc	r2, #0, #1
+ 228 01a8 1A71     		strb	r2, [r3, #4]
+ 154:src/MEMS_L3GD20.c **** 
+ 155:src/MEMS_L3GD20.c **** 	// enable fifo, set boot = 1
+ 156:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x24.boot = 1;
+ 229              		.loc 1 156 0
+ 230 01aa 40F20003 		movw	r3, #:lower16:ConfRegs
+ 231 01ae C0F20003 		movt	r3, #:upper16:ConfRegs
+ 232 01b2 5A79     		ldrb	r2, [r3, #5]
+ 233 01b4 42F08002 		orr	r2, r2, #128
+ 234 01b8 5A71     		strb	r2, [r3, #5]
+ 157:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x24.fifo_en = 0;
+ 235              		.loc 1 157 0
+ 236 01ba 40F20003 		movw	r3, #:lower16:ConfRegs
+ 237 01be C0F20003 		movt	r3, #:upper16:ConfRegs
+ 238 01c2 5A79     		ldrb	r2, [r3, #5]
+ 239 01c4 6FF38612 		bfc	r2, #6, #1
+ 240 01c8 5A71     		strb	r2, [r3, #5]
+ 158:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x24.hpen = 0;
+ 241              		.loc 1 158 0
+ 242 01ca 40F20003 		movw	r3, #:lower16:ConfRegs
+ 243 01ce C0F20003 		movt	r3, #:upper16:ConfRegs
+ 244 01d2 5A79     		ldrb	r2, [r3, #5]
+ 245 01d4 6FF30412 		bfc	r2, #4, #1
+ 246 01d8 5A71     		strb	r2, [r3, #5]
+ 159:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x24.int_sel = 0;
+ 247              		.loc 1 159 0
+ 248 01da 40F20003 		movw	r3, #:lower16:ConfRegs
+ 249 01de C0F20003 		movt	r3, #:upper16:ConfRegs
+ 250 01e2 5A79     		ldrb	r2, [r3, #5]
+ 251 01e4 6FF38302 		bfc	r2, #2, #2
+ 252 01e8 5A71     		strb	r2, [r3, #5]
+ 160:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x24.out_sel = 0;
+ 253              		.loc 1 160 0
+ 254 01ea 40F20003 		movw	r3, #:lower16:ConfRegs
+ 255 01ee C0F20003 		movt	r3, #:upper16:ConfRegs
+ 256 01f2 5A79     		ldrb	r2, [r3, #5]
+ 257 01f4 6FF30102 		bfc	r2, #0, #2
+ 258 01f8 5A71     		strb	r2, [r3, #5]
+ 161:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x24.reserved = 0;
+ 259              		.loc 1 161 0
+ 260 01fa 40F20003 		movw	r3, #:lower16:ConfRegs
+ 261 01fe C0F20003 		movt	r3, #:upper16:ConfRegs
+ 262 0202 5A79     		ldrb	r2, [r3, #5]
+ 263 0204 6FF34512 		bfc	r2, #5, #1
+ 264 0208 5A71     		strb	r2, [r3, #5]
+ 162:src/MEMS_L3GD20.c **** 
+ 163:src/MEMS_L3GD20.c **** 	rwL3GD20((u8_t*)&ConfRegs, NULL, 6);
+ 265              		.loc 1 163 0
+ 266 020a 40F20000 		movw	r0, #:lower16:ConfRegs
+ 267 020e C0F20000 		movt	r0, #:upper16:ConfRegs
+ 268 0212 4FF00001 		mov	r1, #0
+ 269 0216 4FF00602 		mov	r2, #6
+ 270 021a 00F0D7F9 		bl	rwL3GD20
+ 164:src/MEMS_L3GD20.c **** 
+ 165:src/MEMS_L3GD20.c **** 	// write FIFO register
+ 166:src/MEMS_L3GD20.c **** 	wL3GD20Reg(0x2E, 0);
+ 271              		.loc 1 166 0
+ 272 021e 4FF02E00 		mov	r0, #46
+ 273 0222 4FF00001 		mov	r1, #0
+ 274 0226 00F0F7F9 		bl	wL3GD20Reg
+ 167:src/MEMS_L3GD20.c **** 
+ 168:src/MEMS_L3GD20.c **** 	Wait_Usec(2000);
+ 275              		.loc 1 168 0
+ 276 022a 4FF4FA60 		mov	r0, #2000
+ 277 022e FFF7FEFF 		bl	Wait_Usec
+ 169:src/MEMS_L3GD20.c **** 
+ 170:src/MEMS_L3GD20.c **** 	return HW_ERR_OK;
+ 278              		.loc 1 170 0
+ 279 0232 4FF00003 		mov	r3, #0
+ 280              	.L3:
+ 171:src/MEMS_L3GD20.c **** }
+ 281              		.loc 1 171 0
+ 282 0236 1846     		mov	r0, r3
+ 283 0238 80BD     		pop	{r7, pc}
+ 284              		.cfi_endproc
+ 285              	.LFE112:
+ 287 023a 00BF     		.align	2
+ 288              		.global	MEMS_L3GD20_task
+ 289              		.thumb
+ 290              		.thumb_func
+ 292              	MEMS_L3GD20_task:
+ 293              	.LFB113:
+ 172:src/MEMS_L3GD20.c **** 
+ 173:src/MEMS_L3GD20.c **** 
+ 174:src/MEMS_L3GD20.c **** 
+ 175:src/MEMS_L3GD20.c **** 
+ 176:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 177:src/MEMS_L3GD20.c **** //! void MEMS_L3GD20_task(void)
+ 178:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 179:src/MEMS_L3GD20.c **** //! @brief	Gyroscope main task. Reads data from sensor, processes it and writes
+ 180:src/MEMS_L3GD20.c **** //!			results to the according data structure.
+ 181:src/MEMS_L3GD20.c **** //!			Should be called as often as possible.
+ 182:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 183:src/MEMS_L3GD20.c **** void MEMS_L3GD20_task(void){
+ 294              		.loc 1 183 0
+ 295              		.cfi_startproc
+ 296              		@ args = 0, pretend = 0, frame = 0
+ 297              		@ frame_needed = 1, uses_anonymous_args = 0
+ 298 023c 80B5     		push	{r7, lr}
+ 299              	.LCFI2:
+ 300              		.cfi_def_cfa_offset 8
+ 301              		.cfi_offset 7, -8
+ 302              		.cfi_offset 14, -4
+ 303 023e 00AF     		add	r7, sp, #0
+ 304              	.LCFI3:
+ 305              		.cfi_def_cfa_register 7
+ 184:src/MEMS_L3GD20.c **** 
+ 185:src/MEMS_L3GD20.c **** 	switch (L3GD20State) {
+ 306              		.loc 1 185 0
+ 307 0240 40F20003 		movw	r3, #:lower16:L3GD20State
+ 308 0244 C0F20003 		movt	r3, #:upper16:L3GD20State
+ 309 0248 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 310 024a 012B     		cmp	r3, #1
+ 311 024c 13D0     		beq	.L8
+ 312 024e 022B     		cmp	r3, #2
+ 313 0250 25D0     		beq	.L9
+ 314 0252 002B     		cmp	r3, #0
+ 315 0254 39D1     		bne	.L11
+ 316              	.L7:
+ 186:src/MEMS_L3GD20.c **** 	case readGyroDevID:
+ 187:src/MEMS_L3GD20.c **** 		rL3GD20Reg(0x0F, &L3GD20_Readings.GyroDevID);
+ 317              		.loc 1 187 0
+ 318 0256 4FF00F00 		mov	r0, #15
+ 319 025a 40F20001 		movw	r1, #:lower16:L3GD20_Readings
+ 320 025e C0F20001 		movt	r1, #:upper16:L3GD20_Readings
+ 321 0262 00F0F5F9 		bl	rL3GD20Reg
+ 188:src/MEMS_L3GD20.c **** 		L3GD20State = readGyroData;
+ 322              		.loc 1 188 0
+ 323 0266 40F20003 		movw	r3, #:lower16:L3GD20State
+ 324 026a C0F20003 		movt	r3, #:upper16:L3GD20State
+ 325 026e 4FF00102 		mov	r2, #1
+ 326 0272 1A70     		strb	r2, [r3, #0]
+ 189:src/MEMS_L3GD20.c **** 		break;
+ 327              		.loc 1 189 0
+ 328 0274 2AE0     		b	.L5
+ 329              	.L8:
+ 190:src/MEMS_L3GD20.c **** 	case readGyroData:
+ 191:src/MEMS_L3GD20.c **** 		rwL3GD20(wBuff_GyroData, (u8_t*)&DataRegs, 10);
+ 330              		.loc 1 191 0
+ 331 0276 40F20000 		movw	r0, #:lower16:wBuff_GyroData
+ 332 027a C0F20000 		movt	r0, #:upper16:wBuff_GyroData
+ 333 027e 40F20001 		movw	r1, #:lower16:DataRegs
+ 334 0282 C0F20001 		movt	r1, #:upper16:DataRegs
+ 335 0286 4FF00A02 		mov	r2, #10
+ 336 028a 00F09FF9 		bl	rwL3GD20
+ 192:src/MEMS_L3GD20.c **** 		L3GD20State = processResults;
+ 337              		.loc 1 192 0
+ 338 028e 40F20003 		movw	r3, #:lower16:L3GD20State
+ 339 0292 C0F20003 		movt	r3, #:upper16:L3GD20State
+ 340 0296 4FF00202 		mov	r2, #2
+ 341 029a 1A70     		strb	r2, [r3, #0]
+ 193:src/MEMS_L3GD20.c **** 		break;
+ 342              		.loc 1 193 0
+ 343 029c 16E0     		b	.L5
+ 344              	.L9:
+ 194:src/MEMS_L3GD20.c **** 	case processResults:
+ 195:src/MEMS_L3GD20.c **** 		prcRawValues(&DataRegs, &ConfRegs ,&L3GD20_Readings);
+ 345              		.loc 1 195 0
+ 346 029e 40F20000 		movw	r0, #:lower16:DataRegs
+ 347 02a2 C0F20000 		movt	r0, #:upper16:DataRegs
+ 348 02a6 40F20001 		movw	r1, #:lower16:ConfRegs
+ 349 02aa C0F20001 		movt	r1, #:upper16:ConfRegs
+ 350 02ae 40F20002 		movw	r2, #:lower16:L3GD20_Readings
+ 351 02b2 C0F20002 		movt	r2, #:upper16:L3GD20_Readings
+ 352 02b6 00F0FBF8 		bl	prcRawValues
+ 196:src/MEMS_L3GD20.c **** 		//! switch to next state after whole data reading/processing cycle
+ 197:src/MEMS_L3GD20.c **** 		L3GD20State = readGyroData;
+ 353              		.loc 1 197 0
+ 354 02ba 40F20003 		movw	r3, #:lower16:L3GD20State
+ 355 02be C0F20003 		movt	r3, #:upper16:L3GD20State
+ 356 02c2 4FF00102 		mov	r2, #1
+ 357 02c6 1A70     		strb	r2, [r3, #0]
+ 198:src/MEMS_L3GD20.c **** 		break;
+ 358              		.loc 1 198 0
+ 359 02c8 00E0     		b	.L5
+ 360              	.L11:
+ 199:src/MEMS_L3GD20.c **** 	default:
+ 200:src/MEMS_L3GD20.c **** 		break;
+ 361              		.loc 1 200 0
+ 362 02ca 00BF     		nop
+ 363              	.L5:
+ 201:src/MEMS_L3GD20.c **** 		//-------------------------
+ 202:src/MEMS_L3GD20.c **** 	}
+ 203:src/MEMS_L3GD20.c **** 
+ 204:src/MEMS_L3GD20.c **** } // MEMS_L3GD20_task
+ 364              		.loc 1 204 0
+ 365 02cc 80BD     		pop	{r7, pc}
+ 366              		.cfi_endproc
+ 367              	.LFE113:
+ 369 02ce 00BF     		.align	2
+ 370              		.global	MEMS_L3GD20_SetRange
+ 371              		.thumb
+ 372              		.thumb_func
+ 374              	MEMS_L3GD20_SetRange:
+ 375              	.LFB114:
+ 205:src/MEMS_L3GD20.c **** 
+ 206:src/MEMS_L3GD20.c **** 
+ 207:src/MEMS_L3GD20.c **** 
+ 208:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 209:src/MEMS_L3GD20.c **** //! HWStatus_t MEMS_L3GD20_SetRange(u8_t range)
+ 210:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 211:src/MEMS_L3GD20.c **** //! @brief	Sets measurement range of gyroscope
+ 212:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 213:src/MEMS_L3GD20.c **** //! @param	range	range to use (0=250[dps]; 1=500[dps]; 2=2000[dps];
+ 214:src/MEMS_L3GD20.c **** //!					3=2000[dps])
+ 215:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 216:src/MEMS_L3GD20.c **** //! @return one of the default HW_ERR codes
+ 217:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 218:src/MEMS_L3GD20.c **** HWStatus_t MEMS_L3GD20_SetRange(u8_t range){
+ 376              		.loc 1 218 0
+ 377              		.cfi_startproc
+ 378              		@ args = 0, pretend = 0, frame = 16
+ 379              		@ frame_needed = 1, uses_anonymous_args = 0
+ 380 02d0 80B5     		push	{r7, lr}
+ 381              	.LCFI4:
+ 382              		.cfi_def_cfa_offset 8
+ 383              		.cfi_offset 7, -8
+ 384              		.cfi_offset 14, -4
+ 385 02d2 84B0     		sub	sp, sp, #16
+ 386              	.LCFI5:
+ 387              		.cfi_def_cfa_offset 24
+ 388 02d4 00AF     		add	r7, sp, #0
+ 389              	.LCFI6:
+ 390              		.cfi_def_cfa_register 7
+ 391 02d6 0346     		mov	r3, r0
+ 392 02d8 FB71     		strb	r3, [r7, #7]
+ 219:src/MEMS_L3GD20.c **** 	u8_t wBuff[2];
+ 220:src/MEMS_L3GD20.c **** 	u8_t rBuff[2];
+ 221:src/MEMS_L3GD20.c **** 
+ 222:src/MEMS_L3GD20.c **** 	if(range>3)
+ 393              		.loc 1 222 0
+ 394 02da FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 395 02dc 032B     		cmp	r3, #3
+ 396 02de 02D9     		bls	.L13
+ 223:src/MEMS_L3GD20.c **** 		return HW_ERR_ILLPARAMVAL;
+ 397              		.loc 1 223 0
+ 398 02e0 4FF00103 		mov	r3, #1
+ 399 02e4 1DE0     		b	.L15
+ 400              	.L13:
+ 224:src/MEMS_L3GD20.c **** 
+ 225:src/MEMS_L3GD20.c **** 	ConfRegs.Reg_0x23.fs = range;
+ 401              		.loc 1 225 0
+ 402 02e6 FB79     		ldrb	r3, [r7, #7]
+ 403 02e8 03F00303 		and	r3, r3, #3
+ 404 02ec D9B2     		uxtb	r1, r3
+ 405 02ee 40F20003 		movw	r3, #:lower16:ConfRegs
+ 406 02f2 C0F20003 		movt	r3, #:upper16:ConfRegs
+ 407 02f6 1A79     		ldrb	r2, [r3, #4]
+ 408 02f8 61F30512 		bfi	r2, r1, #4, #2
+ 409 02fc 1A71     		strb	r2, [r3, #4]
+ 226:src/MEMS_L3GD20.c **** 
+ 227:src/MEMS_L3GD20.c **** 	wBuff[0] = L3GD20_WR | 0x23; // write register 23h
+ 410              		.loc 1 227 0
+ 411 02fe 4FF02303 		mov	r3, #35
+ 412 0302 3B73     		strb	r3, [r7, #12]
+ 228:src/MEMS_L3GD20.c **** 	wBuff[1] = *((u8_t*)&ConfRegs.Reg_0x23);
+ 413              		.loc 1 228 0
+ 414 0304 094B     		ldr	r3, .L16
+ 415 0306 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 416 0308 7B73     		strb	r3, [r7, #13]
+ 229:src/MEMS_L3GD20.c **** 
+ 230:src/MEMS_L3GD20.c **** 	rwL3GD20(wBuff, rBuff, 2);
+ 417              		.loc 1 230 0
+ 418 030a 07F10C02 		add	r2, r7, #12
+ 419 030e 07F10803 		add	r3, r7, #8
+ 420 0312 1046     		mov	r0, r2
+ 421 0314 1946     		mov	r1, r3
+ 422 0316 4FF00202 		mov	r2, #2
+ 423 031a 00F057F9 		bl	rwL3GD20
+ 231:src/MEMS_L3GD20.c **** 		
+ 232:src/MEMS_L3GD20.c **** 	return HW_ERR_OK;
+ 424              		.loc 1 232 0
+ 425 031e 4FF00003 		mov	r3, #0
+ 426              	.L15:
+ 233:src/MEMS_L3GD20.c **** }
+ 427              		.loc 1 233 0
+ 428 0322 1846     		mov	r0, r3
+ 429 0324 07F11007 		add	r7, r7, #16
+ 430 0328 BD46     		mov	sp, r7
+ 431 032a 80BD     		pop	{r7, pc}
+ 432              	.L17:
+ 433              		.align	2
+ 434              	.L16:
+ 435 032c 08000000 		.word	ConfRegs+4
+ 436              		.cfi_endproc
+ 437              	.LFE114:
+ 439              		.align	2
+ 440              		.global	MEMS_L3GD20_GetRange
+ 441              		.thumb
+ 442              		.thumb_func
+ 444              	MEMS_L3GD20_GetRange:
+ 445              	.LFB115:
+ 234:src/MEMS_L3GD20.c **** 
+ 235:src/MEMS_L3GD20.c **** 
+ 236:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 237:src/MEMS_L3GD20.c **** //! HWStatus_t MEMS_L3GD20_GetRange(u8_t *p_val)
+ 238:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 239:src/MEMS_L3GD20.c **** //! @brief	Reads the current measurement range of the sensor
+ 240:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 241:src/MEMS_L3GD20.c **** //! @param	p_val	pointer to buffer for the result
+ 242:src/MEMS_L3GD20.c **** //!					(0=250[dps]; 1=500[dps]; 2=2000[dps]; 3=2000[dps])
+ 243:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 244:src/MEMS_L3GD20.c **** //! @return one of the default HW_ERR codes
+ 245:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 246:src/MEMS_L3GD20.c **** HWStatus_t MEMS_L3GD20_GetRange(u8_t *p_val){
+ 446              		.loc 1 246 0
+ 447              		.cfi_startproc
+ 448              		@ args = 0, pretend = 0, frame = 16
+ 449              		@ frame_needed = 1, uses_anonymous_args = 0
+ 450 0330 80B5     		push	{r7, lr}
+ 451              	.LCFI7:
+ 452              		.cfi_def_cfa_offset 8
+ 453              		.cfi_offset 7, -8
+ 454              		.cfi_offset 14, -4
+ 455 0332 84B0     		sub	sp, sp, #16
+ 456              	.LCFI8:
+ 457              		.cfi_def_cfa_offset 24
+ 458 0334 00AF     		add	r7, sp, #0
+ 459              	.LCFI9:
+ 460              		.cfi_def_cfa_register 7
+ 461 0336 7860     		str	r0, [r7, #4]
+ 247:src/MEMS_L3GD20.c **** 	HWStatus_t res;
+ 248:src/MEMS_L3GD20.c **** 
+ 249:src/MEMS_L3GD20.c **** 	if(!p_val)
+ 462              		.loc 1 249 0
+ 463 0338 7B68     		ldr	r3, [r7, #4]
+ 464 033a 002B     		cmp	r3, #0
+ 465 033c 02D1     		bne	.L19
+ 250:src/MEMS_L3GD20.c **** 		return HW_ERR_ILLPARAMVAL;
+ 466              		.loc 1 250 0
+ 467 033e 4FF00103 		mov	r3, #1
+ 468 0342 17E0     		b	.L20
+ 469              	.L19:
+ 251:src/MEMS_L3GD20.c **** 
+ 252:src/MEMS_L3GD20.c **** 	res = rL3GD20Reg(0x23, (u8_t*)&ConfRegs.Reg_0x23);
+ 470              		.loc 1 252 0
+ 471 0344 4FF02300 		mov	r0, #35
+ 472 0348 0D49     		ldr	r1, .L22
+ 473 034a 00F081F9 		bl	rL3GD20Reg
+ 474 034e F860     		str	r0, [r7, #12]
+ 253:src/MEMS_L3GD20.c **** 	if(res != HW_ERR_OK)
+ 475              		.loc 1 253 0
+ 476 0350 FB68     		ldr	r3, [r7, #12]
+ 477 0352 002B     		cmp	r3, #0
+ 478 0354 01D0     		beq	.L21
+ 254:src/MEMS_L3GD20.c **** 		return res;
+ 479              		.loc 1 254 0
+ 480 0356 FB68     		ldr	r3, [r7, #12]
+ 481 0358 0CE0     		b	.L20
+ 482              	.L21:
+ 255:src/MEMS_L3GD20.c **** 
+ 256:src/MEMS_L3GD20.c **** 	*p_val = ConfRegs.Reg_0x23.fs;
+ 483              		.loc 1 256 0
+ 484 035a 40F20003 		movw	r3, #:lower16:ConfRegs
+ 485 035e C0F20003 		movt	r3, #:upper16:ConfRegs
+ 486 0362 1B79     		ldrb	r3, [r3, #4]
+ 487 0364 C3F30113 		ubfx	r3, r3, #4, #2
+ 488 0368 DBB2     		uxtb	r3, r3
+ 489 036a 1A46     		mov	r2, r3
+ 490 036c 7B68     		ldr	r3, [r7, #4]
+ 491 036e 1A70     		strb	r2, [r3, #0]
+ 257:src/MEMS_L3GD20.c **** 
+ 258:src/MEMS_L3GD20.c **** 	return HW_ERR_OK;
+ 492              		.loc 1 258 0
+ 493 0370 4FF00003 		mov	r3, #0
+ 494              	.L20:
+ 259:src/MEMS_L3GD20.c **** }
+ 495              		.loc 1 259 0
+ 496 0374 1846     		mov	r0, r3
+ 497 0376 07F11007 		add	r7, r7, #16
+ 498 037a BD46     		mov	sp, r7
+ 499 037c 80BD     		pop	{r7, pc}
+ 500              	.L23:
+ 501 037e 00BF     		.align	2
+ 502              	.L22:
+ 503 0380 08000000 		.word	ConfRegs+4
+ 504              		.cfi_endproc
+ 505              	.LFE115:
+ 507              		.align	2
+ 508              		.thumb
+ 509              		.thumb_func
+ 511              	initSSP:
+ 512              	.LFB116:
+ 260:src/MEMS_L3GD20.c **** 
+ 261:src/MEMS_L3GD20.c **** 
+ 262:src/MEMS_L3GD20.c **** 
+ 263:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 264:src/MEMS_L3GD20.c **** //! static HWStatus_t initSSP(void)
+ 265:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 266:src/MEMS_L3GD20.c **** //! @brief	initializes SSP for Gyroscope usage
+ 267:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 268:src/MEMS_L3GD20.c **** //! @return one of the default HW_ERR codes
+ 269:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 270:src/MEMS_L3GD20.c **** static HWStatus_t initSSP(void){
+ 513              		.loc 1 270 0
+ 514              		.cfi_startproc
+ 515              		@ args = 0, pretend = 0, frame = 16
+ 516              		@ frame_needed = 1, uses_anonymous_args = 0
+ 517 0384 80B5     		push	{r7, lr}
+ 518              	.LCFI10:
+ 519              		.cfi_def_cfa_offset 8
+ 520              		.cfi_offset 7, -8
+ 521              		.cfi_offset 14, -4
+ 522 0386 84B0     		sub	sp, sp, #16
+ 523              	.LCFI11:
+ 524              		.cfi_def_cfa_offset 24
+ 525 0388 00AF     		add	r7, sp, #0
+ 526              	.LCFI12:
+ 527              		.cfi_def_cfa_register 7
+ 271:src/MEMS_L3GD20.c **** 	SSPInit_t init;
+ 272:src/MEMS_L3GD20.c **** 	SSPStatus_t res=0;
+ 528              		.loc 1 272 0
+ 529 038a 4FF00003 		mov	r3, #0
+ 530 038e FB60     		str	r3, [r7, #12]
+ 273:src/MEMS_L3GD20.c **** 
+ 274:src/MEMS_L3GD20.c **** 	init.bitlen = t8_bit;
+ 531              		.loc 1 274 0
+ 532 0390 4FF00703 		mov	r3, #7
+ 533 0394 3B70     		strb	r3, [r7, #0]
+ 275:src/MEMS_L3GD20.c **** 	init.clk_phase = 1;
+ 534              		.loc 1 275 0
+ 535 0396 4FF00103 		mov	r3, #1
+ 536 039a 7B70     		strb	r3, [r7, #1]
+ 276:src/MEMS_L3GD20.c **** 	init.clk_pol = 1;
+ 537              		.loc 1 276 0
+ 538 039c 4FF00103 		mov	r3, #1
+ 539 03a0 BB70     		strb	r3, [r7, #2]
+ 277:src/MEMS_L3GD20.c **** 	init.mode = 0;
+ 540              		.loc 1 277 0
+ 541 03a2 4FF00003 		mov	r3, #0
+ 542 03a6 FB71     		strb	r3, [r7, #7]
+ 278:src/MEMS_L3GD20.c **** 	init.frm_format = 0;
+ 543              		.loc 1 278 0
+ 544 03a8 4FF00003 		mov	r3, #0
+ 545 03ac FB70     		strb	r3, [r7, #3]
+ 279:src/MEMS_L3GD20.c **** 	init.loop_back=0;
+ 546              		.loc 1 279 0
+ 547 03ae 4FF00003 		mov	r3, #0
+ 548 03b2 7B71     		strb	r3, [r7, #5]
+ 280:src/MEMS_L3GD20.c **** 
+ 281:src/MEMS_L3GD20.c **** 	init.ser_clk_rate = 0; 		//! 1 clocks per bit
+ 549              		.loc 1 281 0
+ 550 03b4 4FF00003 		mov	r3, #0
+ 551 03b8 3B71     		strb	r3, [r7, #4]
+ 282:src/MEMS_L3GD20.c **** 	init.clk_prescaler = 12;
+ 552              		.loc 1 282 0
+ 553 03ba 4FF00C03 		mov	r3, #12
+ 554 03be 3B72     		strb	r3, [r7, #8]
+ 283:src/MEMS_L3GD20.c **** 
+ 284:src/MEMS_L3GD20.c **** 	init.enable=1;
+ 555              		.loc 1 284 0
+ 556 03c0 4FF00103 		mov	r3, #1
+ 557 03c4 BB71     		strb	r3, [r7, #6]
+ 285:src/MEMS_L3GD20.c **** 
+ 286:src/MEMS_L3GD20.c **** 	res = SSP_Init(SSP_1, &init);
+ 558              		.loc 1 286 0
+ 559 03c6 3B46     		mov	r3, r7
+ 560 03c8 4FF00000 		mov	r0, #0
+ 561 03cc 1946     		mov	r1, r3
+ 562 03ce FFF7FEFF 		bl	SSP_Init
+ 563 03d2 F860     		str	r0, [r7, #12]
+ 287:src/MEMS_L3GD20.c **** 
+ 288:src/MEMS_L3GD20.c **** 	if(res != SSP_ERR_OK)
+ 564              		.loc 1 288 0
+ 565 03d4 FB68     		ldr	r3, [r7, #12]
+ 566 03d6 002B     		cmp	r3, #0
+ 567 03d8 02D0     		beq	.L25
+ 289:src/MEMS_L3GD20.c **** 		return HW_ERR_RESOURCE;
+ 568              		.loc 1 289 0
+ 569 03da 4FF00203 		mov	r3, #2
+ 570 03de 08E0     		b	.L27
+ 571              	.L25:
+ 290:src/MEMS_L3GD20.c **** 
+ 291:src/MEMS_L3GD20.c **** 	ssp_init=1;
+ 572              		.loc 1 291 0
+ 573 03e0 40F20003 		movw	r3, #:lower16:ssp_init
+ 574 03e4 C0F20003 		movt	r3, #:upper16:ssp_init
+ 575 03e8 4FF00102 		mov	r2, #1
+ 576 03ec 1A70     		strb	r2, [r3, #0]
+ 292:src/MEMS_L3GD20.c **** 
+ 293:src/MEMS_L3GD20.c **** 	return HW_ERR_OK;
+ 577              		.loc 1 293 0
+ 578 03ee 4FF00003 		mov	r3, #0
+ 579              	.L27:
+ 294:src/MEMS_L3GD20.c **** }
+ 580              		.loc 1 294 0
+ 581 03f2 1846     		mov	r0, r3
+ 582 03f4 07F11007 		add	r7, r7, #16
+ 583 03f8 BD46     		mov	sp, r7
+ 584 03fa 80BD     		pop	{r7, pc}
+ 585              		.cfi_endproc
+ 586              	.LFE116:
+ 588              		.align	2
+ 589              		.thumb
+ 590              		.thumb_func
+ 592              	initData:
+ 593              	.LFB117:
+ 295:src/MEMS_L3GD20.c **** 
+ 296:src/MEMS_L3GD20.c **** 
+ 297:src/MEMS_L3GD20.c **** 
+ 298:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 299:src/MEMS_L3GD20.c **** //! static HWStatus_t initSSP(void)
+ 300:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 301:src/MEMS_L3GD20.c **** //! @brief	initializes internal data structures
+ 302:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 303:src/MEMS_L3GD20.c **** static void initData(void){
+ 594              		.loc 1 303 0
+ 595              		.cfi_startproc
+ 596              		@ args = 0, pretend = 0, frame = 0
+ 597              		@ frame_needed = 1, uses_anonymous_args = 0
+ 598              		@ link register save eliminated.
+ 599 03fc 80B4     		push	{r7}
+ 600              	.LCFI13:
+ 601              		.cfi_def_cfa_offset 4
+ 602              		.cfi_offset 7, -4
+ 603 03fe 00AF     		add	r7, sp, #0
+ 604              	.LCFI14:
+ 605              		.cfi_def_cfa_register 7
+ 304:src/MEMS_L3GD20.c **** 
+ 305:src/MEMS_L3GD20.c **** 	// this buffer will clock out 12 bytes for reading the Gyro
+ 306:src/MEMS_L3GD20.c **** 	wBuff_GyroData[0] = (L3GD20_RD| L3GD20_ADDR_INC | 0x25); // command: read from register 25h onward
+ 606              		.loc 1 306 0
+ 607 0400 40F20003 		movw	r3, #:lower16:wBuff_GyroData
+ 608 0404 C0F20003 		movt	r3, #:upper16:wBuff_GyroData
+ 609 0408 4FF0E502 		mov	r2, #229
+ 610 040c 1A70     		strb	r2, [r3, #0]
+ 307:src/MEMS_L3GD20.c **** 	wBuff_GyroData[1] = 0x00; // + 8 clocks for  REFERENCE
+ 611              		.loc 1 307 0
+ 612 040e 40F20003 		movw	r3, #:lower16:wBuff_GyroData
+ 613 0412 C0F20003 		movt	r3, #:upper16:wBuff_GyroData
+ 614 0416 4FF00002 		mov	r2, #0
+ 615 041a 5A70     		strb	r2, [r3, #1]
+ 308:src/MEMS_L3GD20.c **** 	wBuff_GyroData[2] = 0x00; // + 8 clocks for  OUT_TEMP
+ 616              		.loc 1 308 0
+ 617 041c 40F20003 		movw	r3, #:lower16:wBuff_GyroData
+ 618 0420 C0F20003 		movt	r3, #:upper16:wBuff_GyroData
+ 619 0424 4FF00002 		mov	r2, #0
+ 620 0428 9A70     		strb	r2, [r3, #2]
+ 309:src/MEMS_L3GD20.c **** 	wBuff_GyroData[3] = 0x00; // + 8 clocks for  STATUS_REG
+ 621              		.loc 1 309 0
+ 622 042a 40F20003 		movw	r3, #:lower16:wBuff_GyroData
+ 623 042e C0F20003 		movt	r3, #:upper16:wBuff_GyroData
+ 624 0432 4FF00002 		mov	r2, #0
+ 625 0436 DA70     		strb	r2, [r3, #3]
+ 310:src/MEMS_L3GD20.c **** 	wBuff_GyroData[4] = 0x00; // + 8 clocks for  gyro out X LSB
+ 626              		.loc 1 310 0
+ 627 0438 40F20003 		movw	r3, #:lower16:wBuff_GyroData
+ 628 043c C0F20003 		movt	r3, #:upper16:wBuff_GyroData
+ 629 0440 4FF00002 		mov	r2, #0
+ 630 0444 1A71     		strb	r2, [r3, #4]
+ 311:src/MEMS_L3GD20.c **** 	wBuff_GyroData[5] = 0x00; // + 8 clocks for  gyro out X MSB
+ 631              		.loc 1 311 0
+ 632 0446 40F20003 		movw	r3, #:lower16:wBuff_GyroData
+ 633 044a C0F20003 		movt	r3, #:upper16:wBuff_GyroData
+ 634 044e 4FF00002 		mov	r2, #0
+ 635 0452 5A71     		strb	r2, [r3, #5]
+ 312:src/MEMS_L3GD20.c **** 	wBuff_GyroData[6] = 0x00; // + 8 clocks for  gyro out Y LSB
+ 636              		.loc 1 312 0
+ 637 0454 40F20003 		movw	r3, #:lower16:wBuff_GyroData
+ 638 0458 C0F20003 		movt	r3, #:upper16:wBuff_GyroData
+ 639 045c 4FF00002 		mov	r2, #0
+ 640 0460 9A71     		strb	r2, [r3, #6]
+ 313:src/MEMS_L3GD20.c **** 	wBuff_GyroData[7] = 0x00; // + 8 clocks for  gyro out Y MSB
+ 641              		.loc 1 313 0
+ 642 0462 40F20003 		movw	r3, #:lower16:wBuff_GyroData
+ 643 0466 C0F20003 		movt	r3, #:upper16:wBuff_GyroData
+ 644 046a 4FF00002 		mov	r2, #0
+ 645 046e DA71     		strb	r2, [r3, #7]
+ 314:src/MEMS_L3GD20.c **** 	wBuff_GyroData[8] = 0x00; // + 8 clocks for  gyro out Z LSB
+ 646              		.loc 1 314 0
+ 647 0470 40F20003 		movw	r3, #:lower16:wBuff_GyroData
+ 648 0474 C0F20003 		movt	r3, #:upper16:wBuff_GyroData
+ 649 0478 4FF00002 		mov	r2, #0
+ 650 047c 1A72     		strb	r2, [r3, #8]
+ 315:src/MEMS_L3GD20.c **** 	wBuff_GyroData[9] = 0x00; // + 8 clocks for  gyro out Z MSB
+ 651              		.loc 1 315 0
+ 652 047e 40F20003 		movw	r3, #:lower16:wBuff_GyroData
+ 653 0482 C0F20003 		movt	r3, #:upper16:wBuff_GyroData
+ 654 0486 4FF00002 		mov	r2, #0
+ 655 048a 5A72     		strb	r2, [r3, #9]
+ 316:src/MEMS_L3GD20.c **** 
+ 317:src/MEMS_L3GD20.c **** 	// no valid readings so far
+ 318:src/MEMS_L3GD20.c **** 	L3GD20_Readings.data_valid = FALSE;
+ 656              		.loc 1 318 0
+ 657 048c 40F20003 		movw	r3, #:lower16:L3GD20_Readings
+ 658 0490 C0F20003 		movt	r3, #:upper16:L3GD20_Readings
+ 659 0494 4FF00002 		mov	r2, #0
+ 660 0498 1A74     		strb	r2, [r3, #16]
+ 319:src/MEMS_L3GD20.c **** 
+ 320:src/MEMS_L3GD20.c **** 	// init local state machine
+ 321:src/MEMS_L3GD20.c **** 	L3GD20State = readGyroDevID;
+ 661              		.loc 1 321 0
+ 662 049a 40F20003 		movw	r3, #:lower16:L3GD20State
+ 663 049e C0F20003 		movt	r3, #:upper16:L3GD20State
+ 664 04a2 4FF00002 		mov	r2, #0
+ 665 04a6 1A70     		strb	r2, [r3, #0]
+ 322:src/MEMS_L3GD20.c **** }
+ 666              		.loc 1 322 0
+ 667 04a8 BD46     		mov	sp, r7
+ 668 04aa 80BC     		pop	{r7}
+ 669 04ac 7047     		bx	lr
+ 670              		.cfi_endproc
+ 671              	.LFE117:
+ 673              		.global	__aeabi_i2f
+ 674              		.global	__aeabi_fmul
+ 675 04ae 00BF     		.align	2
+ 676              		.thumb
+ 677              		.thumb_func
+ 679              	prcRawValues:
+ 680              	.LFB118:
+ 323:src/MEMS_L3GD20.c **** 
+ 324:src/MEMS_L3GD20.c **** 
+ 325:src/MEMS_L3GD20.c **** 
+ 326:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 327:src/MEMS_L3GD20.c **** //! static void prcRawValues(MEMS_L3GD20_Data_Register_Type *pData,
+ 328:src/MEMS_L3GD20.c **** // MEMS_L3GD20_Config_Register_Type *pConf, MEMS_L3GD20_Result_Type *pRes)
+ 329:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 330:src/MEMS_L3GD20.c **** //! @brief	processes raw data read from gyroscopes registers and writes results
+ 331:src/MEMS_L3GD20.c **** //!			to L3GD20_Readings structure
+ 332:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 333:src/MEMS_L3GD20.c **** static void prcRawValues(MEMS_L3GD20_Data_Register_Type *pData,
+ 334:src/MEMS_L3GD20.c **** 		MEMS_L3GD20_Config_Register_Type *pConf, MEMS_L3GD20_Result_Type *pRes){
+ 681              		.loc 1 334 0
+ 682              		.cfi_startproc
+ 683              		@ args = 0, pretend = 0, frame = 24
+ 684              		@ frame_needed = 1, uses_anonymous_args = 0
+ 685 04b0 90B5     		push	{r4, r7, lr}
+ 686              	.LCFI15:
+ 687              		.cfi_def_cfa_offset 12
+ 688              		.cfi_offset 4, -12
+ 689              		.cfi_offset 7, -8
+ 690              		.cfi_offset 14, -4
+ 691 04b2 87B0     		sub	sp, sp, #28
+ 692              	.LCFI16:
+ 693              		.cfi_def_cfa_offset 40
+ 694 04b4 00AF     		add	r7, sp, #0
+ 695              	.LCFI17:
+ 696              		.cfi_def_cfa_register 7
+ 697 04b6 F860     		str	r0, [r7, #12]
+ 698 04b8 B960     		str	r1, [r7, #8]
+ 699 04ba 7A60     		str	r2, [r7, #4]
+ 335:src/MEMS_L3GD20.c **** 	s16_t tmp;
+ 336:src/MEMS_L3GD20.c **** 
+ 337:src/MEMS_L3GD20.c **** 	L3GD20_Readings.Temperature = pData->temp;
+ 700              		.loc 1 337 0
+ 701 04bc FB68     		ldr	r3, [r7, #12]
+ 702 04be 9A78     		ldrb	r2, [r3, #2]	@ zero_extendqisi2
+ 703 04c0 40F20003 		movw	r3, #:lower16:L3GD20_Readings
+ 704 04c4 C0F20003 		movt	r3, #:upper16:L3GD20_Readings
+ 705 04c8 5A70     		strb	r2, [r3, #1]
+ 338:src/MEMS_L3GD20.c **** 
+ 339:src/MEMS_L3GD20.c **** 	tmp = (s16_t) (pData->x_l | (u16_t) pData->x_h << 8);
+ 706              		.loc 1 339 0
+ 707 04ca FB68     		ldr	r3, [r7, #12]
+ 708 04cc 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+ 709 04ce 1A46     		mov	r2, r3
+ 710 04d0 FB68     		ldr	r3, [r7, #12]
+ 711 04d2 5B79     		ldrb	r3, [r3, #5]	@ zero_extendqisi2
+ 712 04d4 4FEA0323 		lsl	r3, r3, #8
+ 713 04d8 9BB2     		uxth	r3, r3
+ 714 04da 1343     		orrs	r3, r3, r2
+ 715 04dc FB82     		strh	r3, [r7, #22]	@ movhi
+ 340:src/MEMS_L3GD20.c **** 	L3GD20_Readings.Gyro_X = sens[pConf->Reg_0x23.fs] * tmp;
+ 716              		.loc 1 340 0
+ 717 04de BB68     		ldr	r3, [r7, #8]
+ 718 04e0 1B79     		ldrb	r3, [r3, #4]
+ 719 04e2 C3F30113 		ubfx	r3, r3, #4, #2
+ 720 04e6 DBB2     		uxtb	r3, r3
+ 721 04e8 1A46     		mov	r2, r3
+ 722 04ea 40F20003 		movw	r3, #:lower16:sens
+ 723 04ee C0F20003 		movt	r3, #:upper16:sens
+ 724 04f2 53F82240 		ldr	r4, [r3, r2, lsl #2]	@ float
+ 725 04f6 B7F91630 		ldrsh	r3, [r7, #22]
+ 726 04fa 1846     		mov	r0, r3
+ 727 04fc FFF7FEFF 		bl	__aeabi_i2f
+ 728 0500 0346     		mov	r3, r0
+ 729 0502 2046     		mov	r0, r4
+ 730 0504 1946     		mov	r1, r3
+ 731 0506 FFF7FEFF 		bl	__aeabi_fmul
+ 732 050a 0346     		mov	r3, r0
+ 733 050c 1A46     		mov	r2, r3
+ 734 050e 40F20003 		movw	r3, #:lower16:L3GD20_Readings
+ 735 0512 C0F20003 		movt	r3, #:upper16:L3GD20_Readings
+ 736 0516 5A60     		str	r2, [r3, #4]	@ float
+ 341:src/MEMS_L3GD20.c **** 
+ 342:src/MEMS_L3GD20.c **** 	tmp = (s16_t) (pData->y_l | (u16_t) pData->y_h << 8);
+ 737              		.loc 1 342 0
+ 738 0518 FB68     		ldr	r3, [r7, #12]
+ 739 051a 9B79     		ldrb	r3, [r3, #6]	@ zero_extendqisi2
+ 740 051c 1A46     		mov	r2, r3
+ 741 051e FB68     		ldr	r3, [r7, #12]
+ 742 0520 DB79     		ldrb	r3, [r3, #7]	@ zero_extendqisi2
+ 743 0522 4FEA0323 		lsl	r3, r3, #8
+ 744 0526 9BB2     		uxth	r3, r3
+ 745 0528 1343     		orrs	r3, r3, r2
+ 746 052a FB82     		strh	r3, [r7, #22]	@ movhi
+ 343:src/MEMS_L3GD20.c **** 	L3GD20_Readings.Gyro_Y = sens[pConf->Reg_0x23.fs] * tmp;
+ 747              		.loc 1 343 0
+ 748 052c BB68     		ldr	r3, [r7, #8]
+ 749 052e 1B79     		ldrb	r3, [r3, #4]
+ 750 0530 C3F30113 		ubfx	r3, r3, #4, #2
+ 751 0534 DBB2     		uxtb	r3, r3
+ 752 0536 1A46     		mov	r2, r3
+ 753 0538 40F20003 		movw	r3, #:lower16:sens
+ 754 053c C0F20003 		movt	r3, #:upper16:sens
+ 755 0540 53F82240 		ldr	r4, [r3, r2, lsl #2]	@ float
+ 756 0544 B7F91630 		ldrsh	r3, [r7, #22]
+ 757 0548 1846     		mov	r0, r3
+ 758 054a FFF7FEFF 		bl	__aeabi_i2f
+ 759 054e 0346     		mov	r3, r0
+ 760 0550 2046     		mov	r0, r4
+ 761 0552 1946     		mov	r1, r3
+ 762 0554 FFF7FEFF 		bl	__aeabi_fmul
+ 763 0558 0346     		mov	r3, r0
+ 764 055a 1A46     		mov	r2, r3
+ 765 055c 40F20003 		movw	r3, #:lower16:L3GD20_Readings
+ 766 0560 C0F20003 		movt	r3, #:upper16:L3GD20_Readings
+ 767 0564 9A60     		str	r2, [r3, #8]	@ float
+ 344:src/MEMS_L3GD20.c **** 
+ 345:src/MEMS_L3GD20.c **** 	tmp = (s16_t) (pData->z_l | (u16_t) pData->z_h << 8);
+ 768              		.loc 1 345 0
+ 769 0566 FB68     		ldr	r3, [r7, #12]
+ 770 0568 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 771 056a 1A46     		mov	r2, r3
+ 772 056c FB68     		ldr	r3, [r7, #12]
+ 773 056e 5B7A     		ldrb	r3, [r3, #9]	@ zero_extendqisi2
+ 774 0570 4FEA0323 		lsl	r3, r3, #8
+ 775 0574 9BB2     		uxth	r3, r3
+ 776 0576 1343     		orrs	r3, r3, r2
+ 777 0578 FB82     		strh	r3, [r7, #22]	@ movhi
+ 346:src/MEMS_L3GD20.c **** 	L3GD20_Readings.Gyro_Z = sens[pConf->Reg_0x23.fs] * tmp;
+ 778              		.loc 1 346 0
+ 779 057a BB68     		ldr	r3, [r7, #8]
+ 780 057c 1B79     		ldrb	r3, [r3, #4]
+ 781 057e C3F30113 		ubfx	r3, r3, #4, #2
+ 782 0582 DBB2     		uxtb	r3, r3
+ 783 0584 1A46     		mov	r2, r3
+ 784 0586 40F20003 		movw	r3, #:lower16:sens
+ 785 058a C0F20003 		movt	r3, #:upper16:sens
+ 786 058e 53F82240 		ldr	r4, [r3, r2, lsl #2]	@ float
+ 787 0592 B7F91630 		ldrsh	r3, [r7, #22]
+ 788 0596 1846     		mov	r0, r3
+ 789 0598 FFF7FEFF 		bl	__aeabi_i2f
+ 790 059c 0346     		mov	r3, r0
+ 791 059e 2046     		mov	r0, r4
+ 792 05a0 1946     		mov	r1, r3
+ 793 05a2 FFF7FEFF 		bl	__aeabi_fmul
+ 794 05a6 0346     		mov	r3, r0
+ 795 05a8 1A46     		mov	r2, r3
+ 796 05aa 40F20003 		movw	r3, #:lower16:L3GD20_Readings
+ 797 05ae C0F20003 		movt	r3, #:upper16:L3GD20_Readings
+ 798 05b2 DA60     		str	r2, [r3, #12]	@ float
+ 347:src/MEMS_L3GD20.c **** 
+ 348:src/MEMS_L3GD20.c **** 	L3GD20_Readings.data_valid = TRUE;
+ 799              		.loc 1 348 0
+ 800 05b4 40F20003 		movw	r3, #:lower16:L3GD20_Readings
+ 801 05b8 C0F20003 		movt	r3, #:upper16:L3GD20_Readings
+ 802 05bc 4FF00102 		mov	r2, #1
+ 803 05c0 1A74     		strb	r2, [r3, #16]
+ 349:src/MEMS_L3GD20.c **** 			
+ 350:src/MEMS_L3GD20.c **** 	return;
+ 804              		.loc 1 350 0
+ 805 05c2 00BF     		nop
+ 351:src/MEMS_L3GD20.c **** }
+ 806              		.loc 1 351 0
+ 807 05c4 07F11C07 		add	r7, r7, #28
+ 808 05c8 BD46     		mov	sp, r7
+ 809 05ca 90BD     		pop	{r4, r7, pc}
+ 810              		.cfi_endproc
+ 811              	.LFE118:
+ 813              		.align	2
+ 814              		.thumb
+ 815              		.thumb_func
+ 817              	rwL3GD20:
+ 818              	.LFB119:
+ 352:src/MEMS_L3GD20.c **** 
+ 353:src/MEMS_L3GD20.c **** 
+ 354:src/MEMS_L3GD20.c **** 
+ 355:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 356:src/MEMS_L3GD20.c **** //! static HWStatus_t rwL3GD20(u8_t *p_wBuff, u8_t *p_rBuff, u8_t len)
+ 357:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 358:src/MEMS_L3GD20.c **** //! @brief	reads / writes values from / to gyroscope registers.
+ 359:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 360:src/MEMS_L3GD20.c **** //! @param	p_wBuff		pointer to write buffer. first byte used as address,
+ 361:src/MEMS_L3GD20.c **** //!						read/write bit and address increment bit
+ 362:src/MEMS_L3GD20.c **** //! @param	p_rBuff		pointer to read buffer
+ 363:src/MEMS_L3GD20.c **** //! @param	len			length of buffers
+ 364:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 365:src/MEMS_L3GD20.c **** //! @return one of the default HW_ERR codes
+ 366:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 367:src/MEMS_L3GD20.c **** static HWStatus_t rwL3GD20(u8_t *p_wBuff, u8_t *p_rBuff, u8_t len){
+ 819              		.loc 1 367 0
+ 820              		.cfi_startproc
+ 821              		@ args = 0, pretend = 0, frame = 16
+ 822              		@ frame_needed = 1, uses_anonymous_args = 0
+ 823 05cc 80B5     		push	{r7, lr}
+ 824              	.LCFI18:
+ 825              		.cfi_def_cfa_offset 8
+ 826              		.cfi_offset 7, -8
+ 827              		.cfi_offset 14, -4
+ 828 05ce 84B0     		sub	sp, sp, #16
+ 829              	.LCFI19:
+ 830              		.cfi_def_cfa_offset 24
+ 831 05d0 00AF     		add	r7, sp, #0
+ 832              	.LCFI20:
+ 833              		.cfi_def_cfa_register 7
+ 834 05d2 F860     		str	r0, [r7, #12]
+ 835 05d4 B960     		str	r1, [r7, #8]
+ 836 05d6 1346     		mov	r3, r2
+ 837 05d8 FB71     		strb	r3, [r7, #7]
+ 368:src/MEMS_L3GD20.c **** 
+ 369:src/MEMS_L3GD20.c **** 	if(!p_wBuff)
+ 838              		.loc 1 369 0
+ 839 05da FB68     		ldr	r3, [r7, #12]
+ 840 05dc 002B     		cmp	r3, #0
+ 841 05de 02D1     		bne	.L32
+ 370:src/MEMS_L3GD20.c **** 		return HW_ERR_ILLPARAMVAL;
+ 842              		.loc 1 370 0
+ 843 05e0 4FF00103 		mov	r3, #1
+ 844 05e4 12E0     		b	.L33
+ 845              	.L32:
+ 371:src/MEMS_L3GD20.c **** 	if(!len)
+ 846              		.loc 1 371 0
+ 847 05e6 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 848 05e8 002B     		cmp	r3, #0
+ 849 05ea 02D1     		bne	.L34
+ 372:src/MEMS_L3GD20.c **** 		return HW_ERR_ILLPARAMVAL;
+ 850              		.loc 1 372 0
+ 851 05ec 4FF00103 		mov	r3, #1
+ 852 05f0 0CE0     		b	.L33
+ 853              	.L34:
+ 373:src/MEMS_L3GD20.c **** 
+ 374:src/MEMS_L3GD20.c **** 	HW_L3GD20_CsOn();
+ 854              		.loc 1 374 0
+ 855 05f2 FFF7FEFF 		bl	HW_L3GD20_CsOn
+ 375:src/MEMS_L3GD20.c **** 	SSP_ReadWrite(SSP_1, p_rBuff, p_wBuff, len);
+ 856              		.loc 1 375 0
+ 857 05f6 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 858 05f8 4FF00000 		mov	r0, #0
+ 859 05fc B968     		ldr	r1, [r7, #8]
+ 860 05fe FA68     		ldr	r2, [r7, #12]
+ 861 0600 FFF7FEFF 		bl	SSP_ReadWrite
+ 376:src/MEMS_L3GD20.c **** 	HW_L3GD20_CsOff();
+ 862              		.loc 1 376 0
+ 863 0604 FFF7FEFF 		bl	HW_L3GD20_CsOff
+ 377:src/MEMS_L3GD20.c **** 
+ 378:src/MEMS_L3GD20.c **** 	return HW_ERR_OK;
+ 864              		.loc 1 378 0
+ 865 0608 4FF00003 		mov	r3, #0
+ 866              	.L33:
+ 379:src/MEMS_L3GD20.c **** }
+ 867              		.loc 1 379 0
+ 868 060c 1846     		mov	r0, r3
+ 869 060e 07F11007 		add	r7, r7, #16
+ 870 0612 BD46     		mov	sp, r7
+ 871 0614 80BD     		pop	{r7, pc}
+ 872              		.cfi_endproc
+ 873              	.LFE119:
+ 875 0616 00BF     		.align	2
+ 876              		.thumb
+ 877              		.thumb_func
+ 879              	wL3GD20Reg:
+ 880              	.LFB120:
+ 380:src/MEMS_L3GD20.c **** 
+ 381:src/MEMS_L3GD20.c **** 
+ 382:src/MEMS_L3GD20.c **** 
+ 383:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 384:src/MEMS_L3GD20.c **** //! static HWStatus_t wL3GD20Reg(u8_t reg, u8_t val)
+ 385:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 386:src/MEMS_L3GD20.c **** //! @brief	write single L3GD20 register
+ 387:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 388:src/MEMS_L3GD20.c **** //! @param	reg		address of register to write
+ 389:src/MEMS_L3GD20.c **** //! @param	val		value that should be written into register
+ 390:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 391:src/MEMS_L3GD20.c **** //! @return one of the default HW_ERR codes
+ 392:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 393:src/MEMS_L3GD20.c **** static HWStatus_t wL3GD20Reg(u8_t reg, u8_t val){
+ 881              		.loc 1 393 0
+ 882              		.cfi_startproc
+ 883              		@ args = 0, pretend = 0, frame = 16
+ 884              		@ frame_needed = 1, uses_anonymous_args = 0
+ 885 0618 80B5     		push	{r7, lr}
+ 886              	.LCFI21:
+ 887              		.cfi_def_cfa_offset 8
+ 888              		.cfi_offset 7, -8
+ 889              		.cfi_offset 14, -4
+ 890 061a 84B0     		sub	sp, sp, #16
+ 891              	.LCFI22:
+ 892              		.cfi_def_cfa_offset 24
+ 893 061c 00AF     		add	r7, sp, #0
+ 894              	.LCFI23:
+ 895              		.cfi_def_cfa_register 7
+ 896 061e 0246     		mov	r2, r0
+ 897 0620 0B46     		mov	r3, r1
+ 898 0622 FA71     		strb	r2, [r7, #7]
+ 899 0624 BB71     		strb	r3, [r7, #6]
+ 394:src/MEMS_L3GD20.c **** 	u8_t wbuff[2];
+ 395:src/MEMS_L3GD20.c **** 	u8_t rbuff[2];
+ 396:src/MEMS_L3GD20.c **** 
+ 397:src/MEMS_L3GD20.c **** 	wbuff[0]=reg;
+ 900              		.loc 1 397 0
+ 901 0626 FB79     		ldrb	r3, [r7, #7]
+ 902 0628 3B73     		strb	r3, [r7, #12]
+ 398:src/MEMS_L3GD20.c **** 	wbuff[1]=val;
+ 903              		.loc 1 398 0
+ 904 062a BB79     		ldrb	r3, [r7, #6]
+ 905 062c 7B73     		strb	r3, [r7, #13]
+ 399:src/MEMS_L3GD20.c **** 	return rwL3GD20(wbuff, rbuff, 2);
+ 906              		.loc 1 399 0
+ 907 062e 07F10C02 		add	r2, r7, #12
+ 908 0632 07F10803 		add	r3, r7, #8
+ 909 0636 1046     		mov	r0, r2
+ 910 0638 1946     		mov	r1, r3
+ 911 063a 4FF00202 		mov	r2, #2
+ 912 063e FFF7C5FF 		bl	rwL3GD20
+ 913 0642 0346     		mov	r3, r0
+ 400:src/MEMS_L3GD20.c **** }
+ 914              		.loc 1 400 0
+ 915 0644 1846     		mov	r0, r3
+ 916 0646 07F11007 		add	r7, r7, #16
+ 917 064a BD46     		mov	sp, r7
+ 918 064c 80BD     		pop	{r7, pc}
+ 919              		.cfi_endproc
+ 920              	.LFE120:
+ 922 064e 00BF     		.align	2
+ 923              		.thumb
+ 924              		.thumb_func
+ 926              	rL3GD20Reg:
+ 927              	.LFB121:
+ 401:src/MEMS_L3GD20.c **** 
+ 402:src/MEMS_L3GD20.c **** 
+ 403:src/MEMS_L3GD20.c **** 
+ 404:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 405:src/MEMS_L3GD20.c **** //! static HWStatus_t rL3GD20Reg(u8_t reg, u8_t *p_val)
+ 406:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 407:src/MEMS_L3GD20.c **** //! @brief	reads single L3GD20 register
+ 408:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 409:src/MEMS_L3GD20.c **** //! @param	reg		address of register to read
+ 410:src/MEMS_L3GD20.c **** //! @param	p_val	pointer to buffer for register value
+ 411:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 412:src/MEMS_L3GD20.c **** //! @return one of the default HW_ERR codes
+ 413:src/MEMS_L3GD20.c **** //------------------------------------------------------------------------------
+ 414:src/MEMS_L3GD20.c **** static HWStatus_t rL3GD20Reg(u8_t reg, u8_t *p_val){
+ 928              		.loc 1 414 0
+ 929              		.cfi_startproc
+ 930              		@ args = 0, pretend = 0, frame = 24
+ 931              		@ frame_needed = 1, uses_anonymous_args = 0
+ 932 0650 80B5     		push	{r7, lr}
+ 933              	.LCFI24:
+ 934              		.cfi_def_cfa_offset 8
+ 935              		.cfi_offset 7, -8
+ 936              		.cfi_offset 14, -4
+ 937 0652 86B0     		sub	sp, sp, #24
+ 938              	.LCFI25:
+ 939              		.cfi_def_cfa_offset 32
+ 940 0654 00AF     		add	r7, sp, #0
+ 941              	.LCFI26:
+ 942              		.cfi_def_cfa_register 7
+ 943 0656 0346     		mov	r3, r0
+ 944 0658 3960     		str	r1, [r7, #0]
+ 945 065a FB71     		strb	r3, [r7, #7]
+ 415:src/MEMS_L3GD20.c **** 	u8_t wbuff[2];
+ 416:src/MEMS_L3GD20.c **** 	u8_t rbuff[2];
+ 417:src/MEMS_L3GD20.c **** 	HWStatus_t res;
+ 418:src/MEMS_L3GD20.c **** 
+ 419:src/MEMS_L3GD20.c **** 	if(!p_val)
+ 946              		.loc 1 419 0
+ 947 065c 3B68     		ldr	r3, [r7, #0]
+ 948 065e 002B     		cmp	r3, #0
+ 949 0660 02D1     		bne	.L38
+ 420:src/MEMS_L3GD20.c **** 		return HW_ERR_ILLPARAMVAL;
+ 950              		.loc 1 420 0
+ 951 0662 4FF00103 		mov	r3, #1
+ 952 0666 19E0     		b	.L41
+ 953              	.L38:
+ 421:src/MEMS_L3GD20.c **** 
+ 422:src/MEMS_L3GD20.c **** 	wbuff[0]=reg | L3GD20_RD;
+ 954              		.loc 1 422 0
+ 955 0668 FB79     		ldrb	r3, [r7, #7]
+ 956 066a 63F07F03 		orn	r3, r3, #127
+ 957 066e DBB2     		uxtb	r3, r3
+ 958 0670 3B74     		strb	r3, [r7, #16]
+ 423:src/MEMS_L3GD20.c **** 	wbuff[1]=0x00;
+ 959              		.loc 1 423 0
+ 960 0672 4FF00003 		mov	r3, #0
+ 961 0676 7B74     		strb	r3, [r7, #17]
+ 424:src/MEMS_L3GD20.c **** 
+ 425:src/MEMS_L3GD20.c **** 	res = rwL3GD20(wbuff, rbuff, 2);
+ 962              		.loc 1 425 0
+ 963 0678 07F11002 		add	r2, r7, #16
+ 964 067c 07F10C03 		add	r3, r7, #12
+ 965 0680 1046     		mov	r0, r2
+ 966 0682 1946     		mov	r1, r3
+ 967 0684 4FF00202 		mov	r2, #2
+ 968 0688 FFF7A0FF 		bl	rwL3GD20
+ 969 068c 7861     		str	r0, [r7, #20]
+ 426:src/MEMS_L3GD20.c **** 	if(res==HW_ERR_OK)
+ 970              		.loc 1 426 0
+ 971 068e 7B69     		ldr	r3, [r7, #20]
+ 972 0690 002B     		cmp	r3, #0
+ 973 0692 02D1     		bne	.L40
+ 427:src/MEMS_L3GD20.c **** 		*p_val=rbuff[1];
+ 974              		.loc 1 427 0
+ 975 0694 7A7B     		ldrb	r2, [r7, #13]	@ zero_extendqisi2
+ 976 0696 3B68     		ldr	r3, [r7, #0]
+ 977 0698 1A70     		strb	r2, [r3, #0]
+ 978              	.L40:
+ 428:src/MEMS_L3GD20.c **** 
+ 429:src/MEMS_L3GD20.c **** 	return res;
+ 979              		.loc 1 429 0
+ 980 069a 7B69     		ldr	r3, [r7, #20]
+ 981              	.L41:
+ 430:src/MEMS_L3GD20.c **** }
+ 982              		.loc 1 430 0
+ 983 069c 1846     		mov	r0, r3
+ 984 069e 07F11807 		add	r7, r7, #24
+ 985 06a2 BD46     		mov	sp, r7
+ 986 06a4 80BD     		pop	{r7, pc}
+ 987              		.cfi_endproc
+ 988              	.LFE121:
+ 990              	.Letext0:
+ 991              		.file 2 "c:/tools/pcan-router/yagarto-20121222/lib/gcc/../../arm-none-eabi/sys-include/stdint.h"
+ 992              		.file 3 "./inc/typedefs.h"
+ 993              		.file 4 "./inc/lib/ssp.h"
+ 994              		.file 5 "./inc/MEMS_L3GD20.h"
+ 995              		.file 6 "./inc/core_cm4.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 MEMS_L3GD20.c
+                            *COM*:00000014 L3GD20_Readings
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:20     .bss:00000000 L3GD20State
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:21     .bss:00000000 $d
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:23     .bss:00000004 ConfRegs
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:26     .bss:0000000c DataRegs
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:29     .rodata:00000000 $d
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:32     .rodata:00000000 sens
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:39     .bss:00000018 wBuff_GyroData
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:41     .bss:00000028 ssp_init
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:43     .bss:00000029 data_init
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:46     .text:00000000 $t
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:51     .text:00000000 MEMS_L3GD20_init
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:511    .text:00000384 initSSP
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:592    .text:000003fc initData
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:817    .text:000005cc rwL3GD20
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:879    .text:00000618 wL3GD20Reg
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:292    .text:0000023c MEMS_L3GD20_task
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:926    .text:00000650 rL3GD20Reg
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:679    .text:000004b0 prcRawValues
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:374    .text:000002d0 MEMS_L3GD20_SetRange
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:435    .text:0000032c $d
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:439    .text:00000330 $t
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:444    .text:00000330 MEMS_L3GD20_GetRange
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:503    .text:00000380 $d
+C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:507    .text:00000384 $t
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+Wait_Usec
+SSP_Init
+__aeabi_i2f
+__aeabi_fmul
+HW_L3GD20_CsOn
+SSP_ReadWrite
+HW_L3GD20_CsOff

@@ -1,0 +1,404 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"rtc.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.align	2
+  19              		.global	rtc_initialize
+  20              		.thumb
+  21              		.thumb_func
+  23              	rtc_initialize:
+  24              	.LFB112:
+  25              		.file 1 "src/ff/rtc.c"
+   1:src/ff/rtc.c  **** /*------------------------------------------------------------------------/
+   2:src/ff/rtc.c  **** /  LPC176x RTC control module
+   3:src/ff/rtc.c  **** /-------------------------------------------------------------------------/
+   4:src/ff/rtc.c  **** /
+   5:src/ff/rtc.c  **** /  Copyright (C) 2011, ChaN, all right reserved.
+   6:src/ff/rtc.c  **** /
+   7:src/ff/rtc.c  **** / * This software is a free software and there is NO WARRANTY.
+   8:src/ff/rtc.c  **** / * No restriction on use. You can use, modify and redistribute it for
+   9:src/ff/rtc.c  **** /   personal, non-profit or commercial products UNDER YOUR RESPONSIBILITY.
+  10:src/ff/rtc.c  **** / * Redistributions of source code must retain the above copyright notice.
+  11:src/ff/rtc.c  **** /
+  12:src/ff/rtc.c  **** /-------------------------------------------------------------------------*/
+  13:src/ff/rtc.c  **** 
+  14:src/ff/rtc.c  **** #include <lpc407x_8x_177x_8x.h>
+  15:src/ff/rtc.c  **** #include "rtc.h"
+  16:src/ff/rtc.c  **** #include "hardware.h"
+  17:src/ff/rtc.c  **** 
+  18:src/ff/rtc.c  **** 
+  19:src/ff/rtc.c  **** int rtc_initialize (void)
+  20:src/ff/rtc.c  **** {
+  26              		.loc 1 20 0
+  27              		.cfi_startproc
+  28              		@ args = 0, pretend = 0, frame = 0
+  29              		@ frame_needed = 1, uses_anonymous_args = 0
+  30              		@ link register save eliminated.
+  31 0000 80B4     		push	{r7}
+  32              	.LCFI0:
+  33              		.cfi_def_cfa_offset 4
+  34              		.cfi_offset 7, -4
+  35 0002 00AF     		add	r7, sp, #0
+  36              	.LCFI1:
+  37              		.cfi_def_cfa_register 7
+  21:src/ff/rtc.c  **** 	/* Enable PCLK to the RTC */
+  22:src/ff/rtc.c  **** 	LPC_SC->PCONP |= 1<<9;
+  38              		.loc 1 22 0
+  39 0004 4FF44043 		mov	r3, #49152
+  40 0008 C4F20F03 		movt	r3, 16399
+  41 000c 4FF44042 		mov	r2, #49152
+  42 0010 C4F20F02 		movt	r2, 16399
+  43 0014 D2F8C420 		ldr	r2, [r2, #196]
+  44 0018 42F40072 		orr	r2, r2, #512
+  45 001c C3F8C420 		str	r2, [r3, #196]
+  23:src/ff/rtc.c  **** 
+  24:src/ff/rtc.c  **** 	/* Start RTC with external XTAL */
+  25:src/ff/rtc.c  **** 	LPC_RTC->CCR = 0x11;
+  46              		.loc 1 25 0
+  47 0020 4FF48043 		mov	r3, #16384
+  48 0024 C4F20203 		movt	r3, 16386
+  49 0028 4FF01102 		mov	r2, #17
+  50 002c 1A72     		strb	r2, [r3, #8]
+  26:src/ff/rtc.c  **** 
+  27:src/ff/rtc.c  **** 	LPC_RTC->RTC_AUX = 1<<4;
+  51              		.loc 1 27 0
+  52 002e 4FF48043 		mov	r3, #16384
+  53 0032 C4F20203 		movt	r3, 16386
+  54 0036 4FF01002 		mov	r2, #16
+  55 003a 83F85C20 		strb	r2, [r3, #92]
+  28:src/ff/rtc.c  **** 	return 1;
+  56              		.loc 1 28 0
+  57 003e 4FF00103 		mov	r3, #1
+  29:src/ff/rtc.c  **** }
+  58              		.loc 1 29 0
+  59 0042 1846     		mov	r0, r3
+  60 0044 BD46     		mov	sp, r7
+  61 0046 80BC     		pop	{r7}
+  62 0048 7047     		bx	lr
+  63              		.cfi_endproc
+  64              	.LFE112:
+  66 004a 00BF     		.align	2
+  67              		.global	rtc_gettime
+  68              		.thumb
+  69              		.thumb_func
+  71              	rtc_gettime:
+  72              	.LFB113:
+  30:src/ff/rtc.c  **** 
+  31:src/ff/rtc.c  **** 
+  32:src/ff/rtc.c  **** 
+  33:src/ff/rtc.c  **** int rtc_gettime (RTC *rtc)
+  34:src/ff/rtc.c  **** {
+  73              		.loc 1 34 0
+  74              		.cfi_startproc
+  75              		@ args = 0, pretend = 0, frame = 16
+  76              		@ frame_needed = 1, uses_anonymous_args = 0
+  77              		@ link register save eliminated.
+  78 004c 80B4     		push	{r7}
+  79              	.LCFI2:
+  80              		.cfi_def_cfa_offset 4
+  81              		.cfi_offset 7, -4
+  82 004e 85B0     		sub	sp, sp, #20
+  83              	.LCFI3:
+  84              		.cfi_def_cfa_offset 24
+  85 0050 00AF     		add	r7, sp, #0
+  86              	.LCFI4:
+  87              		.cfi_def_cfa_register 7
+  88 0052 7860     		str	r0, [r7, #4]
+  89              	.L4:
+  35:src/ff/rtc.c  **** 	DWORD d, t;
+  36:src/ff/rtc.c  **** 
+  37:src/ff/rtc.c  **** 
+  38:src/ff/rtc.c  **** 	do {
+  39:src/ff/rtc.c  **** 		t = LPC_RTC->CTIME0;
+  90              		.loc 1 39 0 discriminator 1
+  91 0054 4FF48043 		mov	r3, #16384
+  92 0058 C4F20203 		movt	r3, 16386
+  93 005c 5B69     		ldr	r3, [r3, #20]
+  94 005e FB60     		str	r3, [r7, #12]
+  40:src/ff/rtc.c  **** 		d = LPC_RTC->CTIME1;
+  95              		.loc 1 40 0 discriminator 1
+  96 0060 4FF48043 		mov	r3, #16384
+  97 0064 C4F20203 		movt	r3, 16386
+  98 0068 9B69     		ldr	r3, [r3, #24]
+  99 006a BB60     		str	r3, [r7, #8]
+  41:src/ff/rtc.c  **** 	} while (t != LPC_RTC->CTIME0 || d != LPC_RTC->CTIME1);
+ 100              		.loc 1 41 0 discriminator 1
+ 101 006c 4FF48043 		mov	r3, #16384
+ 102 0070 C4F20203 		movt	r3, 16386
+ 103 0074 5A69     		ldr	r2, [r3, #20]
+ 104 0076 FB68     		ldr	r3, [r7, #12]
+ 105 0078 9A42     		cmp	r2, r3
+ 106 007a EBD1     		bne	.L4
+ 107              		.loc 1 41 0 is_stmt 0 discriminator 2
+ 108 007c 4FF48043 		mov	r3, #16384
+ 109 0080 C4F20203 		movt	r3, 16386
+ 110 0084 9A69     		ldr	r2, [r3, #24]
+ 111 0086 BB68     		ldr	r3, [r7, #8]
+ 112 0088 9A42     		cmp	r2, r3
+ 113 008a E3D1     		bne	.L4
+  42:src/ff/rtc.c  **** 
+  43:src/ff/rtc.c  **** 	if(LPC_RTC->RTC_AUX & 1<<4){
+ 114              		.loc 1 43 0 is_stmt 1
+ 115 008c 4FF48043 		mov	r3, #16384
+ 116 0090 C4F20203 		movt	r3, 16386
+ 117 0094 93F85C30 		ldrb	r3, [r3, #92]
+ 118 0098 DBB2     		uxtb	r3, r3
+ 119 009a 03F01003 		and	r3, r3, #16
+ 120 009e 002B     		cmp	r3, #0
+ 121 00a0 1ED0     		beq	.L5
+  44:src/ff/rtc.c  **** 		rtc->sec = 0;
+ 122              		.loc 1 44 0
+ 123 00a2 7B68     		ldr	r3, [r7, #4]
+ 124 00a4 4FF00002 		mov	r2, #0
+ 125 00a8 DA71     		strb	r2, [r3, #7]
+  45:src/ff/rtc.c  **** 		rtc->min = 0;
+ 126              		.loc 1 45 0
+ 127 00aa 7B68     		ldr	r3, [r7, #4]
+ 128 00ac 4FF00002 		mov	r2, #0
+ 129 00b0 9A71     		strb	r2, [r3, #6]
+  46:src/ff/rtc.c  **** 		rtc->hour = 0;
+ 130              		.loc 1 46 0
+ 131 00b2 7B68     		ldr	r3, [r7, #4]
+ 132 00b4 4FF00002 		mov	r2, #0
+ 133 00b8 5A71     		strb	r2, [r3, #5]
+  47:src/ff/rtc.c  **** 		rtc->wday = 0;
+ 134              		.loc 1 47 0
+ 135 00ba 7B68     		ldr	r3, [r7, #4]
+ 136 00bc 4FF00002 		mov	r2, #0
+ 137 00c0 1A71     		strb	r2, [r3, #4]
+  48:src/ff/rtc.c  **** 		rtc->mday = 1;
+ 138              		.loc 1 48 0
+ 139 00c2 7B68     		ldr	r3, [r7, #4]
+ 140 00c4 4FF00102 		mov	r2, #1
+ 141 00c8 DA70     		strb	r2, [r3, #3]
+  49:src/ff/rtc.c  **** 		rtc->month = 1;
+ 142              		.loc 1 49 0
+ 143 00ca 7B68     		ldr	r3, [r7, #4]
+ 144 00cc 4FF00102 		mov	r2, #1
+ 145 00d0 9A70     		strb	r2, [r3, #2]
+  50:src/ff/rtc.c  **** 		rtc->year = 2011;
+ 146              		.loc 1 50 0
+ 147 00d2 7B68     		ldr	r3, [r7, #4]
+ 148 00d4 40F2DB72 		movw	r2, #2011
+ 149 00d8 1A80     		strh	r2, [r3, #0]	@ movhi
+  51:src/ff/rtc.c  **** 		return 0;
+ 150              		.loc 1 51 0
+ 151 00da 4FF00003 		mov	r3, #0
+ 152 00de 3EE0     		b	.L6
+ 153              	.L5:
+  52:src/ff/rtc.c  **** 	}
+  53:src/ff/rtc.c  **** 
+  54:src/ff/rtc.c  **** 	rtc->sec = t & 63;
+ 154              		.loc 1 54 0
+ 155 00e0 FB68     		ldr	r3, [r7, #12]
+ 156 00e2 DBB2     		uxtb	r3, r3
+ 157 00e4 03F03F03 		and	r3, r3, #63
+ 158 00e8 DAB2     		uxtb	r2, r3
+ 159 00ea 7B68     		ldr	r3, [r7, #4]
+ 160 00ec DA71     		strb	r2, [r3, #7]
+  55:src/ff/rtc.c  **** 	rtc->min = (t >> 8) & 63;
+ 161              		.loc 1 55 0
+ 162 00ee FB68     		ldr	r3, [r7, #12]
+ 163 00f0 4FEA1323 		lsr	r3, r3, #8
+ 164 00f4 DBB2     		uxtb	r3, r3
+ 165 00f6 03F03F03 		and	r3, r3, #63
+ 166 00fa DAB2     		uxtb	r2, r3
+ 167 00fc 7B68     		ldr	r3, [r7, #4]
+ 168 00fe 9A71     		strb	r2, [r3, #6]
+  56:src/ff/rtc.c  **** 	rtc->hour = (t >> 16) & 31;
+ 169              		.loc 1 56 0
+ 170 0100 FB68     		ldr	r3, [r7, #12]
+ 171 0102 4FEA1343 		lsr	r3, r3, #16
+ 172 0106 DBB2     		uxtb	r3, r3
+ 173 0108 03F01F03 		and	r3, r3, #31
+ 174 010c DAB2     		uxtb	r2, r3
+ 175 010e 7B68     		ldr	r3, [r7, #4]
+ 176 0110 5A71     		strb	r2, [r3, #5]
+  57:src/ff/rtc.c  **** 	rtc->wday = (t >> 24) & 7;
+ 177              		.loc 1 57 0
+ 178 0112 FB68     		ldr	r3, [r7, #12]
+ 179 0114 4FEA1363 		lsr	r3, r3, #24
+ 180 0118 DBB2     		uxtb	r3, r3
+ 181 011a 03F00703 		and	r3, r3, #7
+ 182 011e DAB2     		uxtb	r2, r3
+ 183 0120 7B68     		ldr	r3, [r7, #4]
+ 184 0122 1A71     		strb	r2, [r3, #4]
+  58:src/ff/rtc.c  **** 	rtc->mday = d & 31;
+ 185              		.loc 1 58 0
+ 186 0124 BB68     		ldr	r3, [r7, #8]
+ 187 0126 DBB2     		uxtb	r3, r3
+ 188 0128 03F01F03 		and	r3, r3, #31
+ 189 012c DAB2     		uxtb	r2, r3
+ 190 012e 7B68     		ldr	r3, [r7, #4]
+ 191 0130 DA70     		strb	r2, [r3, #3]
+  59:src/ff/rtc.c  **** 	rtc->month = (d >> 8) & 15;
+ 192              		.loc 1 59 0
+ 193 0132 BB68     		ldr	r3, [r7, #8]
+ 194 0134 4FEA1323 		lsr	r3, r3, #8
+ 195 0138 DBB2     		uxtb	r3, r3
+ 196 013a 03F00F03 		and	r3, r3, #15
+ 197 013e DAB2     		uxtb	r2, r3
+ 198 0140 7B68     		ldr	r3, [r7, #4]
+ 199 0142 9A70     		strb	r2, [r3, #2]
+  60:src/ff/rtc.c  **** 	rtc->year = (d >> 16) & 4095;
+ 200              		.loc 1 60 0
+ 201 0144 BB68     		ldr	r3, [r7, #8]
+ 202 0146 4FEA1343 		lsr	r3, r3, #16
+ 203 014a 9BB2     		uxth	r3, r3
+ 204 014c 4FEA0353 		lsl	r3, r3, #20
+ 205 0150 4FEA1353 		lsr	r3, r3, #20
+ 206 0154 9AB2     		uxth	r2, r3
+ 207 0156 7B68     		ldr	r3, [r7, #4]
+ 208 0158 1A80     		strh	r2, [r3, #0]	@ movhi
+  61:src/ff/rtc.c  **** 	return 1;
+ 209              		.loc 1 61 0
+ 210 015a 4FF00103 		mov	r3, #1
+ 211              	.L6:
+  62:src/ff/rtc.c  **** }
+ 212              		.loc 1 62 0
+ 213 015e 1846     		mov	r0, r3
+ 214 0160 07F11407 		add	r7, r7, #20
+ 215 0164 BD46     		mov	sp, r7
+ 216 0166 80BC     		pop	{r7}
+ 217 0168 7047     		bx	lr
+ 218              		.cfi_endproc
+ 219              	.LFE113:
+ 221 016a 00BF     		.align	2
+ 222              		.global	rtc_settime
+ 223              		.thumb
+ 224              		.thumb_func
+ 226              	rtc_settime:
+ 227              	.LFB114:
+  63:src/ff/rtc.c  **** 
+  64:src/ff/rtc.c  **** 
+  65:src/ff/rtc.c  **** 
+  66:src/ff/rtc.c  **** 
+  67:src/ff/rtc.c  **** int rtc_settime (const RTC *rtc)
+  68:src/ff/rtc.c  **** {
+ 228              		.loc 1 68 0
+ 229              		.cfi_startproc
+ 230              		@ args = 0, pretend = 0, frame = 8
+ 231              		@ frame_needed = 1, uses_anonymous_args = 0
+ 232              		@ link register save eliminated.
+ 233 016c 80B4     		push	{r7}
+ 234              	.LCFI5:
+ 235              		.cfi_def_cfa_offset 4
+ 236              		.cfi_offset 7, -4
+ 237 016e 83B0     		sub	sp, sp, #12
+ 238              	.LCFI6:
+ 239              		.cfi_def_cfa_offset 16
+ 240 0170 00AF     		add	r7, sp, #0
+ 241              	.LCFI7:
+ 242              		.cfi_def_cfa_register 7
+ 243 0172 7860     		str	r0, [r7, #4]
+  69:src/ff/rtc.c  **** 	LPC_RTC->CCR = 0x12;		/* Stop RTC */
+ 244              		.loc 1 69 0
+ 245 0174 4FF48043 		mov	r3, #16384
+ 246 0178 C4F20203 		movt	r3, 16386
+ 247 017c 4FF01202 		mov	r2, #18
+ 248 0180 1A72     		strb	r2, [r3, #8]
+  70:src/ff/rtc.c  **** 
+  71:src/ff/rtc.c  **** 	/* Update RTC registers */
+  72:src/ff/rtc.c  **** 	LPC_RTC->SEC = rtc->sec;
+ 249              		.loc 1 72 0
+ 250 0182 4FF48043 		mov	r3, #16384
+ 251 0186 C4F20203 		movt	r3, 16386
+ 252 018a 7A68     		ldr	r2, [r7, #4]
+ 253 018c D279     		ldrb	r2, [r2, #7]	@ zero_extendqisi2
+ 254 018e 83F82020 		strb	r2, [r3, #32]
+  73:src/ff/rtc.c  **** 	LPC_RTC->MIN = rtc->min;
+ 255              		.loc 1 73 0
+ 256 0192 4FF48043 		mov	r3, #16384
+ 257 0196 C4F20203 		movt	r3, 16386
+ 258 019a 7A68     		ldr	r2, [r7, #4]
+ 259 019c 9279     		ldrb	r2, [r2, #6]	@ zero_extendqisi2
+ 260 019e 83F82420 		strb	r2, [r3, #36]
+  74:src/ff/rtc.c  **** 	LPC_RTC->HOUR = rtc->hour;
+ 261              		.loc 1 74 0
+ 262 01a2 4FF48043 		mov	r3, #16384
+ 263 01a6 C4F20203 		movt	r3, 16386
+ 264 01aa 7A68     		ldr	r2, [r7, #4]
+ 265 01ac 5279     		ldrb	r2, [r2, #5]	@ zero_extendqisi2
+ 266 01ae 83F82820 		strb	r2, [r3, #40]
+  75:src/ff/rtc.c  **** 	LPC_RTC->DOW = rtc->wday;
+ 267              		.loc 1 75 0
+ 268 01b2 4FF48043 		mov	r3, #16384
+ 269 01b6 C4F20203 		movt	r3, 16386
+ 270 01ba 7A68     		ldr	r2, [r7, #4]
+ 271 01bc 1279     		ldrb	r2, [r2, #4]	@ zero_extendqisi2
+ 272 01be 83F83020 		strb	r2, [r3, #48]
+  76:src/ff/rtc.c  **** 	LPC_RTC->DOM = rtc->mday;
+ 273              		.loc 1 76 0
+ 274 01c2 4FF48043 		mov	r3, #16384
+ 275 01c6 C4F20203 		movt	r3, 16386
+ 276 01ca 7A68     		ldr	r2, [r7, #4]
+ 277 01cc D278     		ldrb	r2, [r2, #3]	@ zero_extendqisi2
+ 278 01ce 83F82C20 		strb	r2, [r3, #44]
+  77:src/ff/rtc.c  **** 	LPC_RTC->MONTH = rtc->month;
+ 279              		.loc 1 77 0
+ 280 01d2 4FF48043 		mov	r3, #16384
+ 281 01d6 C4F20203 		movt	r3, 16386
+ 282 01da 7A68     		ldr	r2, [r7, #4]
+ 283 01dc 9278     		ldrb	r2, [r2, #2]	@ zero_extendqisi2
+ 284 01de 83F83820 		strb	r2, [r3, #56]
+  78:src/ff/rtc.c  **** 	LPC_RTC->YEAR = rtc->year;
+ 285              		.loc 1 78 0
+ 286 01e2 4FF48043 		mov	r3, #16384
+ 287 01e6 C4F20203 		movt	r3, 16386
+ 288 01ea 7A68     		ldr	r2, [r7, #4]
+ 289 01ec 1288     		ldrh	r2, [r2, #0]
+ 290 01ee 9A87     		strh	r2, [r3, #60]	@ movhi
+  79:src/ff/rtc.c  **** 
+  80:src/ff/rtc.c  **** 	LPC_RTC->RTC_AUX = 1<<4;	/* Clear power fail flag */
+ 291              		.loc 1 80 0
+ 292 01f0 4FF48043 		mov	r3, #16384
+ 293 01f4 C4F20203 		movt	r3, 16386
+ 294 01f8 4FF01002 		mov	r2, #16
+ 295 01fc 83F85C20 		strb	r2, [r3, #92]
+  81:src/ff/rtc.c  **** 	LPC_RTC->CCR = 0x11;			/* Restart RTC, Disable calibration feature */
+ 296              		.loc 1 81 0
+ 297 0200 4FF48043 		mov	r3, #16384
+ 298 0204 C4F20203 		movt	r3, 16386
+ 299 0208 4FF01102 		mov	r2, #17
+ 300 020c 1A72     		strb	r2, [r3, #8]
+  82:src/ff/rtc.c  **** 
+  83:src/ff/rtc.c  **** 	return 1;
+ 301              		.loc 1 83 0
+ 302 020e 4FF00103 		mov	r3, #1
+  84:src/ff/rtc.c  **** }
+ 303              		.loc 1 84 0
+ 304 0212 1846     		mov	r0, r3
+ 305 0214 07F10C07 		add	r7, r7, #12
+ 306 0218 BD46     		mov	sp, r7
+ 307 021a 80BC     		pop	{r7}
+ 308 021c 7047     		bx	lr
+ 309              		.cfi_endproc
+ 310              	.LFE114:
+ 312              	.Letext0:
+ 313              		.file 2 "c:/tools/pcan-router/yagarto-20121222/lib/gcc/../../arm-none-eabi/sys-include/stdint.h"
+ 314              		.file 3 "./inc/lpc407x_8x_177x_8x.h"
+ 315              		.file 4 "./inc/typedefs.h"
+ 316              		.file 5 "./inc/ff/rtc.h"
+ 317              		.file 6 "./inc/core_cm4.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 rtc.c
+C:\Users\Ian\AppData\Local\Temp\ccBRXPsP.s:18     .text:00000000 $t
+C:\Users\Ian\AppData\Local\Temp\ccBRXPsP.s:23     .text:00000000 rtc_initialize
+C:\Users\Ian\AppData\Local\Temp\ccBRXPsP.s:71     .text:0000004c rtc_gettime
+C:\Users\Ian\AppData\Local\Temp\ccBRXPsP.s:226    .text:0000016c rtc_settime
+                     .debug_frame:00000010 $d
+
+NO UNDEFINED SYMBOLS

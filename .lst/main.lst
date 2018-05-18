@@ -1,0 +1,1118 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"main.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.global	Ident
+  19              		.section	.ident,"a",%progbits
+  20              		.align	2
+  23              	Ident:
+  24 0000 5043414E 		.ascii	"PCAN-GPS\000"
+  24      2D475053 
+  24      00
+  25              		.global	C2F_Array
+  26 0009 000000   		.section	.C2F_Info,"a",%progbits
+  27              		.align	2
+  30              	C2F_Array:
+  31 0000 4352432D 		.ascii	"CRC-Arrays\000"
+  31      41727261 
+  31      797300
+  32 000b 00000000 		.space	5
+  32      00
+  33 0010 2100     		.short	33
+  34 0012 0500     		.short	5
+  35 0014 0500     		.short	5
+  36 0016 06000000 		.4byte	6
+  37 001a 00000000 		.space	6
+  37      0000
+  38              		.comm	cfg_data,36,4
+  39              		.global	Initialized
+  40              		.bss
+  43              	Initialized:
+  44 0000 00       		.space	1
+  45              		.global	persistant_config_used
+  48              	persistant_config_used:
+  49 0001 00       		.space	1
+  50              		.text
+  51              		.align	2
+  52              		.global	Timer_1000usec
+  53              		.thumb
+  54              		.thumb_func
+  56              	Timer_1000usec:
+  57              	.LFB112:
+  58              		.file 1 "src/main.c"
+   1:src/main.c    **** /*******************************************************************************
+   2:src/main.c    ****  *
+   3:src/main.c    ****  * Project  :	PCAN-GPS - Timer Example
+   4:src/main.c    ****  * Module   :
+   5:src/main.c    ****  * Filename :	main.c
+   6:src/main.c    ****  * System   :
+   7:src/main.c    ****  * Compiler :
+   8:src/main.c    ****  * Switches :
+   9:src/main.c    ****  * Rights   : 	(c) PEAK-System Technik GmbH
+  10:src/main.c    ****  *            	www.peak-system.com
+  11:src/main.c    ****  *
+  12:src/main.c    ****  *******************************************************************************
+  13:src/main.c    ****  * Implementation description
+  14:src/main.c    ****  *
+  15:src/main.c    ****  *
+  16:src/main.c    ****  *
+  17:src/main.c    ****  *******************************************************************************
+  18:src/main.c    ****  * History: (newer entries first!)
+  19:src/main.c    ****  *------------------------------------------------------------------------------
+  20:src/main.c    ****  * Date / Name      Vers.   changes made
+  21:src/main.c    ****  *------------------------------------------------------------------------------
+  22:src/main.c    ****  * 2014 October StM	1.0.2	Changed wrong mask when sending module ID
+  23:src/main.c    ****  * 2014 October StM	1.0.1	Changed format for GPS position in CAN frame
+  24:src/main.c    ****  * 2014 July StM	1.0.0	Initial Version
+  25:src/main.c    ****  ******************************************************************************/
+  26:src/main.c    **** 
+  27:src/main.c    **** /*******************************************************************************
+  28:src/main.c    ****  include files
+  29:src/main.c    ****  ******************************************************************************/
+  30:src/main.c    **** //
+  31:src/main.c    **** // System header files
+  32:src/main.c    **** //
+  33:src/main.c    **** #include <system_LPC407x_8x_177x_8x.h>
+  34:src/main.c    **** #include <lpc407x_8x_177x_8x.h>
+  35:src/main.c    **** 
+  36:src/main.c    **** //
+  37:src/main.c    **** // Library header files
+  38:src/main.c    **** //
+  39:src/main.c    **** #include "typedefs.h"
+  40:src/main.c    **** #include "hardware.h"
+  41:src/main.c    **** #include "can.h"
+  42:src/main.c    **** #include "ssp.h"
+  43:src/main.c    **** #include "eeprom.h"
+  44:src/main.c    **** #include "serial.h"
+  45:src/main.c    **** #include "crc.h"
+  46:src/main.c    **** 
+  47:src/main.c    **** //
+  48:src/main.c    **** // Source code header files
+  49:src/main.c    **** //
+  50:src/main.c    **** #include "timer.h"
+  51:src/main.c    **** #include "MEMS_BMC050.h"
+  52:src/main.c    **** #include "MEMS_L3GD20.h"
+  53:src/main.c    **** #include "MAX-7W.h"
+  54:src/main.c    **** #include "can_user.h"
+  55:src/main.c    **** #include "crc_data.h"
+  56:src/main.c    **** #include "rtc.h"
+  57:src/main.c    **** 
+  58:src/main.c    **** 
+  59:src/main.c    **** /*******************************************************************************
+  60:src/main.c    ****  global definitions
+  61:src/main.c    ****  ******************************************************************************/
+  62:src/main.c    **** //! identifier is needed by PCANFlash.exe -> do not delete
+  63:src/main.c    **** const b8_t Ident[] __attribute__ ((section(".ident"), used)) = { "PCAN-GPS"};
+  64:src/main.c    **** 
+  65:src/main.c    **** //! info data for PCANFlash.exe
+  66:src/main.c    **** const crc_array_t  C2F_Array __attribute__((section(".C2F_Info"), used)) = {
+  67:src/main.c    **** 	.Str = CRC_IDENT_STRING,
+  68:src/main.c    **** 	.Version = 0x21,
+  69:src/main.c    **** 	.Day = 5,
+  70:src/main.c    **** 	.Month = 5,
+  71:src/main.c    **** 	.Year = 6,
+  72:src/main.c    **** 
+  73:src/main.c    **** 	// crc infos are patched during link time by flash.ld
+  74:src/main.c    **** 	// crc value is patched by PCANFlash.exe
+  75:src/main.c    **** };
+  76:src/main.c    **** 
+  77:src/main.c    **** #define EEPROM_CFG_ADDR 0x00
+  78:src/main.c    **** S_CONFIG_DATA_t cfg_data;
+  79:src/main.c    **** 
+  80:src/main.c    **** 
+  81:src/main.c    **** /*******************************************************************************
+  82:src/main.c    ****  local definitions
+  83:src/main.c    ****  ******************************************************************************/
+  84:src/main.c    **** u8_t Initialized = 0;
+  85:src/main.c    **** u8_t persistant_config_used=0;
+  86:src/main.c    **** 
+  87:src/main.c    **** 
+  88:src/main.c    **** 
+  89:src/main.c    **** /*******************************************************************************
+  90:src/main.c    ****  local function prototypes
+  91:src/main.c    ****  ******************************************************************************/
+  92:src/main.c    **** static s32_t init_system(void);
+  93:src/main.c    **** static s32_t get_default_config(void);
+  94:src/main.c    **** static s32_t read_persistent_config(void);
+  95:src/main.c    **** void Timer_1000usec(void);
+  96:src/main.c    **** 
+  97:src/main.c    **** 
+  98:src/main.c    **** /*******************************************************************************
+  99:src/main.c    ****  global functions
+ 100:src/main.c    ****  ******************************************************************************/
+ 101:src/main.c    **** 
+ 102:src/main.c    **** 
+ 103:src/main.c    **** 
+ 104:src/main.c    **** //------------------------------------------------------------------------------
+ 105:src/main.c    **** //! void Timer_1000usec(void)
+ 106:src/main.c    **** //------------------------------------------------------------------------------
+ 107:src/main.c    **** //! @brief	this function is called every 1[ms] by timer0 match-interrupt ISR
+ 108:src/main.c    **** //------------------------------------------------------------------------------
+ 109:src/main.c    **** void Timer_1000usec(void){
+  59              		.loc 1 109 0
+  60              		.cfi_startproc
+  61              		@ args = 0, pretend = 0, frame = 0
+  62              		@ frame_needed = 1, uses_anonymous_args = 0
+  63 0000 80B5     		push	{r7, lr}
+  64              	.LCFI0:
+  65              		.cfi_def_cfa_offset 8
+  66              		.cfi_offset 7, -8
+  67              		.cfi_offset 14, -4
+  68 0002 00AF     		add	r7, sp, #0
+  69              	.LCFI1:
+  70              		.cfi_def_cfa_register 7
+ 110:src/main.c    **** 	static u32_t  LedBlink_counter=0;
+ 111:src/main.c    **** 	static u8_t	toggle_led = 0;
+ 112:src/main.c    **** 
+ 113:src/main.c    **** 	if (!Initialized)
+  71              		.loc 1 113 0
+  72 0004 40F20003 		movw	r3, #:lower16:Initialized
+  73 0008 C0F20003 		movt	r3, #:upper16:Initialized
+  74 000c 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+  75 000e 002B     		cmp	r3, #0
+  76 0010 3ED0     		beq	.L6
+  77              	.L2:
+ 114:src/main.c    **** 		return;
+ 115:src/main.c    **** 
+ 116:src/main.c    **** 	if (LedBlink_counter < 1000){
+  78              		.loc 1 116 0
+  79 0012 40F20003 		movw	r3, #:lower16:LedBlink_counter.6673
+  80 0016 C0F20003 		movt	r3, #:upper16:LedBlink_counter.6673
+  81 001a 1A68     		ldr	r2, [r3, #0]
+  82 001c 40F2E733 		movw	r3, #999
+  83 0020 9A42     		cmp	r2, r3
+  84 0022 0CD8     		bhi	.L4
+ 117:src/main.c    **** 		LedBlink_counter++;
+  85              		.loc 1 117 0
+  86 0024 40F20003 		movw	r3, #:lower16:LedBlink_counter.6673
+  87 0028 C0F20003 		movt	r3, #:upper16:LedBlink_counter.6673
+  88 002c 1B68     		ldr	r3, [r3, #0]
+  89 002e 03F10102 		add	r2, r3, #1
+  90 0032 40F20003 		movw	r3, #:lower16:LedBlink_counter.6673
+  91 0036 C0F20003 		movt	r3, #:upper16:LedBlink_counter.6673
+  92 003a 1A60     		str	r2, [r3, #0]
+  93 003c 29E0     		b	.L1
+  94              	.L4:
+ 118:src/main.c    **** 	}else{
+ 119:src/main.c    **** 		LedBlink_counter = 0;
+  95              		.loc 1 119 0
+  96 003e 40F20003 		movw	r3, #:lower16:LedBlink_counter.6673
+  97 0042 C0F20003 		movt	r3, #:upper16:LedBlink_counter.6673
+  98 0046 4FF00002 		mov	r2, #0
+  99 004a 1A60     		str	r2, [r3, #0]
+ 120:src/main.c    **** 
+ 121:src/main.c    **** 		toggle_led ^= 1;		// invert flag and set new value
+ 100              		.loc 1 121 0
+ 101 004c 40F20003 		movw	r3, #:lower16:toggle_led.6674
+ 102 0050 C0F20003 		movt	r3, #:upper16:toggle_led.6674
+ 103 0054 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 104 0056 83F00103 		eor	r3, r3, #1
+ 105 005a DAB2     		uxtb	r2, r3
+ 106 005c 40F20003 		movw	r3, #:lower16:toggle_led.6674
+ 107 0060 C0F20003 		movt	r3, #:upper16:toggle_led.6674
+ 108 0064 1A70     		strb	r2, [r3, #0]
+ 122:src/main.c    **** 		if (toggle_led){
+ 109              		.loc 1 122 0
+ 110 0066 40F20003 		movw	r3, #:lower16:toggle_led.6674
+ 111 006a C0F20003 		movt	r3, #:upper16:toggle_led.6674
+ 112 006e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 113 0070 002B     		cmp	r3, #0
+ 114 0072 06D0     		beq	.L5
+ 123:src/main.c    **** 			HW_SetLED (HW_LED_STATUS_1, HW_LED_GREEN);
+ 115              		.loc 1 123 0
+ 116 0074 4FF00100 		mov	r0, #1
+ 117 0078 4FF00201 		mov	r1, #2
+ 118 007c FFF7FEFF 		bl	HW_SetLED
+ 119 0080 07E0     		b	.L1
+ 120              	.L5:
+ 124:src/main.c    **** 		} else {
+ 125:src/main.c    **** 			HW_SetLED(HW_LED_STATUS_1, HW_LED_OFF);
+ 121              		.loc 1 125 0
+ 122 0082 4FF00100 		mov	r0, #1
+ 123 0086 4FF00001 		mov	r1, #0
+ 124 008a FFF7FEFF 		bl	HW_SetLED
+ 125 008e 00E0     		b	.L1
+ 126              	.L6:
+ 114:src/main.c    **** 		return;
+ 127              		.loc 1 114 0
+ 128 0090 00BF     		nop
+ 129              	.L1:
+ 126:src/main.c    **** 		}
+ 127:src/main.c    **** 	}
+ 128:src/main.c    **** }
+ 130              		.loc 1 128 0
+ 131 0092 80BD     		pop	{r7, pc}
+ 132              		.cfi_endproc
+ 133              	.LFE112:
+ 135              		.align	2
+ 136              		.global	main
+ 137              		.thumb
+ 138              		.thumb_func
+ 140              	main:
+ 141              	.LFB113:
+ 129:src/main.c    **** 
+ 130:src/main.c    **** 
+ 131:src/main.c    **** //------------------------------------------------------------------------------
+ 132:src/main.c    **** //! int main(void)
+ 133:src/main.c    **** //------------------------------------------------------------------------------
+ 134:src/main.c    **** //! @brief	initialization and main loop
+ 135:src/main.c    **** //------------------------------------------------------------------------------
+ 136:src/main.c    **** int main(void)
+ 137:src/main.c    **** {
+ 142              		.loc 1 137 0
+ 143              		.cfi_startproc
+ 144              		@ args = 0, pretend = 0, frame = 0
+ 145              		@ frame_needed = 1, uses_anonymous_args = 0
+ 146 0094 80B5     		push	{r7, lr}
+ 147              	.LCFI2:
+ 148              		.cfi_def_cfa_offset 8
+ 149              		.cfi_offset 7, -8
+ 150              		.cfi_offset 14, -4
+ 151 0096 00AF     		add	r7, sp, #0
+ 152              	.LCFI3:
+ 153              		.cfi_def_cfa_register 7
+ 138:src/main.c    **** 
+ 139:src/main.c    **** 	Initialized = 0;
+ 154              		.loc 1 139 0
+ 155 0098 40F20003 		movw	r3, #:lower16:Initialized
+ 156 009c C0F20003 		movt	r3, #:upper16:Initialized
+ 157 00a0 4FF00002 		mov	r2, #0
+ 158 00a4 1A70     		strb	r2, [r3, #0]
+ 140:src/main.c    **** 
+ 141:src/main.c    **** 	init_system();
+ 159              		.loc 1 141 0
+ 160 00a6 00F043F9 		bl	init_system
+ 161              	.L23:
+ 162              	.LBB2:
+ 142:src/main.c    **** 
+ 143:src/main.c    **** 	while(1) 	
+ 144:src/main.c    **** 	{
+ 145:src/main.c    **** 		static u32_t  		BMC050task_counter=0;
+ 146:src/main.c    **** 		static u32_t  		L3GD20task_counter=0;
+ 147:src/main.c    **** 		static u32_t  		MAX7Wtask_counter=0;
+ 148:src/main.c    **** 		static u32_t  		DIO_counter=0;
+ 149:src/main.c    **** 		static u32_t  		TIME_counter=0;
+ 150:src/main.c    **** 
+ 151:src/main.c    **** 		// read new compass/accelerometer/temperature data
+ 152:src/main.c    **** 		if (SYSTIME_DIFF(BMC050task_counter, SYSTIME_NOW) >= 25000)
+ 163              		.loc 1 152 0
+ 164 00aa 4FF04023 		mov	r3, #1073758208
+ 165 00ae 9A68     		ldr	r2, [r3, #8]
+ 166 00b0 40F20003 		movw	r3, #:lower16:BMC050task_counter.6678
+ 167 00b4 C0F20003 		movt	r3, #:upper16:BMC050task_counter.6678
+ 168 00b8 1B68     		ldr	r3, [r3, #0]
+ 169 00ba 9A42     		cmp	r2, r3
+ 170 00bc 10D3     		bcc	.L8
+ 171              		.loc 1 152 0 is_stmt 0 discriminator 1
+ 172 00be 4FF04023 		mov	r3, #1073758208
+ 173 00c2 9A68     		ldr	r2, [r3, #8]
+ 174 00c4 40F20003 		movw	r3, #:lower16:BMC050task_counter.6678
+ 175 00c8 C0F20003 		movt	r3, #:upper16:BMC050task_counter.6678
+ 176 00cc 1B68     		ldr	r3, [r3, #0]
+ 177 00ce D21A     		subs	r2, r2, r3
+ 178 00d0 46F2A713 		movw	r3, #24999
+ 179 00d4 9A42     		cmp	r2, r3
+ 180 00d6 94BF     		ite	ls
+ 181 00d8 0023     		movls	r3, #0
+ 182 00da 0123     		movhi	r3, #1
+ 183 00dc DBB2     		uxtb	r3, r3
+ 184 00de 11E0     		b	.L9
+ 185              	.L8:
+ 186              		.loc 1 152 0 discriminator 2
+ 187 00e0 40F20003 		movw	r3, #:lower16:BMC050task_counter.6678
+ 188 00e4 C0F20003 		movt	r3, #:upper16:BMC050task_counter.6678
+ 189 00e8 1B68     		ldr	r3, [r3, #0]
+ 190 00ea 6FEA0302 		mvn	r2, r3
+ 191 00ee 4FF04023 		mov	r3, #1073758208
+ 192 00f2 9B68     		ldr	r3, [r3, #8]
+ 193 00f4 D218     		adds	r2, r2, r3
+ 194 00f6 46F2A713 		movw	r3, #24999
+ 195 00fa 9A42     		cmp	r2, r3
+ 196 00fc 94BF     		ite	ls
+ 197 00fe 0023     		movls	r3, #0
+ 198 0100 0123     		movhi	r3, #1
+ 199 0102 DBB2     		uxtb	r3, r3
+ 200              	.L9:
+ 201              		.loc 1 152 0 discriminator 3
+ 202 0104 002B     		cmp	r3, #0
+ 203 0106 19D0     		beq	.L10
+ 153:src/main.c    **** 		{
+ 154:src/main.c    **** 			// update time interval
+ 155:src/main.c    **** 			BMC050task_counter = SYSTIME_NOW;
+ 204              		.loc 1 155 0 is_stmt 1
+ 205 0108 4FF04023 		mov	r3, #1073758208
+ 206 010c 9A68     		ldr	r2, [r3, #8]
+ 207 010e 40F20003 		movw	r3, #:lower16:BMC050task_counter.6678
+ 208 0112 C0F20003 		movt	r3, #:upper16:BMC050task_counter.6678
+ 209 0116 1A60     		str	r2, [r3, #0]
+ 156:src/main.c    **** 			// as long as there is not a complete set of readings
+ 157:src/main.c    **** 			if (BMC050_Readings.data_valid == FALSE)
+ 210              		.loc 1 157 0
+ 211 0118 40F20003 		movw	r3, #:lower16:BMC050_Readings
+ 212 011c C0F20003 		movt	r3, #:upper16:BMC050_Readings
+ 213 0120 5B7C     		ldrb	r3, [r3, #17]	@ zero_extendqisi2
+ 214 0122 002B     		cmp	r3, #0
+ 215 0124 0AD1     		bne	.L10
+ 158:src/main.c    **** 			{
+ 159:src/main.c    **** 				MEMS_BMC050_task();
+ 216              		.loc 1 159 0
+ 217 0126 FFF7FEFF 		bl	MEMS_BMC050_task
+ 160:src/main.c    **** 			
+ 161:src/main.c    **** 				if (BMC050_Readings.data_valid == TRUE){
+ 218              		.loc 1 161 0
+ 219 012a 40F20003 		movw	r3, #:lower16:BMC050_Readings
+ 220 012e C0F20003 		movt	r3, #:upper16:BMC050_Readings
+ 221 0132 5B7C     		ldrb	r3, [r3, #17]	@ zero_extendqisi2
+ 222 0134 012B     		cmp	r3, #1
+ 223 0136 01D1     		bne	.L10
+ 162:src/main.c    **** 					CAN_UserSendBMCData();
+ 224              		.loc 1 162 0
+ 225 0138 FFF7FEFF 		bl	CAN_UserSendBMCData
+ 226              	.L10:
+ 163:src/main.c    **** 				}
+ 164:src/main.c    **** 			}
+ 165:src/main.c    **** 		}
+ 166:src/main.c    **** 		//-------------------------
+ 167:src/main.c    **** 		
+ 168:src/main.c    **** 		// read new gyro/temperature data
+ 169:src/main.c    **** 		if (SYSTIME_DIFF (L3GD20task_counter, SYSTIME_NOW) >= 50000)
+ 227              		.loc 1 169 0
+ 228 013c 4FF04023 		mov	r3, #1073758208
+ 229 0140 9A68     		ldr	r2, [r3, #8]
+ 230 0142 40F20003 		movw	r3, #:lower16:L3GD20task_counter.6679
+ 231 0146 C0F20003 		movt	r3, #:upper16:L3GD20task_counter.6679
+ 232 014a 1B68     		ldr	r3, [r3, #0]
+ 233 014c 9A42     		cmp	r2, r3
+ 234 014e 10D3     		bcc	.L11
+ 235              		.loc 1 169 0 is_stmt 0 discriminator 1
+ 236 0150 4FF04023 		mov	r3, #1073758208
+ 237 0154 9A68     		ldr	r2, [r3, #8]
+ 238 0156 40F20003 		movw	r3, #:lower16:L3GD20task_counter.6679
+ 239 015a C0F20003 		movt	r3, #:upper16:L3GD20task_counter.6679
+ 240 015e 1B68     		ldr	r3, [r3, #0]
+ 241 0160 D21A     		subs	r2, r2, r3
+ 242 0162 4CF24F33 		movw	r3, #49999
+ 243 0166 9A42     		cmp	r2, r3
+ 244 0168 94BF     		ite	ls
+ 245 016a 0023     		movls	r3, #0
+ 246 016c 0123     		movhi	r3, #1
+ 247 016e DBB2     		uxtb	r3, r3
+ 248 0170 11E0     		b	.L12
+ 249              	.L11:
+ 250              		.loc 1 169 0 discriminator 2
+ 251 0172 40F20003 		movw	r3, #:lower16:L3GD20task_counter.6679
+ 252 0176 C0F20003 		movt	r3, #:upper16:L3GD20task_counter.6679
+ 253 017a 1B68     		ldr	r3, [r3, #0]
+ 254 017c 6FEA0302 		mvn	r2, r3
+ 255 0180 4FF04023 		mov	r3, #1073758208
+ 256 0184 9B68     		ldr	r3, [r3, #8]
+ 257 0186 D218     		adds	r2, r2, r3
+ 258 0188 4CF24F33 		movw	r3, #49999
+ 259 018c 9A42     		cmp	r2, r3
+ 260 018e 94BF     		ite	ls
+ 261 0190 0023     		movls	r3, #0
+ 262 0192 0123     		movhi	r3, #1
+ 263 0194 DBB2     		uxtb	r3, r3
+ 264              	.L12:
+ 265              		.loc 1 169 0 discriminator 3
+ 266 0196 002B     		cmp	r3, #0
+ 267 0198 12D0     		beq	.L13
+ 170:src/main.c    **** 		{
+ 171:src/main.c    **** 			// update time interval
+ 172:src/main.c    **** 			L3GD20task_counter = SYSTIME_NOW;
+ 268              		.loc 1 172 0 is_stmt 1
+ 269 019a 4FF04023 		mov	r3, #1073758208
+ 270 019e 9A68     		ldr	r2, [r3, #8]
+ 271 01a0 40F20003 		movw	r3, #:lower16:L3GD20task_counter.6679
+ 272 01a4 C0F20003 		movt	r3, #:upper16:L3GD20task_counter.6679
+ 273 01a8 1A60     		str	r2, [r3, #0]
+ 173:src/main.c    **** 			// as long as there is not a complete set of readings
+ 174:src/main.c    **** 			MEMS_L3GD20_task();
+ 274              		.loc 1 174 0
+ 275 01aa FFF7FEFF 		bl	MEMS_L3GD20_task
+ 175:src/main.c    **** 			
+ 176:src/main.c    **** 			if (L3GD20_Readings.data_valid == TRUE)
+ 276              		.loc 1 176 0
+ 277 01ae 40F20003 		movw	r3, #:lower16:L3GD20_Readings
+ 278 01b2 C0F20003 		movt	r3, #:upper16:L3GD20_Readings
+ 279 01b6 1B7C     		ldrb	r3, [r3, #16]	@ zero_extendqisi2
+ 280 01b8 012B     		cmp	r3, #1
+ 281 01ba 01D1     		bne	.L13
+ 177:src/main.c    **** 				CAN_UserSendL3GDData();
+ 282              		.loc 1 177 0
+ 283 01bc FFF7FEFF 		bl	CAN_UserSendL3GDData
+ 284              	.L13:
+ 178:src/main.c    **** 		}
+ 179:src/main.c    **** 		//-------------------------
+ 180:src/main.c    **** 
+ 181:src/main.c    **** 		// evaluate new gps data as fast as possible
+ 182:src/main.c    **** 		UBLOX_MAX7W_task();
+ 285              		.loc 1 182 0
+ 286 01c0 FFF7FEFF 		bl	UBLOX_MAX7W_task
+ 183:src/main.c    **** 		if (SYSTIME_DIFF (MAX7Wtask_counter, SYSTIME_NOW) >= 100000)
+ 287              		.loc 1 183 0
+ 288 01c4 4FF04023 		mov	r3, #1073758208
+ 289 01c8 9A68     		ldr	r2, [r3, #8]
+ 290 01ca 40F20003 		movw	r3, #:lower16:MAX7Wtask_counter.6680
+ 291 01ce C0F20003 		movt	r3, #:upper16:MAX7Wtask_counter.6680
+ 292 01d2 1B68     		ldr	r3, [r3, #0]
+ 293 01d4 9A42     		cmp	r2, r3
+ 294 01d6 12D3     		bcc	.L14
+ 295              		.loc 1 183 0 is_stmt 0 discriminator 1
+ 296 01d8 4FF04023 		mov	r3, #1073758208
+ 297 01dc 9A68     		ldr	r2, [r3, #8]
+ 298 01de 40F20003 		movw	r3, #:lower16:MAX7Wtask_counter.6680
+ 299 01e2 C0F20003 		movt	r3, #:upper16:MAX7Wtask_counter.6680
+ 300 01e6 1B68     		ldr	r3, [r3, #0]
+ 301 01e8 D21A     		subs	r2, r2, r3
+ 302 01ea 48F29F63 		movw	r3, #34463
+ 303 01ee C0F20103 		movt	r3, 1
+ 304 01f2 9A42     		cmp	r2, r3
+ 305 01f4 94BF     		ite	ls
+ 306 01f6 0023     		movls	r3, #0
+ 307 01f8 0123     		movhi	r3, #1
+ 308 01fa DBB2     		uxtb	r3, r3
+ 309 01fc 13E0     		b	.L15
+ 310              	.L14:
+ 311              		.loc 1 183 0 discriminator 2
+ 312 01fe 40F20003 		movw	r3, #:lower16:MAX7Wtask_counter.6680
+ 313 0202 C0F20003 		movt	r3, #:upper16:MAX7Wtask_counter.6680
+ 314 0206 1B68     		ldr	r3, [r3, #0]
+ 315 0208 6FEA0302 		mvn	r2, r3
+ 316 020c 4FF04023 		mov	r3, #1073758208
+ 317 0210 9B68     		ldr	r3, [r3, #8]
+ 318 0212 D218     		adds	r2, r2, r3
+ 319 0214 48F29F63 		movw	r3, #34463
+ 320 0218 C0F20103 		movt	r3, 1
+ 321 021c 9A42     		cmp	r2, r3
+ 322 021e 94BF     		ite	ls
+ 323 0220 0023     		movls	r3, #0
+ 324 0222 0123     		movhi	r3, #1
+ 325 0224 DBB2     		uxtb	r3, r3
+ 326              	.L15:
+ 327              		.loc 1 183 0 discriminator 3
+ 328 0226 002B     		cmp	r3, #0
+ 329 0228 09D0     		beq	.L16
+ 184:src/main.c    **** 		{
+ 185:src/main.c    **** 			// update time interval
+ 186:src/main.c    **** 			MAX7Wtask_counter = SYSTIME_NOW;
+ 330              		.loc 1 186 0 is_stmt 1
+ 331 022a 4FF04023 		mov	r3, #1073758208
+ 332 022e 9A68     		ldr	r2, [r3, #8]
+ 333 0230 40F20003 		movw	r3, #:lower16:MAX7Wtask_counter.6680
+ 334 0234 C0F20003 		movt	r3, #:upper16:MAX7Wtask_counter.6680
+ 335 0238 1A60     		str	r2, [r3, #0]
+ 187:src/main.c    **** 			CAN_UserSendGPSData();
+ 336              		.loc 1 187 0
+ 337 023a FFF7FEFF 		bl	CAN_UserSendGPSData
+ 338              	.L16:
+ 188:src/main.c    **** 		}
+ 189:src/main.c    **** 		//-------------------------
+ 190:src/main.c    **** 		if (SYSTIME_DIFF (DIO_counter, SYSTIME_NOW) >= 25000)
+ 339              		.loc 1 190 0
+ 340 023e 4FF04023 		mov	r3, #1073758208
+ 341 0242 9A68     		ldr	r2, [r3, #8]
+ 342 0244 40F20003 		movw	r3, #:lower16:DIO_counter.6681
+ 343 0248 C0F20003 		movt	r3, #:upper16:DIO_counter.6681
+ 344 024c 1B68     		ldr	r3, [r3, #0]
+ 345 024e 9A42     		cmp	r2, r3
+ 346 0250 10D3     		bcc	.L17
+ 347              		.loc 1 190 0 is_stmt 0 discriminator 1
+ 348 0252 4FF04023 		mov	r3, #1073758208
+ 349 0256 9A68     		ldr	r2, [r3, #8]
+ 350 0258 40F20003 		movw	r3, #:lower16:DIO_counter.6681
+ 351 025c C0F20003 		movt	r3, #:upper16:DIO_counter.6681
+ 352 0260 1B68     		ldr	r3, [r3, #0]
+ 353 0262 D21A     		subs	r2, r2, r3
+ 354 0264 46F2A713 		movw	r3, #24999
+ 355 0268 9A42     		cmp	r2, r3
+ 356 026a 94BF     		ite	ls
+ 357 026c 0023     		movls	r3, #0
+ 358 026e 0123     		movhi	r3, #1
+ 359 0270 DBB2     		uxtb	r3, r3
+ 360 0272 11E0     		b	.L18
+ 361              	.L17:
+ 362              		.loc 1 190 0 discriminator 2
+ 363 0274 40F20003 		movw	r3, #:lower16:DIO_counter.6681
+ 364 0278 C0F20003 		movt	r3, #:upper16:DIO_counter.6681
+ 365 027c 1B68     		ldr	r3, [r3, #0]
+ 366 027e 6FEA0302 		mvn	r2, r3
+ 367 0282 4FF04023 		mov	r3, #1073758208
+ 368 0286 9B68     		ldr	r3, [r3, #8]
+ 369 0288 D218     		adds	r2, r2, r3
+ 370 028a 46F2A713 		movw	r3, #24999
+ 371 028e 9A42     		cmp	r2, r3
+ 372 0290 94BF     		ite	ls
+ 373 0292 0023     		movls	r3, #0
+ 374 0294 0123     		movhi	r3, #1
+ 375 0296 DBB2     		uxtb	r3, r3
+ 376              	.L18:
+ 377              		.loc 1 190 0 discriminator 3
+ 378 0298 002B     		cmp	r3, #0
+ 379 029a 09D0     		beq	.L19
+ 191:src/main.c    **** 		{
+ 192:src/main.c    **** 			// update time interval
+ 193:src/main.c    **** 			DIO_counter = SYSTIME_NOW;
+ 380              		.loc 1 193 0 is_stmt 1
+ 381 029c 4FF04023 		mov	r3, #1073758208
+ 382 02a0 9A68     		ldr	r2, [r3, #8]
+ 383 02a2 40F20003 		movw	r3, #:lower16:DIO_counter.6681
+ 384 02a6 C0F20003 		movt	r3, #:upper16:DIO_counter.6681
+ 385 02aa 1A60     		str	r2, [r3, #0]
+ 194:src/main.c    **** 			CAN_UserSendDioData();
+ 386              		.loc 1 194 0
+ 387 02ac FFF7FEFF 		bl	CAN_UserSendDioData
+ 388              	.L19:
+ 195:src/main.c    **** 		}
+ 196:src/main.c    **** 		//-------------------------
+ 197:src/main.c    **** 
+ 198:src/main.c    **** 		if (SYSTIME_DIFF (TIME_counter, SYSTIME_NOW) >= 500000)
+ 389              		.loc 1 198 0
+ 390 02b0 4FF04023 		mov	r3, #1073758208
+ 391 02b4 9A68     		ldr	r2, [r3, #8]
+ 392 02b6 40F20003 		movw	r3, #:lower16:TIME_counter.6682
+ 393 02ba C0F20003 		movt	r3, #:upper16:TIME_counter.6682
+ 394 02be 1B68     		ldr	r3, [r3, #0]
+ 395 02c0 9A42     		cmp	r2, r3
+ 396 02c2 12D3     		bcc	.L20
+ 397              		.loc 1 198 0 is_stmt 0 discriminator 1
+ 398 02c4 4FF04023 		mov	r3, #1073758208
+ 399 02c8 9A68     		ldr	r2, [r3, #8]
+ 400 02ca 40F20003 		movw	r3, #:lower16:TIME_counter.6682
+ 401 02ce C0F20003 		movt	r3, #:upper16:TIME_counter.6682
+ 402 02d2 1B68     		ldr	r3, [r3, #0]
+ 403 02d4 D21A     		subs	r2, r2, r3
+ 404 02d6 4AF21F13 		movw	r3, #41247
+ 405 02da C0F20703 		movt	r3, 7
+ 406 02de 9A42     		cmp	r2, r3
+ 407 02e0 94BF     		ite	ls
+ 408 02e2 0023     		movls	r3, #0
+ 409 02e4 0123     		movhi	r3, #1
+ 410 02e6 DBB2     		uxtb	r3, r3
+ 411 02e8 13E0     		b	.L21
+ 412              	.L20:
+ 413              		.loc 1 198 0 discriminator 2
+ 414 02ea 40F20003 		movw	r3, #:lower16:TIME_counter.6682
+ 415 02ee C0F20003 		movt	r3, #:upper16:TIME_counter.6682
+ 416 02f2 1B68     		ldr	r3, [r3, #0]
+ 417 02f4 6FEA0302 		mvn	r2, r3
+ 418 02f8 4FF04023 		mov	r3, #1073758208
+ 419 02fc 9B68     		ldr	r3, [r3, #8]
+ 420 02fe D218     		adds	r2, r2, r3
+ 421 0300 4AF21F13 		movw	r3, #41247
+ 422 0304 C0F20703 		movt	r3, 7
+ 423 0308 9A42     		cmp	r2, r3
+ 424 030a 94BF     		ite	ls
+ 425 030c 0023     		movls	r3, #0
+ 426 030e 0123     		movhi	r3, #1
+ 427 0310 DBB2     		uxtb	r3, r3
+ 428              	.L21:
+ 429              		.loc 1 198 0 discriminator 3
+ 430 0312 002B     		cmp	r3, #0
+ 431 0314 09D0     		beq	.L22
+ 199:src/main.c    **** 		{
+ 200:src/main.c    **** 			// update time interval
+ 201:src/main.c    **** 			TIME_counter = SYSTIME_NOW;
+ 432              		.loc 1 201 0 is_stmt 1
+ 433 0316 4FF04023 		mov	r3, #1073758208
+ 434 031a 9A68     		ldr	r2, [r3, #8]
+ 435 031c 40F20003 		movw	r3, #:lower16:TIME_counter.6682
+ 436 0320 C0F20003 		movt	r3, #:upper16:TIME_counter.6682
+ 437 0324 1A60     		str	r2, [r3, #0]
+ 202:src/main.c    **** 			CAN_UserSendRTCTime();
+ 438              		.loc 1 202 0
+ 439 0326 FFF7FEFF 		bl	CAN_UserSendRTCTime
+ 440              	.L22:
+ 203:src/main.c    **** 		}
+ 204:src/main.c    **** 		//-------------------------
+ 205:src/main.c    **** 
+ 206:src/main.c    **** 		CAN_UserProcessMsg();
+ 441              		.loc 1 206 0
+ 442 032a FFF7FEFF 		bl	CAN_UserProcessMsg
+ 443              	.LBE2:
+ 207:src/main.c    **** 	} // end while (1)
+ 444              		.loc 1 207 0
+ 445 032e BCE6     		b	.L23
+ 446              		.cfi_endproc
+ 447              	.LFE113:
+ 449              		.align	2
+ 450              		.thumb
+ 451              		.thumb_func
+ 453              	init_system:
+ 454              	.LFB114:
+ 208:src/main.c    **** }
+ 209:src/main.c    **** 
+ 210:src/main.c    **** 
+ 211:src/main.c    **** 
+ 212:src/main.c    **** 	
+ 213:src/main.c    **** //------------------------------------------------------------------------------
+ 214:src/main.c    **** //! s32_t init_system(void)
+ 215:src/main.c    **** //------------------------------------------------------------------------------
+ 216:src/main.c    **** //! @brief initializes system
+ 217:src/main.c    **** //------------------------------------------------------------------------------
+ 218:src/main.c    **** s32_t init_system(void){
+ 455              		.loc 1 218 0
+ 456              		.cfi_startproc
+ 457              		@ args = 0, pretend = 0, frame = 8
+ 458              		@ frame_needed = 1, uses_anonymous_args = 0
+ 459 0330 80B5     		push	{r7, lr}
+ 460              	.LCFI4:
+ 461              		.cfi_def_cfa_offset 8
+ 462              		.cfi_offset 7, -8
+ 463              		.cfi_offset 14, -4
+ 464 0332 82B0     		sub	sp, sp, #8
+ 465              	.LCFI5:
+ 466              		.cfi_def_cfa_offset 16
+ 467 0334 00AF     		add	r7, sp, #0
+ 468              	.LCFI6:
+ 469              		.cfi_def_cfa_register 7
+ 219:src/main.c    **** 	s32_t res = 0;
+ 470              		.loc 1 219 0
+ 471 0336 4FF00003 		mov	r3, #0
+ 472 033a 7B60     		str	r3, [r7, #4]
+ 220:src/main.c    **** 
+ 221:src/main.c    **** 	// Initialize Basic Parts
+ 222:src/main.c    **** 	HW_Init();
+ 473              		.loc 1 222 0
+ 474 033c FFF7FEFF 		bl	HW_Init
+ 223:src/main.c    **** 
+ 224:src/main.c    **** 	// Initialize Systemtimer
+ 225:src/main.c    **** 	Init_Timer0();
+ 475              		.loc 1 225 0
+ 476 0340 FFF7FEFF 		bl	Init_Timer0
+ 226:src/main.c    **** 
+ 227:src/main.c    **** 	rtc_initialize();
+ 477              		.loc 1 227 0
+ 478 0344 FFF7FEFF 		bl	rtc_initialize
+ 228:src/main.c    **** 
+ 229:src/main.c    **** 	// read configuration values from EEPROM if present
+ 230:src/main.c    **** 	res = read_persistent_config();
+ 479              		.loc 1 230 0
+ 480 0348 00F098F8 		bl	read_persistent_config
+ 481 034c 7860     		str	r0, [r7, #4]
+ 231:src/main.c    **** 	if(res!=RET_OK)
+ 482              		.loc 1 231 0
+ 483 034e 7B68     		ldr	r3, [r7, #4]
+ 484 0350 002B     		cmp	r3, #0
+ 485 0352 01D0     		beq	.L25
+ 232:src/main.c    **** 		get_default_config();
+ 486              		.loc 1 232 0
+ 487 0354 00F036F8 		bl	get_default_config
+ 488              	.L25:
+ 233:src/main.c    **** 
+ 234:src/main.c    **** 	// Initialize CAN Controller
+ 235:src/main.c    **** 	CAN_UserInit();
+ 489              		.loc 1 235 0
+ 490 0358 FFF7FEFF 		bl	CAN_UserInit
+ 236:src/main.c    **** 
+ 237:src/main.c    **** 	// Init GPS and UART2
+ 238:src/main.c    **** 	UBLOX_MAX7W_init();
+ 491              		.loc 1 238 0
+ 492 035c FFF7FEFF 		bl	UBLOX_MAX7W_init
+ 239:src/main.c    **** 
+ 240:src/main.c    **** 	// Initialize gyroscope
+ 241:src/main.c    **** 	MEMS_L3GD20_init();
+ 493              		.loc 1 241 0
+ 494 0360 FFF7FEFF 		bl	MEMS_L3GD20_init
+ 242:src/main.c    **** 
+ 243:src/main.c    **** 	// Initialize magnetometer and accelerometer
+ 244:src/main.c    **** 	MEMS_BMC050_init_Accelerometer();
+ 495              		.loc 1 244 0
+ 496 0364 FFF7FEFF 		bl	MEMS_BMC050_init_Accelerometer
+ 245:src/main.c    **** 	MEMS_BMC050_init_Magnetometer();
+ 497              		.loc 1 245 0
+ 498 0368 FFF7FEFF 		bl	MEMS_BMC050_init_Magnetometer
+ 246:src/main.c    **** 
+ 247:src/main.c    **** 	// set values read from EEPROM *after* initialization of sensors with
+ 248:src/main.c    **** 	// default values
+ 249:src/main.c    **** 	MEMS_BMC050_SetAccCalTargets(	&cfg_data.Acc.cmp_target_x,
+ 499              		.loc 1 249 0
+ 500 036c 40F20000 		movw	r0, #:lower16:cfg_data
+ 501 0370 C0F20000 		movt	r0, #:upper16:cfg_data
+ 502 0374 1149     		ldr	r1, .L27
+ 503 0376 124A     		ldr	r2, .L27+4
+ 504 0378 FFF7FEFF 		bl	MEMS_BMC050_SetAccCalTargets
+ 250:src/main.c    **** 									&cfg_data.Acc.cmp_target_y,
+ 251:src/main.c    **** 									&cfg_data.Acc.cmp_target_z);
+ 252:src/main.c    **** 	MEMS_BMC050_SetAccRange(cfg_data.Acc.range);
+ 505              		.loc 1 252 0
+ 506 037c 40F20003 		movw	r3, #:lower16:cfg_data
+ 507 0380 C0F20003 		movt	r3, #:upper16:cfg_data
+ 508 0384 5B7A     		ldrb	r3, [r3, #9]	@ zero_extendqisi2
+ 509 0386 1846     		mov	r0, r3
+ 510 0388 FFF7FEFF 		bl	MEMS_BMC050_SetAccRange
+ 253:src/main.c    **** 
+ 254:src/main.c    **** 	MEMS_L3GD20_SetRange(cfg_data.Gyro.range);
+ 511              		.loc 1 254 0
+ 512 038c 40F20003 		movw	r3, #:lower16:cfg_data
+ 513 0390 C0F20003 		movt	r3, #:upper16:cfg_data
+ 514 0394 DB7A     		ldrb	r3, [r3, #11]	@ zero_extendqisi2
+ 515 0396 1846     		mov	r0, r3
+ 516 0398 FFF7FEFF 		bl	MEMS_L3GD20_SetRange
+ 255:src/main.c    **** 
+ 256:src/main.c    **** 	// Transmit initial configuration values once
+ 257:src/main.c    **** 	CAN_UserResetPanelValues();
+ 517              		.loc 1 257 0
+ 518 039c FFF7FEFF 		bl	CAN_UserResetPanelValues
+ 258:src/main.c    **** 
+ 259:src/main.c    **** 	Initialized = 1;
+ 519              		.loc 1 259 0
+ 520 03a0 40F20003 		movw	r3, #:lower16:Initialized
+ 521 03a4 C0F20003 		movt	r3, #:upper16:Initialized
+ 522 03a8 4FF00102 		mov	r2, #1
+ 523 03ac 1A70     		strb	r2, [r3, #0]
+ 260:src/main.c    **** 	return RET_OK;
+ 524              		.loc 1 260 0
+ 525 03ae 4FF00003 		mov	r3, #0
+ 261:src/main.c    **** }
+ 526              		.loc 1 261 0
+ 527 03b2 1846     		mov	r0, r3
+ 528 03b4 07F10807 		add	r7, r7, #8
+ 529 03b8 BD46     		mov	sp, r7
+ 530 03ba 80BD     		pop	{r7, pc}
+ 531              	.L28:
+ 532              		.align	2
+ 533              	.L27:
+ 534 03bc 01000000 		.word	cfg_data+1
+ 535 03c0 02000000 		.word	cfg_data+2
+ 536              		.cfi_endproc
+ 537              	.LFE114:
+ 539              		.align	2
+ 540              		.thumb
+ 541              		.thumb_func
+ 543              	get_default_config:
+ 544              	.LFB115:
+ 262:src/main.c    **** 
+ 263:src/main.c    **** 
+ 264:src/main.c    **** 
+ 265:src/main.c    **** //------------------------------------------------------------------------------
+ 266:src/main.c    **** //! static s32_t get_default_config(void)
+ 267:src/main.c    **** //------------------------------------------------------------------------------
+ 268:src/main.c    **** //! @brief	sets system configuration to default values
+ 269:src/main.c    **** //------------------------------------------------------------------------------
+ 270:src/main.c    **** static s32_t get_default_config(void){
+ 545              		.loc 1 270 0
+ 546              		.cfi_startproc
+ 547              		@ args = 0, pretend = 0, frame = 0
+ 548              		@ frame_needed = 1, uses_anonymous_args = 0
+ 549              		@ link register save eliminated.
+ 550 03c4 80B4     		push	{r7}
+ 551              	.LCFI7:
+ 552              		.cfi_def_cfa_offset 4
+ 553              		.cfi_offset 7, -4
+ 554 03c6 00AF     		add	r7, sp, #0
+ 555              	.LCFI8:
+ 556              		.cfi_def_cfa_register 7
+ 271:src/main.c    **** 
+ 272:src/main.c    **** 	cfg_data.Acc.cmp_target_x = 0;
+ 557              		.loc 1 272 0
+ 558 03c8 40F20003 		movw	r3, #:lower16:cfg_data
+ 559 03cc C0F20003 		movt	r3, #:upper16:cfg_data
+ 560 03d0 4FF00002 		mov	r2, #0
+ 561 03d4 1A70     		strb	r2, [r3, #0]
+ 273:src/main.c    **** 	cfg_data.Acc.cmp_target_y = 0;
+ 562              		.loc 1 273 0
+ 563 03d6 40F20003 		movw	r3, #:lower16:cfg_data
+ 564 03da C0F20003 		movt	r3, #:upper16:cfg_data
+ 565 03de 4FF00002 		mov	r2, #0
+ 566 03e2 5A70     		strb	r2, [r3, #1]
+ 274:src/main.c    **** 	cfg_data.Acc.cmp_target_z = 0;	
+ 567              		.loc 1 274 0
+ 568 03e4 40F20003 		movw	r3, #:lower16:cfg_data
+ 569 03e8 C0F20003 		movt	r3, #:upper16:cfg_data
+ 570 03ec 4FF00002 		mov	r2, #0
+ 571 03f0 9A70     		strb	r2, [r3, #2]
+ 275:src/main.c    **** 	cfg_data.Acc.cmp_filt_x = 0;
+ 572              		.loc 1 275 0
+ 573 03f2 40F20003 		movw	r3, #:lower16:cfg_data
+ 574 03f6 C0F20003 		movt	r3, #:upper16:cfg_data
+ 575 03fa 4FF00002 		mov	r2, #0
+ 576 03fe 9A71     		strb	r2, [r3, #6]
+ 276:src/main.c    **** 	cfg_data.Acc.cmp_filt_y = 0;
+ 577              		.loc 1 276 0
+ 578 0400 40F20003 		movw	r3, #:lower16:cfg_data
+ 579 0404 C0F20003 		movt	r3, #:upper16:cfg_data
+ 580 0408 4FF00002 		mov	r2, #0
+ 581 040c DA71     		strb	r2, [r3, #7]
+ 277:src/main.c    **** 	cfg_data.Acc.cmp_filt_z = 0;
+ 582              		.loc 1 277 0
+ 583 040e 40F20003 		movw	r3, #:lower16:cfg_data
+ 584 0412 C0F20003 		movt	r3, #:upper16:cfg_data
+ 585 0416 4FF00002 		mov	r2, #0
+ 586 041a 1A72     		strb	r2, [r3, #8]
+ 278:src/main.c    **** 	cfg_data.Acc.cmp_raw_x = 0;
+ 587              		.loc 1 278 0
+ 588 041c 40F20003 		movw	r3, #:lower16:cfg_data
+ 589 0420 C0F20003 		movt	r3, #:upper16:cfg_data
+ 590 0424 4FF00002 		mov	r2, #0
+ 591 0428 DA70     		strb	r2, [r3, #3]
+ 279:src/main.c    **** 	cfg_data.Acc.cmp_raw_y = 0;
+ 592              		.loc 1 279 0
+ 593 042a 40F20003 		movw	r3, #:lower16:cfg_data
+ 594 042e C0F20003 		movt	r3, #:upper16:cfg_data
+ 595 0432 4FF00002 		mov	r2, #0
+ 596 0436 1A71     		strb	r2, [r3, #4]
+ 280:src/main.c    **** 	cfg_data.Acc.cmp_raw_z = 0;
+ 597              		.loc 1 280 0
+ 598 0438 40F20003 		movw	r3, #:lower16:cfg_data
+ 599 043c C0F20003 		movt	r3, #:upper16:cfg_data
+ 600 0440 4FF00002 		mov	r2, #0
+ 601 0444 5A71     		strb	r2, [r3, #5]
+ 281:src/main.c    **** 	cfg_data.Acc.flags = 0;
+ 602              		.loc 1 281 0
+ 603 0446 40F20003 		movw	r3, #:lower16:cfg_data
+ 604 044a C0F20003 		movt	r3, #:upper16:cfg_data
+ 605 044e 4FF00002 		mov	r2, #0
+ 606 0452 9A72     		strb	r2, [r3, #10]
+ 282:src/main.c    **** 	
+ 283:src/main.c    **** 	cfg_data.Acc.range = 1;
+ 607              		.loc 1 283 0
+ 608 0454 40F20003 		movw	r3, #:lower16:cfg_data
+ 609 0458 C0F20003 		movt	r3, #:upper16:cfg_data
+ 610 045c 4FF00102 		mov	r2, #1
+ 611 0460 5A72     		strb	r2, [r3, #9]
+ 284:src/main.c    **** 
+ 285:src/main.c    **** 	cfg_data.Gyro.range = 0;
+ 612              		.loc 1 285 0
+ 613 0462 40F20003 		movw	r3, #:lower16:cfg_data
+ 614 0466 C0F20003 		movt	r3, #:upper16:cfg_data
+ 615 046a 4FF00002 		mov	r2, #0
+ 616 046e DA72     		strb	r2, [r3, #11]
+ 286:src/main.c    **** 	
+ 287:src/main.c    **** 	return RET_OK;
+ 617              		.loc 1 287 0
+ 618 0470 4FF00003 		mov	r3, #0
+ 288:src/main.c    **** }
+ 619              		.loc 1 288 0
+ 620 0474 1846     		mov	r0, r3
+ 621 0476 BD46     		mov	sp, r7
+ 622 0478 80BC     		pop	{r7}
+ 623 047a 7047     		bx	lr
+ 624              		.cfi_endproc
+ 625              	.LFE115:
+ 627              		.section	.rodata
+ 628              		.align	2
+ 629              	.LC0:
+ 630 0000 FFFFFFFF 		.word	-1
+ 631 0004 02       		.byte	2
+ 632 0005 01       		.byte	1
+ 633 0006 01       		.byte	1
+ 634 0007 00       		.byte	0
+ 635 0008 01       		.byte	1
+ 636 0009 000000   		.space	3
+ 637              		.text
+ 638              		.align	2
+ 639              		.thumb
+ 640              		.thumb_func
+ 642              	read_persistent_config:
+ 643              	.LFB116:
+ 289:src/main.c    **** 
+ 290:src/main.c    **** 
+ 291:src/main.c    **** 
+ 292:src/main.c    **** //------------------------------------------------------------------------------
+ 293:src/main.c    **** //! static s32_t read_persistent_config(void)
+ 294:src/main.c    **** //------------------------------------------------------------------------------
+ 295:src/main.c    **** //! @brief reads configuration from EEPROM
+ 296:src/main.c    **** //------------------------------------------------------------------------------
+ 297:src/main.c    **** //! @return	RET_ERR if EEPROM read fails or if CRC checksum was not valid
+ 298:src/main.c    **** //!			RET_OK	elsewise
+ 299:src/main.c    **** //------------------------------------------------------------------------------
+ 300:src/main.c    **** static s32_t read_persistent_config(void){
+ 644              		.loc 1 300 0
+ 645              		.cfi_startproc
+ 646              		@ args = 0, pretend = 0, frame = 24
+ 647              		@ frame_needed = 1, uses_anonymous_args = 0
+ 648 047c 90B5     		push	{r4, r7, lr}
+ 649              	.LCFI9:
+ 650              		.cfi_def_cfa_offset 12
+ 651              		.cfi_offset 4, -12
+ 652              		.cfi_offset 7, -8
+ 653              		.cfi_offset 14, -4
+ 654 047e 89B0     		sub	sp, sp, #36
+ 655              	.LCFI10:
+ 656              		.cfi_def_cfa_offset 48
+ 657 0480 02AF     		add	r7, sp, #8
+ 658              	.LCFI11:
+ 659              		.cfi_def_cfa 7, 40
+ 301:src/main.c    **** 	CRCInit_t cfg= CRC32_CONFIG;
+ 660              		.loc 1 301 0
+ 661 0482 40F20003 		movw	r3, #:lower16:.LC0
+ 662 0486 C0F20003 		movt	r3, #:upper16:.LC0
+ 663 048a 07F10404 		add	r4, r7, #4
+ 664 048e 93E80700 		ldmia	r3, {r0, r1, r2}
+ 665 0492 84E80700 		stmia	r4, {r0, r1, r2}
+ 302:src/main.c    **** 	u32_t res=0;
+ 666              		.loc 1 302 0
+ 667 0496 4FF00003 		mov	r3, #0
+ 668 049a 7B61     		str	r3, [r7, #20]
+ 303:src/main.c    **** 	u32_t cnt=0;
+ 669              		.loc 1 303 0
+ 670 049c 4FF00003 		mov	r3, #0
+ 671 04a0 3B61     		str	r3, [r7, #16]
+ 304:src/main.c    **** 	
+ 305:src/main.c    **** 	//! read static configuration data from eeprom
+ 306:src/main.c    **** 	if(EEPROM_Read(EEPROM_INT, EEPROM_CFG_ADDR,
+ 672              		.loc 1 306 0
+ 673 04a2 4FF00000 		mov	r0, #0
+ 674 04a6 4FF00001 		mov	r1, #0
+ 675 04aa 40F20002 		movw	r2, #:lower16:cfg_data
+ 676 04ae C0F20002 		movt	r2, #:upper16:cfg_data
+ 677 04b2 4FF02403 		mov	r3, #36
+ 678 04b6 FFF7FEFF 		bl	EEPROM_Read
+ 679 04ba 0346     		mov	r3, r0
+ 680 04bc 002B     		cmp	r3, #0
+ 681 04be 02D0     		beq	.L32
+ 307:src/main.c    **** 			(u8_t*)&cfg_data, sizeof(cfg_data))!=EEPROM_ERR_OK)
+ 308:src/main.c    **** 		return RET_ERR;
+ 682              		.loc 1 308 0
+ 683 04c0 4FF0FF33 		mov	r3, #-1
+ 684 04c4 23E0     		b	.L35
+ 685              	.L32:
+ 309:src/main.c    **** 
+ 310:src/main.c    **** 	cnt = sizeof(cfg_data)-sizeofmember(S_CONFIG_DATA_t, crc32);
+ 686              		.loc 1 310 0
+ 687 04c6 4FF02003 		mov	r3, #32
+ 688 04ca 3B61     		str	r3, [r7, #16]
+ 311:src/main.c    **** 	res = CRC_Valid(&cfg_data, cnt, t_crc_8_bit, &cfg, cfg_data.crc32);
+ 689              		.loc 1 311 0
+ 690 04cc 40F20003 		movw	r3, #:lower16:cfg_data
+ 691 04d0 C0F20003 		movt	r3, #:upper16:cfg_data
+ 692 04d4 1A6A     		ldr	r2, [r3, #32]
+ 693 04d6 07F10403 		add	r3, r7, #4
+ 694 04da 0092     		str	r2, [sp, #0]
+ 695 04dc 40F20000 		movw	r0, #:lower16:cfg_data
+ 696 04e0 C0F20000 		movt	r0, #:upper16:cfg_data
+ 697 04e4 3969     		ldr	r1, [r7, #16]
+ 698 04e6 4FF00002 		mov	r2, #0
+ 699 04ea FFF7FEFF 		bl	CRC_Valid
+ 700 04ee 7861     		str	r0, [r7, #20]
+ 312:src/main.c    **** 	if(res!=1)
+ 701              		.loc 1 312 0
+ 702 04f0 7B69     		ldr	r3, [r7, #20]
+ 703 04f2 012B     		cmp	r3, #1
+ 704 04f4 02D0     		beq	.L34
+ 313:src/main.c    **** 		return RET_ERR;
+ 705              		.loc 1 313 0
+ 706 04f6 4FF0FF33 		mov	r3, #-1
+ 707 04fa 08E0     		b	.L35
+ 708              	.L34:
+ 314:src/main.c    **** 
+ 315:src/main.c    **** 	persistant_config_used = 1;
+ 709              		.loc 1 315 0
+ 710 04fc 40F20003 		movw	r3, #:lower16:persistant_config_used
+ 711 0500 C0F20003 		movt	r3, #:upper16:persistant_config_used
+ 712 0504 4FF00102 		mov	r2, #1
+ 713 0508 1A70     		strb	r2, [r3, #0]
+ 316:src/main.c    **** 
+ 317:src/main.c    **** 	return RET_OK;
+ 714              		.loc 1 317 0
+ 715 050a 4FF00003 		mov	r3, #0
+ 716              	.L35:
+ 318:src/main.c    **** }
+ 717              		.loc 1 318 0
+ 718 050e 1846     		mov	r0, r3
+ 719 0510 07F11C07 		add	r7, r7, #28
+ 720 0514 BD46     		mov	sp, r7
+ 721 0516 90BD     		pop	{r4, r7, pc}
+ 722              		.cfi_endproc
+ 723              	.LFE116:
+ 725              		.bss
+ 726 0002 0000     		.align	2
+ 727              	BMC050task_counter.6678:
+ 728 0004 00000000 		.space	4
+ 729              		.align	2
+ 730              	L3GD20task_counter.6679:
+ 731 0008 00000000 		.space	4
+ 732              		.align	2
+ 733              	MAX7Wtask_counter.6680:
+ 734 000c 00000000 		.space	4
+ 735              		.align	2
+ 736              	DIO_counter.6681:
+ 737 0010 00000000 		.space	4
+ 738              		.align	2
+ 739              	TIME_counter.6682:
+ 740 0014 00000000 		.space	4
+ 741              		.align	2
+ 742              	LedBlink_counter.6673:
+ 743 0018 00000000 		.space	4
+ 744              	toggle_led.6674:
+ 745 001c 00       		.space	1
+ 746 001d 000000   		.text
+ 747              	.Letext0:
+ 748              		.file 2 "c:/tools/pcan-router/yagarto-20121222/lib/gcc/../../arm-none-eabi/sys-include/stdint.h"
+ 749              		.file 3 "./inc/lpc407x_8x_177x_8x.h"
+ 750              		.file 4 "./inc/typedefs.h"
+ 751              		.file 5 "./inc/lib/crc.h"
+ 752              		.file 6 "./inc/MEMS_BMC050.h"
+ 753              		.file 7 "./inc/MEMS_L3GD20.h"
+ 754              		.file 8 "./inc/crc_data.h"
+ 755              		.file 9 "./inc/core_cm4.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:23     .ident:00000000 Ident
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:20     .ident:00000000 $d
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:30     .C2F_Info:00000000 C2F_Array
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:27     .C2F_Info:00000000 $d
+                            *COM*:00000024 cfg_data
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:43     .bss:00000000 Initialized
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:44     .bss:00000000 $d
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:48     .bss:00000001 persistant_config_used
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:51     .text:00000000 $t
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:56     .text:00000000 Timer_1000usec
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:742    .bss:00000018 LedBlink_counter.6673
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:744    .bss:0000001c toggle_led.6674
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:140    .text:00000094 main
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:453    .text:00000330 init_system
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:727    .bss:00000004 BMC050task_counter.6678
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:730    .bss:00000008 L3GD20task_counter.6679
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:733    .bss:0000000c MAX7Wtask_counter.6680
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:736    .bss:00000010 DIO_counter.6681
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:739    .bss:00000014 TIME_counter.6682
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:642    .text:0000047c read_persistent_config
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:543    .text:000003c4 get_default_config
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:534    .text:000003bc $d
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:539    .text:000003c4 $t
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:628    .rodata:00000000 $d
+C:\Users\Ian\AppData\Local\Temp\ccDG6MZZ.s:629    .rodata:00000000 .LC0
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+HW_SetLED
+BMC050_Readings
+MEMS_BMC050_task
+CAN_UserSendBMCData
+MEMS_L3GD20_task
+L3GD20_Readings
+CAN_UserSendL3GDData
+UBLOX_MAX7W_task
+CAN_UserSendGPSData
+CAN_UserSendDioData
+CAN_UserSendRTCTime
+CAN_UserProcessMsg
+HW_Init
+Init_Timer0
+rtc_initialize
+CAN_UserInit
+UBLOX_MAX7W_init
+MEMS_L3GD20_init
+MEMS_BMC050_init_Accelerometer
+MEMS_BMC050_init_Magnetometer
+MEMS_BMC050_SetAccCalTargets
+MEMS_BMC050_SetAccRange
+MEMS_L3GD20_SetRange
+CAN_UserResetPanelValues
+EEPROM_Read
+CRC_Valid

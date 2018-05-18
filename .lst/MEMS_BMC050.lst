@@ -1,0 +1,4430 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"MEMS_BMC050.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.bss
+  19              	use_dbg_data:
+  20 0000 00       		.space	1
+  21              		.comm	BMC050_dbg_data_cmp,11,4
+  22              		.comm	BMC050_dbg_data_acc,10,4
+  23              		.comm	BMC050_Readings,18,4
+  24              		.comm	BMC050_AccCompensate,10,4
+  25              	BMC050State:
+  26 0001 00       		.space	1
+  27              	GoToState:
+  28 0002 00       		.space	1
+  29 0003 00       		.align	2
+  30              	AccIRQConfig:
+  31 0004 00000000 		.space	27
+  31      00000000 
+  31      00000000 
+  31      00000000 
+  31      00000000 
+  32 001f 00       		.align	2
+  33              	AccBWPwrConfig:
+  34 0020 000000   		.space	3
+  35              		.data
+  38              	vertical_axis:
+  39 0000 03       		.byte	3
+  40              		.bss
+  41 0023 00       		.align	2
+  42              	AccDataRaw:
+  43 0024 00000000 		.space	10
+  43      00000000 
+  43      0000
+  44 002e 0000     		.align	2
+  45              	CmpDataRaw:
+  46 0030 00000000 		.space	11
+  46      00000000 
+  46      000000
+  47              	ssp_init:
+  48 003b 00       		.space	1
+  49              	data_init:
+  50 003c 00       		.space	1
+  51 003d 000000   		.data
+  54              	AccSensitivity:
+  55 0001 04       		.byte	4
+  56              		.text
+  57              		.align	2
+  58              		.global	MEMS_BMC050_init_Accelerometer
+  59              		.thumb
+  60              		.thumb_func
+  62              	MEMS_BMC050_init_Accelerometer:
+  63              	.LFB112:
+  64              		.file 1 "src/MEMS_BMC050.c"
+   1:src/MEMS_BMC050.c **** /*******************************************************************************
+   2:src/MEMS_BMC050.c ****  *
+   3:src/MEMS_BMC050.c ****  * Project  :	PCAN-GPS
+   4:src/MEMS_BMC050.c ****  * Module   :
+   5:src/MEMS_BMC050.c ****  * Filename :	MEMS_BMC050.c
+   6:src/MEMS_BMC050.c ****  * System   :
+   7:src/MEMS_BMC050.c ****  * Compiler :
+   8:src/MEMS_BMC050.c ****  * Switches :
+   9:src/MEMS_BMC050.c ****  * Rights   : 	(c) PEAK-System Technik GmbH
+  10:src/MEMS_BMC050.c ****  *            	www.peak-system.com
+  11:src/MEMS_BMC050.c ****  *
+  12:src/MEMS_BMC050.c ****  *******************************************************************************
+  13:src/MEMS_BMC050.c ****  * Implementation description
+  14:src/MEMS_BMC050.c ****  *
+  15:src/MEMS_BMC050.c ****  *
+  16:src/MEMS_BMC050.c ****  *
+  17:src/MEMS_BMC050.c ****  *******************************************************************************
+  18:src/MEMS_BMC050.c ****  * History: (newer entries first!)
+  19:src/MEMS_BMC050.c ****  *------------------------------------------------------------------------------
+  20:src/MEMS_BMC050.c ****  * Date / Name      Vers.   changes made
+  21:src/MEMS_BMC050.c ****  *------------------------------------------------------------------------------
+  22:src/MEMS_BMC050.c ****  * 2015 Mar  06/StM	0.0.3	bug fixed in acceleration calculation
+  23:src/MEMS_BMC050.c ****  * 2014 June 04/StM	0.0.2	clean-up
+  24:src/MEMS_BMC050.c ****  * 2013 Sep xx/StS	0.0.1	Initial Version
+  25:src/MEMS_BMC050.c ****  ******************************************************************************/
+  26:src/MEMS_BMC050.c **** 
+  27:src/MEMS_BMC050.c **** /* @ ToDo: 	- remove debug functions	*/
+  28:src/MEMS_BMC050.c **** 
+  29:src/MEMS_BMC050.c **** /*******************************************************************************
+  30:src/MEMS_BMC050.c ****  include files
+  31:src/MEMS_BMC050.c ****  ******************************************************************************/
+  32:src/MEMS_BMC050.c **** //
+  33:src/MEMS_BMC050.c **** // System header files
+  34:src/MEMS_BMC050.c **** //
+  35:src/MEMS_BMC050.c **** #include <math.h>
+  36:src/MEMS_BMC050.c **** #include <lpc407x_8x_177x_8x.h>
+  37:src/MEMS_BMC050.c **** #include <system_LPC407x_8x_177x_8x.h>
+  38:src/MEMS_BMC050.c **** 
+  39:src/MEMS_BMC050.c **** //
+  40:src/MEMS_BMC050.c **** // Library header files
+  41:src/MEMS_BMC050.c **** //
+  42:src/MEMS_BMC050.c **** #include "typedefs.h"
+  43:src/MEMS_BMC050.c **** #include "hardware.h"
+  44:src/MEMS_BMC050.c **** #include "timer.h"
+  45:src/MEMS_BMC050.c **** #include "ssp.h"
+  46:src/MEMS_BMC050.c **** 
+  47:src/MEMS_BMC050.c **** //
+  48:src/MEMS_BMC050.c **** // Source code header files
+  49:src/MEMS_BMC050.c **** //
+  50:src/MEMS_BMC050.c **** #include "MEMS_BMC050.h"
+  51:src/MEMS_BMC050.c **** 
+  52:src/MEMS_BMC050.c **** /*******************************************************************************
+  53:src/MEMS_BMC050.c ****  global definitions
+  54:src/MEMS_BMC050.c ****  ******************************************************************************/
+  55:src/MEMS_BMC050.c **** #ifdef DEBUG
+  56:src/MEMS_BMC050.c **** #undef DEBUG
+  57:src/MEMS_BMC050.c **** #endif
+  58:src/MEMS_BMC050.c **** #define DEBUG 1
+  59:src/MEMS_BMC050.c **** 
+  60:src/MEMS_BMC050.c **** #ifdef DEBUG
+  61:src/MEMS_BMC050.c **** static u8_t use_dbg_data=0;
+  62:src/MEMS_BMC050.c **** MEMS_BMC050_Mag_Data_Type BMC050_dbg_data_cmp;
+  63:src/MEMS_BMC050.c **** MEMS_BMC050_Acc_Data_Type BMC050_dbg_data_acc;
+  64:src/MEMS_BMC050.c **** #endif
+  65:src/MEMS_BMC050.c **** 
+  66:src/MEMS_BMC050.c **** // holds results of the BMC050
+  67:src/MEMS_BMC050.c **** MEMS_BMC050_Result_Type BMC050_Readings;
+  68:src/MEMS_BMC050.c **** MEMS_BMC050_Acc_Comp_Type BMC050_AccCompensate;
+  69:src/MEMS_BMC050.c **** 
+  70:src/MEMS_BMC050.c **** extern S_CONFIG_DATA_t cfg_data;
+  71:src/MEMS_BMC050.c **** 
+  72:src/MEMS_BMC050.c **** /*******************************************************************************
+  73:src/MEMS_BMC050.c ****  local definitions
+  74:src/MEMS_BMC050.c ****  ******************************************************************************/
+  75:src/MEMS_BMC050.c **** #define bufsize 17
+  76:src/MEMS_BMC050.c **** 
+  77:src/MEMS_BMC050.c **** 
+  78:src/MEMS_BMC050.c **** typedef enum _BMC050States {
+  79:src/MEMS_BMC050.c **** 	readAccelerometer,
+  80:src/MEMS_BMC050.c **** 	readMagnetometer,
+  81:src/MEMS_BMC050.c **** 	processResults,
+  82:src/MEMS_BMC050.c **** 	slowCompensation,
+  83:src/MEMS_BMC050.c **** 	startFastCompensation,
+  84:src/MEMS_BMC050.c **** 	fastCompensation_x,
+  85:src/MEMS_BMC050.c **** 	fastCompensation_y,
+  86:src/MEMS_BMC050.c **** 	fastCompensation_z,
+  87:src/MEMS_BMC050.c **** 	readAccelerometerCompenstaionValues,
+  88:src/MEMS_BMC050.c **** 	manualAccCompensation,
+  89:src/MEMS_BMC050.c **** 	resetAccCompensation,
+  90:src/MEMS_BMC050.c **** } MEMS_BMC050_States_Type;
+  91:src/MEMS_BMC050.c **** 
+  92:src/MEMS_BMC050.c **** // holds current state of state machine
+  93:src/MEMS_BMC050.c **** static MEMS_BMC050_States_Type BMC050State = readAccelerometer;
+  94:src/MEMS_BMC050.c **** // holds state to set state machine to after next "processResults" cycle is done
+  95:src/MEMS_BMC050.c **** static MEMS_BMC050_States_Type GoToState = readAccelerometer;
+  96:src/MEMS_BMC050.c **** 
+  97:src/MEMS_BMC050.c **** 
+  98:src/MEMS_BMC050.c **** static MEMS_BMC050_Acc_IRQCfg_Type  AccIRQConfig;
+  99:src/MEMS_BMC050.c **** static MEMS_BMC050_Acc_BwPwr_Type  AccBWPwrConfig;
+ 100:src/MEMS_BMC050.c **** 
+ 101:src/MEMS_BMC050.c **** static u8_t vertical_axis = Z_AXIS;
+ 102:src/MEMS_BMC050.c **** 
+ 103:src/MEMS_BMC050.c **** static MEMS_BMC050_Acc_Data_Type AccDataRaw;
+ 104:src/MEMS_BMC050.c **** static MEMS_BMC050_Mag_Data_Type CmpDataRaw;
+ 105:src/MEMS_BMC050.c **** 
+ 106:src/MEMS_BMC050.c **** static u8_t ssp_init=0;			//<! ssp initialized yet?
+ 107:src/MEMS_BMC050.c **** static u8_t data_init=0;		//<! data structure initialized yet?
+ 108:src/MEMS_BMC050.c **** 
+ 109:src/MEMS_BMC050.c **** //! multiplier for acceleration values to have always the same scale in data
+ 110:src/MEMS_BMC050.c **** //! structure independent from sensors measurement range
+ 111:src/MEMS_BMC050.c **** static u8_t AccSensitivity = 4;
+ 112:src/MEMS_BMC050.c **** 
+ 113:src/MEMS_BMC050.c **** 
+ 114:src/MEMS_BMC050.c **** /*******************************************************************************
+ 115:src/MEMS_BMC050.c ****  local function prototypes
+ 116:src/MEMS_BMC050.c ****  ******************************************************************************/
+ 117:src/MEMS_BMC050.c **** int AccCalRdy(void);
+ 118:src/MEMS_BMC050.c **** 
+ 119:src/MEMS_BMC050.c **** static HWStatus_t initSSP(void);
+ 120:src/MEMS_BMC050.c **** static void initData(void);
+ 121:src/MEMS_BMC050.c **** static int prcRawAccValues(MEMS_BMC050_Acc_Data_Type *pData,
+ 122:src/MEMS_BMC050.c **** 		MEMS_BMC050_Result_Type *pRes);
+ 123:src/MEMS_BMC050.c **** static int prcRawCmpValues(MEMS_BMC050_Mag_Data_Type *pData,
+ 124:src/MEMS_BMC050.c **** 		MEMS_BMC050_Result_Type *pRes);
+ 125:src/MEMS_BMC050.c **** static int readCurrAccelerationValues(MEMS_BMC050_Acc_Data_Type *pBuff);
+ 126:src/MEMS_BMC050.c **** static int readCurrMagValues(MEMS_BMC050_Mag_Data_Type *pBuff);
+ 127:src/MEMS_BMC050.c **** static int readAccRange(void);
+ 128:src/MEMS_BMC050.c **** static void setAccRange(void);
+ 129:src/MEMS_BMC050.c **** static int readAccIRQConfig(void);
+ 130:src/MEMS_BMC050.c **** static int setAccCompensationTargets(void);
+ 131:src/MEMS_BMC050.c **** static int readAccCompenstaionValues(void);
+ 132:src/MEMS_BMC050.c **** static int accFastCompensationX(void);
+ 133:src/MEMS_BMC050.c **** static int accFastCompensationY(void);
+ 134:src/MEMS_BMC050.c **** static int accFastCompensationZ(void);
+ 135:src/MEMS_BMC050.c **** static int resetAccCompensationValues(void);
+ 136:src/MEMS_BMC050.c **** static u8_t checkAccIRQ(void);
+ 137:src/MEMS_BMC050.c **** static u8_t checkMagIRQ(void);
+ 138:src/MEMS_BMC050.c **** static void handleAccIRQ(void);
+ 139:src/MEMS_BMC050.c **** static void handleMagIRQ(void);
+ 140:src/MEMS_BMC050.c **** static u8_t rwACC(u8_t *p_wBuff, u8_t *p_rBuff, u8_t len);
+ 141:src/MEMS_BMC050.c **** static u8_t rwMAG(u8_t *p_wBuff, u8_t *p_rBuff, u8_t len);
+ 142:src/MEMS_BMC050.c **** static u8_t wAccReg(u8_t reg, u8_t val);
+ 143:src/MEMS_BMC050.c **** static u8_t wMagReg(u8_t reg, u8_t val);
+ 144:src/MEMS_BMC050.c **** static u8_t rMagReg(u8_t reg, u8_t *p_val);
+ 145:src/MEMS_BMC050.c **** 
+ 146:src/MEMS_BMC050.c **** /*******************************************************************************
+ 147:src/MEMS_BMC050.c ****  global functions
+ 148:src/MEMS_BMC050.c ****  ******************************************************************************/
+ 149:src/MEMS_BMC050.c **** 
+ 150:src/MEMS_BMC050.c **** 
+ 151:src/MEMS_BMC050.c **** 
+ 152:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 153:src/MEMS_BMC050.c **** //! HWStatus_t MEMS_BMC050_init_Accelerometer(void)
+ 154:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 155:src/MEMS_BMC050.c **** //! @brief	initializes accelerometer part of BMC50/150 sensor with default
+ 156:src/MEMS_BMC050.c **** //!			settings. If not done yet SSP is also initialized
+ 157:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 158:src/MEMS_BMC050.c **** //! @return one of the default HW_ERR codes
+ 159:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 160:src/MEMS_BMC050.c **** HWStatus_t MEMS_BMC050_init_Accelerometer(void){
+  65              		.loc 1 160 0
+  66              		.cfi_startproc
+  67              		@ args = 0, pretend = 0, frame = 40
+  68              		@ frame_needed = 1, uses_anonymous_args = 0
+  69 0000 80B5     		push	{r7, lr}
+  70              	.LCFI0:
+  71              		.cfi_def_cfa_offset 8
+  72              		.cfi_offset 7, -8
+  73              		.cfi_offset 14, -4
+  74 0002 8AB0     		sub	sp, sp, #40
+  75              	.LCFI1:
+  76              		.cfi_def_cfa_offset 48
+  77 0004 00AF     		add	r7, sp, #0
+  78              	.LCFI2:
+  79              		.cfi_def_cfa_register 7
+ 161:src/MEMS_BMC050.c **** 	u8_t wBuff[bufsize];
+ 162:src/MEMS_BMC050.c **** 	u8_t rBuff[bufsize];
+ 163:src/MEMS_BMC050.c **** 
+ 164:src/MEMS_BMC050.c **** 	if(!ssp_init){
+  80              		.loc 1 164 0
+  81 0006 40F20003 		movw	r3, #:lower16:ssp_init
+  82 000a C0F20003 		movt	r3, #:upper16:ssp_init
+  83 000e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+  84 0010 002B     		cmp	r3, #0
+  85 0012 07D1     		bne	.L2
+ 165:src/MEMS_BMC050.c **** 		if(initSSP() != HW_ERR_OK)
+  86              		.loc 1 165 0
+  87 0014 00F068FD 		bl	initSSP
+  88 0018 0346     		mov	r3, r0
+  89 001a 002B     		cmp	r3, #0
+  90 001c 02D0     		beq	.L2
+ 166:src/MEMS_BMC050.c **** 			return HW_ERR_RESOURCE;
+  91              		.loc 1 166 0
+  92 001e 4FF00203 		mov	r3, #2
+  93 0022 70E1     		b	.L7
+  94              	.L2:
+ 167:src/MEMS_BMC050.c **** 	}
+ 168:src/MEMS_BMC050.c **** 
+ 169:src/MEMS_BMC050.c **** 	if(!data_init)
+  95              		.loc 1 169 0
+  96 0024 40F20003 		movw	r3, #:lower16:data_init
+  97 0028 C0F20003 		movt	r3, #:upper16:data_init
+  98 002c 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+  99 002e 002B     		cmp	r3, #0
+ 100 0030 01D1     		bne	.L4
+ 170:src/MEMS_BMC050.c **** 		initData();
+ 101              		.loc 1 170 0
+ 102 0032 00F03DFD 		bl	initData
+ 103              	.L4:
+ 171:src/MEMS_BMC050.c **** 
+ 172:src/MEMS_BMC050.c **** 	// this initializes the accelerometer
+ 173:src/MEMS_BMC050.c **** 	// write register 34h: spi 4-wire
+ 174:src/MEMS_BMC050.c **** 	wAccReg(0x34, 0x00);
+ 104              		.loc 1 174 0
+ 105 0036 4FF03400 		mov	r0, #52
+ 106 003a 4FF00001 		mov	r1, #0
+ 107 003e 01F095F9 		bl	wAccReg
+ 175:src/MEMS_BMC050.c **** 
+ 176:src/MEMS_BMC050.c **** 	// write register 0Fh: G-range
+ 177:src/MEMS_BMC050.c **** 	setAccRange();
+ 108              		.loc 1 177 0
+ 109 0042 00F05BFF 		bl	setAccRange
+ 178:src/MEMS_BMC050.c **** 	
+ 179:src/MEMS_BMC050.c **** 	AccBWPwrConfig.cmd=0x10;
+ 110              		.loc 1 179 0
+ 111 0046 40F20003 		movw	r3, #:lower16:AccBWPwrConfig
+ 112 004a C0F20003 		movt	r3, #:upper16:AccBWPwrConfig
+ 113 004e 4FF01002 		mov	r2, #16
+ 114 0052 1A70     		strb	r2, [r3, #0]
+ 180:src/MEMS_BMC050.c **** 	AccBWPwrConfig.Reg_0x10.bandwidth = 0x4;
+ 115              		.loc 1 180 0
+ 116 0054 40F20003 		movw	r3, #:lower16:AccBWPwrConfig
+ 117 0058 C0F20003 		movt	r3, #:upper16:AccBWPwrConfig
+ 118 005c 5A78     		ldrb	r2, [r3, #1]
+ 119 005e 4FF00401 		mov	r1, #4
+ 120 0062 61F30402 		bfi	r2, r1, #0, #5
+ 121 0066 5A70     		strb	r2, [r3, #1]
+ 181:src/MEMS_BMC050.c **** 	AccBWPwrConfig.Reg_0x11.lowpower_en=0;
+ 122              		.loc 1 181 0
+ 123 0068 40F20003 		movw	r3, #:lower16:AccBWPwrConfig
+ 124 006c C0F20003 		movt	r3, #:upper16:AccBWPwrConfig
+ 125 0070 9A78     		ldrb	r2, [r3, #2]
+ 126 0072 6FF38612 		bfc	r2, #6, #1
+ 127 0076 9A70     		strb	r2, [r3, #2]
+ 182:src/MEMS_BMC050.c **** 	AccBWPwrConfig.Reg_0x11.sleep_dur=0;
+ 128              		.loc 1 182 0
+ 129 0078 40F20003 		movw	r3, #:lower16:AccBWPwrConfig
+ 130 007c C0F20003 		movt	r3, #:upper16:AccBWPwrConfig
+ 131 0080 9A78     		ldrb	r2, [r3, #2]
+ 132 0082 6FF34402 		bfc	r2, #1, #4
+ 133 0086 9A70     		strb	r2, [r3, #2]
+ 183:src/MEMS_BMC050.c **** 	AccBWPwrConfig.Reg_0x11.suspend=0;
+ 134              		.loc 1 183 0
+ 135 0088 40F20003 		movw	r3, #:lower16:AccBWPwrConfig
+ 136 008c C0F20003 		movt	r3, #:upper16:AccBWPwrConfig
+ 137 0090 9A78     		ldrb	r2, [r3, #2]
+ 138 0092 6FF3C712 		bfc	r2, #7, #1
+ 139 0096 9A70     		strb	r2, [r3, #2]
+ 184:src/MEMS_BMC050.c **** 	rwACC((u8_t*)&AccBWPwrConfig, rBuff, 3);
+ 140              		.loc 1 184 0
+ 141 0098 3B46     		mov	r3, r7
+ 142 009a 40F20000 		movw	r0, #:lower16:AccBWPwrConfig
+ 143 009e C0F20000 		movt	r0, #:upper16:AccBWPwrConfig
+ 144 00a2 1946     		mov	r1, r3
+ 145 00a4 4FF00302 		mov	r2, #3
+ 146 00a8 01F07CF9 		bl	rwACC
+ 185:src/MEMS_BMC050.c **** 
+ 186:src/MEMS_BMC050.c **** 	// write register 13h: Filtered Data & Shadow on
+ 187:src/MEMS_BMC050.c **** 	wAccReg(0x13, 0x00);
+ 147              		.loc 1 187 0
+ 148 00ac 4FF01300 		mov	r0, #19
+ 149 00b0 4FF00001 		mov	r1, #0
+ 150 00b4 01F05AF9 		bl	wAccReg
+ 188:src/MEMS_BMC050.c **** 	
+ 189:src/MEMS_BMC050.c **** 	readAccIRQConfig();
+ 151              		.loc 1 189 0
+ 152 00b8 00F04CFF 		bl	readAccIRQConfig
+ 190:src/MEMS_BMC050.c **** 
+ 191:src/MEMS_BMC050.c **** 	// disable desired interrupt, change parameters, wait for about 1[ms],
+ 192:src/MEMS_BMC050.c **** 	// enable the desired interrupt
+ 193:src/MEMS_BMC050.c **** 	AccIRQConfig.Reg_0x2C.orient_blocking = 3;
+ 153              		.loc 1 193 0
+ 154 00bc 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 155 00c0 C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 156 00c4 DA7D     		ldrb	r2, [r3, #23]
+ 157 00c6 42F00C02 		orr	r2, r2, #12
+ 158 00ca DA75     		strb	r2, [r3, #23]
+ 194:src/MEMS_BMC050.c **** 	AccIRQConfig.Reg_0x2C.orient_hyst = 3;
+ 159              		.loc 1 194 0
+ 160 00cc 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 161 00d0 C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 162 00d4 DA7D     		ldrb	r2, [r3, #23]
+ 163 00d6 4FF00301 		mov	r1, #3
+ 164 00da 61F30612 		bfi	r2, r1, #4, #3
+ 165 00de DA75     		strb	r2, [r3, #23]
+ 195:src/MEMS_BMC050.c **** 	wAccReg(0x2C, *((u8_t*)&AccIRQConfig.Reg_0x2C));
+ 166              		.loc 1 195 0
+ 167 00e0 8B4B     		ldr	r3, .L8
+ 168 00e2 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 169 00e4 4FF02C00 		mov	r0, #44
+ 170 00e8 1946     		mov	r1, r3
+ 171 00ea 01F03FF9 		bl	wAccReg
+ 196:src/MEMS_BMC050.c **** 	
+ 197:src/MEMS_BMC050.c **** 	AccIRQConfig.Reg_0x2F.flat_hold_time = 0;
+ 172              		.loc 1 197 0
+ 173 00ee 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 174 00f2 C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 175 00f6 9A7E     		ldrb	r2, [r3, #26]
+ 176 00f8 6FF30512 		bfc	r2, #4, #2
+ 177 00fc 9A76     		strb	r2, [r3, #26]
+ 198:src/MEMS_BMC050.c **** 	wAccReg(0x2F, *((u8_t*)&AccIRQConfig.Reg_0x2F));
+ 178              		.loc 1 198 0
+ 179 00fe 854B     		ldr	r3, .L8+4
+ 180 0100 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 181 0102 4FF02F00 		mov	r0, #47
+ 182 0106 1946     		mov	r1, r3
+ 183 0108 01F030F9 		bl	wAccReg
+ 199:src/MEMS_BMC050.c **** 	
+ 200:src/MEMS_BMC050.c **** 	AccIRQConfig.int_map_01 = 0xC0;
+ 184              		.loc 1 200 0
+ 185 010c 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 186 0110 C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 187 0114 4FF0C002 		mov	r2, #192
+ 188 0118 1A71     		strb	r2, [r3, #4]
+ 201:src/MEMS_BMC050.c **** 	wAccReg(0x19, AccIRQConfig.int_map_01);
+ 189              		.loc 1 201 0
+ 190 011a 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 191 011e C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 192 0122 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+ 193 0124 4FF01900 		mov	r0, #25
+ 194 0128 1946     		mov	r1, r3
+ 195 012a 01F01FF9 		bl	wAccReg
+ 202:src/MEMS_BMC050.c **** 	AccIRQConfig.int_map_02 = 1;
+ 196              		.loc 1 202 0
+ 197 012e 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 198 0132 C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 199 0136 4FF00102 		mov	r2, #1
+ 200 013a 5A71     		strb	r2, [r3, #5]
+ 203:src/MEMS_BMC050.c **** 	wAccReg(0x1A, AccIRQConfig.int_map_02);
+ 201              		.loc 1 203 0
+ 202 013c 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 203 0140 C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 204 0144 5B79     		ldrb	r3, [r3, #5]	@ zero_extendqisi2
+ 205 0146 4FF01A00 		mov	r0, #26
+ 206 014a 1946     		mov	r1, r3
+ 207 014c 01F00EF9 		bl	wAccReg
+ 204:src/MEMS_BMC050.c **** 
+ 205:src/MEMS_BMC050.c **** 	if (cfg_data.Acc.flags & ACC_USE_EEPROM_FILT_COMPENSATION_VALUES){
+ 208              		.loc 1 205 0
+ 209 0150 40F20003 		movw	r3, #:lower16:cfg_data
+ 210 0154 C0F20003 		movt	r3, #:upper16:cfg_data
+ 211 0158 9B7A     		ldrb	r3, [r3, #10]	@ zero_extendqisi2
+ 212 015a 03F00203 		and	r3, r3, #2
+ 213 015e 002B     		cmp	r3, #0
+ 214 0160 3BD0     		beq	.L5
+ 206:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.AccelerationCompFilt_X = cfg_data.Acc.cmp_filt_x;
+ 215              		.loc 1 206 0
+ 216 0162 40F20003 		movw	r3, #:lower16:cfg_data
+ 217 0166 C0F20003 		movt	r3, #:upper16:cfg_data
+ 218 016a 9A79     		ldrb	r2, [r3, #6]	@ zero_extendqisi2
+ 219 016c 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 220 0170 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 221 0174 DA70     		strb	r2, [r3, #3]
+ 207:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.AccelerationCompFilt_Y = cfg_data.Acc.cmp_filt_y;
+ 222              		.loc 1 207 0
+ 223 0176 40F20003 		movw	r3, #:lower16:cfg_data
+ 224 017a C0F20003 		movt	r3, #:upper16:cfg_data
+ 225 017e DA79     		ldrb	r2, [r3, #7]	@ zero_extendqisi2
+ 226 0180 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 227 0184 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 228 0188 1A71     		strb	r2, [r3, #4]
+ 208:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.AccelerationCompFilt_Z = cfg_data.Acc.cmp_filt_z;
+ 229              		.loc 1 208 0
+ 230 018a 40F20003 		movw	r3, #:lower16:cfg_data
+ 231 018e C0F20003 		movt	r3, #:upper16:cfg_data
+ 232 0192 1A7A     		ldrb	r2, [r3, #8]	@ zero_extendqisi2
+ 233 0194 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 234 0198 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 235 019c 5A71     		strb	r2, [r3, #5]
+ 209:src/MEMS_BMC050.c **** 
+ 210:src/MEMS_BMC050.c **** 		wAccReg(0x38, BMC050_AccCompensate.AccelerationCompFilt_X);
+ 236              		.loc 1 210 0
+ 237 019e 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 238 01a2 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 239 01a6 DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 240 01a8 4FF03800 		mov	r0, #56
+ 241 01ac 1946     		mov	r1, r3
+ 242 01ae 01F0DDF8 		bl	wAccReg
+ 211:src/MEMS_BMC050.c **** 		wAccReg(0x39, BMC050_AccCompensate.AccelerationCompFilt_Y);
+ 243              		.loc 1 211 0
+ 244 01b2 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 245 01b6 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 246 01ba 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+ 247 01bc 4FF03900 		mov	r0, #57
+ 248 01c0 1946     		mov	r1, r3
+ 249 01c2 01F0D3F8 		bl	wAccReg
+ 212:src/MEMS_BMC050.c **** 		wAccReg(0x3A, BMC050_AccCompensate.AccelerationCompFilt_Z);
+ 250              		.loc 1 212 0
+ 251 01c6 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 252 01ca C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 253 01ce 5B79     		ldrb	r3, [r3, #5]	@ zero_extendqisi2
+ 254 01d0 4FF03A00 		mov	r0, #58
+ 255 01d4 1946     		mov	r1, r3
+ 256 01d6 01F0C9F8 		bl	wAccReg
+ 257              	.L5:
+ 213:src/MEMS_BMC050.c **** 	}
+ 214:src/MEMS_BMC050.c **** 	if (cfg_data.Acc.flags & ACC_USE_EEPROM_RAW_COMPENSATION_VALUES){
+ 258              		.loc 1 214 0
+ 259 01da 40F20003 		movw	r3, #:lower16:cfg_data
+ 260 01de C0F20003 		movt	r3, #:upper16:cfg_data
+ 261 01e2 9B7A     		ldrb	r3, [r3, #10]	@ zero_extendqisi2
+ 262 01e4 03F00103 		and	r3, r3, #1
+ 263 01e8 002B     		cmp	r3, #0
+ 264 01ea 3BD0     		beq	.L6
+ 215:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.AccelerationComp_X = cfg_data.Acc.cmp_raw_x;
+ 265              		.loc 1 215 0
+ 266 01ec 40F20003 		movw	r3, #:lower16:cfg_data
+ 267 01f0 C0F20003 		movt	r3, #:upper16:cfg_data
+ 268 01f4 DA78     		ldrb	r2, [r3, #3]	@ zero_extendqisi2
+ 269 01f6 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 270 01fa C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 271 01fe 9A71     		strb	r2, [r3, #6]
+ 216:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.AccelerationComp_Y = cfg_data.Acc.cmp_raw_y;
+ 272              		.loc 1 216 0
+ 273 0200 40F20003 		movw	r3, #:lower16:cfg_data
+ 274 0204 C0F20003 		movt	r3, #:upper16:cfg_data
+ 275 0208 1A79     		ldrb	r2, [r3, #4]	@ zero_extendqisi2
+ 276 020a 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 277 020e C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 278 0212 DA71     		strb	r2, [r3, #7]
+ 217:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.AccelerationComp_Z = cfg_data.Acc.cmp_raw_z;
+ 279              		.loc 1 217 0
+ 280 0214 40F20003 		movw	r3, #:lower16:cfg_data
+ 281 0218 C0F20003 		movt	r3, #:upper16:cfg_data
+ 282 021c 5A79     		ldrb	r2, [r3, #5]	@ zero_extendqisi2
+ 283 021e 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 284 0222 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 285 0226 1A72     		strb	r2, [r3, #8]
+ 218:src/MEMS_BMC050.c **** 
+ 219:src/MEMS_BMC050.c **** 		wAccReg(0x3B, BMC050_AccCompensate.AccelerationComp_X);
+ 286              		.loc 1 219 0
+ 287 0228 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 288 022c C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 289 0230 9B79     		ldrb	r3, [r3, #6]	@ zero_extendqisi2
+ 290 0232 4FF03B00 		mov	r0, #59
+ 291 0236 1946     		mov	r1, r3
+ 292 0238 01F098F8 		bl	wAccReg
+ 220:src/MEMS_BMC050.c **** 		wAccReg(0x3C, BMC050_AccCompensate.AccelerationComp_Y);
+ 293              		.loc 1 220 0
+ 294 023c 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 295 0240 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 296 0244 DB79     		ldrb	r3, [r3, #7]	@ zero_extendqisi2
+ 297 0246 4FF03C00 		mov	r0, #60
+ 298 024a 1946     		mov	r1, r3
+ 299 024c 01F08EF8 		bl	wAccReg
+ 221:src/MEMS_BMC050.c **** 		wAccReg(0x3D, BMC050_AccCompensate.AccelerationComp_Z);
+ 300              		.loc 1 221 0
+ 301 0250 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 302 0254 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 303 0258 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 304 025a 4FF03D00 		mov	r0, #61
+ 305 025e 1946     		mov	r1, r3
+ 306 0260 01F084F8 		bl	wAccReg
+ 307              	.L6:
+ 222:src/MEMS_BMC050.c **** 	}
+ 223:src/MEMS_BMC050.c **** 
+ 224:src/MEMS_BMC050.c **** 	AccIRQConfig.Reg_0x20.int1_lvl = 1;
+ 308              		.loc 1 224 0
+ 309 0264 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 310 0268 C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 311 026c DA7A     		ldrb	r2, [r3, #11]
+ 312 026e 42F00102 		orr	r2, r2, #1
+ 313 0272 DA72     		strb	r2, [r3, #11]
+ 225:src/MEMS_BMC050.c **** 	AccIRQConfig.Reg_0x20.int2_lvl = 1;
+ 314              		.loc 1 225 0
+ 315 0274 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 316 0278 C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 317 027c DA7A     		ldrb	r2, [r3, #11]
+ 318 027e 42F00402 		orr	r2, r2, #4
+ 319 0282 DA72     		strb	r2, [r3, #11]
+ 226:src/MEMS_BMC050.c **** 	AccIRQConfig.Reg_0x21.latch_int = 0xC;
+ 320              		.loc 1 226 0
+ 321 0284 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 322 0288 C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 323 028c 1A7B     		ldrb	r2, [r3, #12]
+ 324 028e 4FF00C01 		mov	r1, #12
+ 325 0292 61F30302 		bfi	r2, r1, #0, #4
+ 326 0296 1A73     		strb	r2, [r3, #12]
+ 227:src/MEMS_BMC050.c **** 	AccIRQConfig.Reg_0x21.reset_int = 1;
+ 327              		.loc 1 227 0
+ 328 0298 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 329 029c C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 330 02a0 1A7B     		ldrb	r2, [r3, #12]
+ 331 02a2 42F08002 		orr	r2, r2, #128
+ 332 02a6 1A73     		strb	r2, [r3, #12]
+ 228:src/MEMS_BMC050.c **** 	wBuff[0] = 0x20;  // command: write register 20h
+ 333              		.loc 1 228 0
+ 334 02a8 4FF02003 		mov	r3, #32
+ 335 02ac 3B75     		strb	r3, [r7, #20]
+ 229:src/MEMS_BMC050.c **** 	wBuff[1] = *((u8_t*)&AccIRQConfig.Reg_0x20);
+ 336              		.loc 1 229 0
+ 337 02ae 1A4B     		ldr	r3, .L8+8
+ 338 02b0 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 339 02b2 7B75     		strb	r3, [r7, #21]
+ 230:src/MEMS_BMC050.c **** 	wBuff[2] = *((u8_t*)&AccIRQConfig.Reg_0x21);
+ 340              		.loc 1 230 0
+ 341 02b4 194B     		ldr	r3, .L8+12
+ 342 02b6 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 343 02b8 BB75     		strb	r3, [r7, #22]
+ 231:src/MEMS_BMC050.c **** 	rwACC(wBuff, rBuff, 3);
+ 344              		.loc 1 231 0
+ 345 02ba 07F11402 		add	r2, r7, #20
+ 346 02be 3B46     		mov	r3, r7
+ 347 02c0 1046     		mov	r0, r2
+ 348 02c2 1946     		mov	r1, r3
+ 349 02c4 4FF00302 		mov	r2, #3
+ 350 02c8 01F06CF8 		bl	rwACC
+ 232:src/MEMS_BMC050.c **** 
+ 233:src/MEMS_BMC050.c **** 	/* @ ToDo check if necessary */
+ 234:src/MEMS_BMC050.c **** 	Wait_Usec(2000);
+ 351              		.loc 1 234 0
+ 352 02cc 4FF4FA60 		mov	r0, #2000
+ 353 02d0 FFF7FEFF 		bl	Wait_Usec
+ 235:src/MEMS_BMC050.c **** 
+ 236:src/MEMS_BMC050.c **** 	AccIRQConfig.Reg_0x16.orient_en = 1;
+ 354              		.loc 1 236 0
+ 355 02d4 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 356 02d8 C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 357 02dc 5A78     		ldrb	r2, [r3, #1]
+ 358 02de 42F04002 		orr	r2, r2, #64
+ 359 02e2 5A70     		strb	r2, [r3, #1]
+ 237:src/MEMS_BMC050.c **** 	AccIRQConfig.Reg_0x16.flat_en = 1;
+ 360              		.loc 1 237 0
+ 361 02e4 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 362 02e8 C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 363 02ec 5A78     		ldrb	r2, [r3, #1]
+ 364 02ee 42F08002 		orr	r2, r2, #128
+ 365 02f2 5A70     		strb	r2, [r3, #1]
+ 238:src/MEMS_BMC050.c **** 	wAccReg(0x16, *((u8_t*)&AccIRQConfig.Reg_0x16));
+ 366              		.loc 1 238 0
+ 367 02f4 0A4B     		ldr	r3, .L8+16
+ 368 02f6 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 369 02f8 4FF01600 		mov	r0, #22
+ 370 02fc 1946     		mov	r1, r3
+ 371 02fe 01F035F8 		bl	wAccReg
+ 239:src/MEMS_BMC050.c **** 
+ 240:src/MEMS_BMC050.c **** 	return HW_ERR_OK;
+ 372              		.loc 1 240 0
+ 373 0302 4FF00003 		mov	r3, #0
+ 374              	.L7:
+ 241:src/MEMS_BMC050.c **** }
+ 375              		.loc 1 241 0
+ 376 0306 1846     		mov	r0, r3
+ 377 0308 07F12807 		add	r7, r7, #40
+ 378 030c BD46     		mov	sp, r7
+ 379 030e 80BD     		pop	{r7, pc}
+ 380              	.L9:
+ 381              		.align	2
+ 382              	.L8:
+ 383 0310 1B000000 		.word	AccIRQConfig+23
+ 384 0314 1E000000 		.word	AccIRQConfig+26
+ 385 0318 0F000000 		.word	AccIRQConfig+11
+ 386 031c 10000000 		.word	AccIRQConfig+12
+ 387 0320 05000000 		.word	AccIRQConfig+1
+ 388              		.cfi_endproc
+ 389              	.LFE112:
+ 391              		.align	2
+ 392              		.global	MEMS_BMC050_init_Magnetometer
+ 393              		.thumb
+ 394              		.thumb_func
+ 396              	MEMS_BMC050_init_Magnetometer:
+ 397              	.LFB113:
+ 242:src/MEMS_BMC050.c **** 
+ 243:src/MEMS_BMC050.c **** 
+ 244:src/MEMS_BMC050.c **** 
+ 245:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 246:src/MEMS_BMC050.c **** //! HWStatus_t MEMS_BMC050_init_Magnetometer(void)
+ 247:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 248:src/MEMS_BMC050.c **** //! @brief	initializes magnetometer part of BMC50/150 sensor with default
+ 249:src/MEMS_BMC050.c **** //!			settings. If not done yet SSP is also initialized
+ 250:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 251:src/MEMS_BMC050.c **** //! @return one of the default HW_ERR codes
+ 252:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 253:src/MEMS_BMC050.c **** HWStatus_t MEMS_BMC050_init_Magnetometer(void){
+ 398              		.loc 1 253 0
+ 399              		.cfi_startproc
+ 400              		@ args = 0, pretend = 0, frame = 8
+ 401              		@ frame_needed = 1, uses_anonymous_args = 0
+ 402 0324 80B5     		push	{r7, lr}
+ 403              	.LCFI3:
+ 404              		.cfi_def_cfa_offset 8
+ 405              		.cfi_offset 7, -8
+ 406              		.cfi_offset 14, -4
+ 407 0326 82B0     		sub	sp, sp, #8
+ 408              	.LCFI4:
+ 409              		.cfi_def_cfa_offset 16
+ 410 0328 00AF     		add	r7, sp, #0
+ 411              	.LCFI5:
+ 412              		.cfi_def_cfa_register 7
+ 254:src/MEMS_BMC050.c **** 	u32_t time = 0;
+ 413              		.loc 1 254 0
+ 414 032a 4FF00003 		mov	r3, #0
+ 415 032e 7B60     		str	r3, [r7, #4]
+ 255:src/MEMS_BMC050.c **** 
+ 256:src/MEMS_BMC050.c **** 	if(!ssp_init){
+ 416              		.loc 1 256 0
+ 417 0330 40F20003 		movw	r3, #:lower16:ssp_init
+ 418 0334 C0F20003 		movt	r3, #:upper16:ssp_init
+ 419 0338 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 420 033a 002B     		cmp	r3, #0
+ 421 033c 07D1     		bne	.L11
+ 257:src/MEMS_BMC050.c **** 		if(initSSP() != HW_ERR_OK)
+ 422              		.loc 1 257 0
+ 423 033e 00F0D3FB 		bl	initSSP
+ 424 0342 0346     		mov	r3, r0
+ 425 0344 002B     		cmp	r3, #0
+ 426 0346 02D0     		beq	.L11
+ 258:src/MEMS_BMC050.c **** 			return HW_ERR_RESOURCE;
+ 427              		.loc 1 258 0
+ 428 0348 4FF00203 		mov	r3, #2
+ 429 034c 7EE0     		b	.L12
+ 430              	.L11:
+ 259:src/MEMS_BMC050.c **** 	}
+ 260:src/MEMS_BMC050.c **** 
+ 261:src/MEMS_BMC050.c **** 	if(!data_init)
+ 431              		.loc 1 261 0
+ 432 034e 40F20003 		movw	r3, #:lower16:data_init
+ 433 0352 C0F20003 		movt	r3, #:upper16:data_init
+ 434 0356 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 435 0358 002B     		cmp	r3, #0
+ 436 035a 01D1     		bne	.L13
+ 262:src/MEMS_BMC050.c **** 		initData();
+ 437              		.loc 1 262 0
+ 438 035c 00F0A8FB 		bl	initData
+ 439              	.L13:
+ 263:src/MEMS_BMC050.c **** 
+ 264:src/MEMS_BMC050.c **** 	// wait at least 1 [ms] cause from to allow magnetometer to switch from OFF to suspend mode
+ 265:src/MEMS_BMC050.c **** 	time = SYSTIME_NOW;
+ 440              		.loc 1 265 0
+ 441 0360 4FF04023 		mov	r3, #1073758208
+ 442 0364 9B68     		ldr	r3, [r3, #8]
+ 443 0366 7B60     		str	r3, [r7, #4]
+ 266:src/MEMS_BMC050.c **** 	while(SYSTIME_DIFF (time, SYSTIME_NOW) < 2000);
+ 444              		.loc 1 266 0
+ 445 0368 00BF     		nop
+ 446              	.L16:
+ 447              		.loc 1 266 0 is_stmt 0 discriminator 1
+ 448 036a 4FF04023 		mov	r3, #1073758208
+ 449 036e 9A68     		ldr	r2, [r3, #8]
+ 450 0370 7B68     		ldr	r3, [r7, #4]
+ 451 0372 9A42     		cmp	r2, r3
+ 452 0374 0CD3     		bcc	.L14
+ 453 0376 4FF04023 		mov	r3, #1073758208
+ 454 037a 9A68     		ldr	r2, [r3, #8]
+ 455 037c 7B68     		ldr	r3, [r7, #4]
+ 456 037e D21A     		subs	r2, r2, r3
+ 457 0380 40F2CF73 		movw	r3, #1999
+ 458 0384 9A42     		cmp	r2, r3
+ 459 0386 8CBF     		ite	hi
+ 460 0388 0023     		movhi	r3, #0
+ 461 038a 0123     		movls	r3, #1
+ 462 038c DBB2     		uxtb	r3, r3
+ 463 038e 0DE0     		b	.L15
+ 464              	.L14:
+ 465              		.loc 1 266 0 discriminator 2
+ 466 0390 7B68     		ldr	r3, [r7, #4]
+ 467 0392 6FEA0302 		mvn	r2, r3
+ 468 0396 4FF04023 		mov	r3, #1073758208
+ 469 039a 9B68     		ldr	r3, [r3, #8]
+ 470 039c D218     		adds	r2, r2, r3
+ 471 039e 40F2CF73 		movw	r3, #1999
+ 472 03a2 9A42     		cmp	r2, r3
+ 473 03a4 8CBF     		ite	hi
+ 474 03a6 0023     		movhi	r3, #0
+ 475 03a8 0123     		movls	r3, #1
+ 476 03aa DBB2     		uxtb	r3, r3
+ 477              	.L15:
+ 478              		.loc 1 266 0 discriminator 3
+ 479 03ac 002B     		cmp	r3, #0
+ 480 03ae DCD1     		bne	.L16
+ 267:src/MEMS_BMC050.c **** 
+ 268:src/MEMS_BMC050.c **** 	// initialize the magnetometer
+ 269:src/MEMS_BMC050.c **** 	wMagReg(0x4B, 0x83); 	//<! 4Bh: spi 4-wire + PowerControlBit, (SuspendMode=>SleepMode) + SoftReset
+ 481              		.loc 1 269 0 is_stmt 1
+ 482 03b0 4FF04B00 		mov	r0, #75
+ 483 03b4 4FF08301 		mov	r1, #131
+ 484 03b8 01F01AF8 		bl	wMagReg
+ 270:src/MEMS_BMC050.c **** 
+ 271:src/MEMS_BMC050.c **** 	// wait at least 3[ms] to allow magnetometer to switch from suspend to sleep mode
+ 272:src/MEMS_BMC050.c **** 	time = SYSTIME_NOW;
+ 485              		.loc 1 272 0
+ 486 03bc 4FF04023 		mov	r3, #1073758208
+ 487 03c0 9B68     		ldr	r3, [r3, #8]
+ 488 03c2 7B60     		str	r3, [r7, #4]
+ 273:src/MEMS_BMC050.c **** 	while(SYSTIME_DIFF (time, SYSTIME_NOW) < 3000);
+ 489              		.loc 1 273 0
+ 490 03c4 00BF     		nop
+ 491              	.L19:
+ 492              		.loc 1 273 0 is_stmt 0 discriminator 1
+ 493 03c6 4FF04023 		mov	r3, #1073758208
+ 494 03ca 9A68     		ldr	r2, [r3, #8]
+ 495 03cc 7B68     		ldr	r3, [r7, #4]
+ 496 03ce 9A42     		cmp	r2, r3
+ 497 03d0 0CD3     		bcc	.L17
+ 498 03d2 4FF04023 		mov	r3, #1073758208
+ 499 03d6 9A68     		ldr	r2, [r3, #8]
+ 500 03d8 7B68     		ldr	r3, [r7, #4]
+ 501 03da D21A     		subs	r2, r2, r3
+ 502 03dc 40F6B733 		movw	r3, #2999
+ 503 03e0 9A42     		cmp	r2, r3
+ 504 03e2 8CBF     		ite	hi
+ 505 03e4 0023     		movhi	r3, #0
+ 506 03e6 0123     		movls	r3, #1
+ 507 03e8 DBB2     		uxtb	r3, r3
+ 508 03ea 0DE0     		b	.L18
+ 509              	.L17:
+ 510              		.loc 1 273 0 discriminator 2
+ 511 03ec 7B68     		ldr	r3, [r7, #4]
+ 512 03ee 6FEA0302 		mvn	r2, r3
+ 513 03f2 4FF04023 		mov	r3, #1073758208
+ 514 03f6 9B68     		ldr	r3, [r3, #8]
+ 515 03f8 D218     		adds	r2, r2, r3
+ 516 03fa 40F6B733 		movw	r3, #2999
+ 517 03fe 9A42     		cmp	r2, r3
+ 518 0400 8CBF     		ite	hi
+ 519 0402 0023     		movhi	r3, #0
+ 520 0404 0123     		movls	r3, #1
+ 521 0406 DBB2     		uxtb	r3, r3
+ 522              	.L18:
+ 523              		.loc 1 273 0 discriminator 3
+ 524 0408 002B     		cmp	r3, #0
+ 525 040a DCD1     		bne	.L19
+ 274:src/MEMS_BMC050.c **** 	
+ 275:src/MEMS_BMC050.c **** 	wMagReg(0x4C, 0x00); 	//<! 4Ch: OpMode = Normal (SleepMode=>ActiveMode)
+ 526              		.loc 1 275 0 is_stmt 1
+ 527 040c 4FF04C00 		mov	r0, #76
+ 528 0410 4FF00001 		mov	r1, #0
+ 529 0414 00F0ECFF 		bl	wMagReg
+ 276:src/MEMS_BMC050.c **** 	wMagReg(0x4D, 0x3F); 	//<! 4Dh: generate no Interrupts
+ 530              		.loc 1 276 0
+ 531 0418 4FF04D00 		mov	r0, #77
+ 532 041c 4FF03F01 		mov	r1, #63
+ 533 0420 00F0E6FF 		bl	wMagReg
+ 277:src/MEMS_BMC050.c **** 	wMagReg(0x4E, 0x00); 	//<! 4Eh: each axis enable, line polarity dont care.
+ 534              		.loc 1 277 0
+ 535 0424 4FF04E00 		mov	r0, #78
+ 536 0428 4FF00001 		mov	r1, #0
+ 537 042c 00F0E0FF 		bl	wMagReg
+ 278:src/MEMS_BMC050.c **** 	wMagReg(0x51, 0x07); 	//<! 51h: repetition count for X-Y value smoothing.
+ 538              		.loc 1 278 0
+ 539 0430 4FF05100 		mov	r0, #81
+ 540 0434 4FF00701 		mov	r1, #7
+ 541 0438 00F0DAFF 		bl	wMagReg
+ 279:src/MEMS_BMC050.c **** 	wMagReg(0x52, 0x1B); 	//<! 52h: repetition count for Z value smoothing.
+ 542              		.loc 1 279 0
+ 543 043c 4FF05200 		mov	r0, #82
+ 544 0440 4FF01B01 		mov	r1, #27
+ 545 0444 00F0D4FF 		bl	wMagReg
+ 280:src/MEMS_BMC050.c **** 	
+ 281:src/MEMS_BMC050.c **** 	return HW_ERR_OK;
+ 546              		.loc 1 281 0
+ 547 0448 4FF00003 		mov	r3, #0
+ 548              	.L12:
+ 282:src/MEMS_BMC050.c **** }
+ 549              		.loc 1 282 0
+ 550 044c 1846     		mov	r0, r3
+ 551 044e 07F10807 		add	r7, r7, #8
+ 552 0452 BD46     		mov	sp, r7
+ 553 0454 80BD     		pop	{r7, pc}
+ 554              		.cfi_endproc
+ 555              	.LFE113:
+ 557 0456 00BF     		.align	2
+ 558              		.global	MEMS_BMC050_readAccCompValues
+ 559              		.thumb
+ 560              		.thumb_func
+ 562              	MEMS_BMC050_readAccCompValues:
+ 563              	.LFB114:
+ 283:src/MEMS_BMC050.c **** 
+ 284:src/MEMS_BMC050.c **** 
+ 285:src/MEMS_BMC050.c **** 
+ 286:src/MEMS_BMC050.c **** void MEMS_BMC050_readAccCompValues(void) {
+ 564              		.loc 1 286 0
+ 565              		.cfi_startproc
+ 566              		@ args = 0, pretend = 0, frame = 0
+ 567              		@ frame_needed = 1, uses_anonymous_args = 0
+ 568              		@ link register save eliminated.
+ 569 0458 80B4     		push	{r7}
+ 570              	.LCFI6:
+ 571              		.cfi_def_cfa_offset 4
+ 572              		.cfi_offset 7, -4
+ 573 045a 00AF     		add	r7, sp, #0
+ 574              	.LCFI7:
+ 575              		.cfi_def_cfa_register 7
+ 287:src/MEMS_BMC050.c **** 	GoToState = readAccelerometerCompenstaionValues;
+ 576              		.loc 1 287 0
+ 577 045c 40F20003 		movw	r3, #:lower16:GoToState
+ 578 0460 C0F20003 		movt	r3, #:upper16:GoToState
+ 579 0464 4FF00802 		mov	r2, #8
+ 580 0468 1A70     		strb	r2, [r3, #0]
+ 288:src/MEMS_BMC050.c **** }
+ 581              		.loc 1 288 0
+ 582 046a BD46     		mov	sp, r7
+ 583 046c 80BC     		pop	{r7}
+ 584 046e 7047     		bx	lr
+ 585              		.cfi_endproc
+ 586              	.LFE114:
+ 588              		.align	2
+ 589              		.global	MEMS_BMC050_StartFastAccCompensation
+ 590              		.thumb
+ 591              		.thumb_func
+ 593              	MEMS_BMC050_StartFastAccCompensation:
+ 594              	.LFB115:
+ 289:src/MEMS_BMC050.c **** 
+ 290:src/MEMS_BMC050.c **** void MEMS_BMC050_StartFastAccCompensation(void) {
+ 595              		.loc 1 290 0
+ 596              		.cfi_startproc
+ 597              		@ args = 0, pretend = 0, frame = 0
+ 598              		@ frame_needed = 1, uses_anonymous_args = 0
+ 599              		@ link register save eliminated.
+ 600 0470 80B4     		push	{r7}
+ 601              	.LCFI8:
+ 602              		.cfi_def_cfa_offset 4
+ 603              		.cfi_offset 7, -4
+ 604 0472 00AF     		add	r7, sp, #0
+ 605              	.LCFI9:
+ 606              		.cfi_def_cfa_register 7
+ 291:src/MEMS_BMC050.c **** 	GoToState = startFastCompensation;
+ 607              		.loc 1 291 0
+ 608 0474 40F20003 		movw	r3, #:lower16:GoToState
+ 609 0478 C0F20003 		movt	r3, #:upper16:GoToState
+ 610 047c 4FF00402 		mov	r2, #4
+ 611 0480 1A70     		strb	r2, [r3, #0]
+ 292:src/MEMS_BMC050.c **** }
+ 612              		.loc 1 292 0
+ 613 0482 BD46     		mov	sp, r7
+ 614 0484 80BC     		pop	{r7}
+ 615 0486 7047     		bx	lr
+ 616              		.cfi_endproc
+ 617              	.LFE115:
+ 619              		.align	2
+ 620              		.global	MEMS_BMC050_ResetAccCompensation
+ 621              		.thumb
+ 622              		.thumb_func
+ 624              	MEMS_BMC050_ResetAccCompensation:
+ 625              	.LFB116:
+ 293:src/MEMS_BMC050.c **** 
+ 294:src/MEMS_BMC050.c **** void MEMS_BMC050_ResetAccCompensation(void) {
+ 626              		.loc 1 294 0
+ 627              		.cfi_startproc
+ 628              		@ args = 0, pretend = 0, frame = 0
+ 629              		@ frame_needed = 1, uses_anonymous_args = 0
+ 630              		@ link register save eliminated.
+ 631 0488 80B4     		push	{r7}
+ 632              	.LCFI10:
+ 633              		.cfi_def_cfa_offset 4
+ 634              		.cfi_offset 7, -4
+ 635 048a 00AF     		add	r7, sp, #0
+ 636              	.LCFI11:
+ 637              		.cfi_def_cfa_register 7
+ 295:src/MEMS_BMC050.c **** 	GoToState = resetAccCompensation;
+ 638              		.loc 1 295 0
+ 639 048c 40F20003 		movw	r3, #:lower16:GoToState
+ 640 0490 C0F20003 		movt	r3, #:upper16:GoToState
+ 641 0494 4FF00A02 		mov	r2, #10
+ 642 0498 1A70     		strb	r2, [r3, #0]
+ 296:src/MEMS_BMC050.c **** }
+ 643              		.loc 1 296 0
+ 644 049a BD46     		mov	sp, r7
+ 645 049c 80BC     		pop	{r7}
+ 646 049e 7047     		bx	lr
+ 647              		.cfi_endproc
+ 648              	.LFE116:
+ 650              		.align	2
+ 651              		.global	MEMS_BMC050_SetVertialAxis
+ 652              		.thumb
+ 653              		.thumb_func
+ 655              	MEMS_BMC050_SetVertialAxis:
+ 656              	.LFB117:
+ 297:src/MEMS_BMC050.c **** 
+ 298:src/MEMS_BMC050.c **** HWStatus_t MEMS_BMC050_SetVertialAxis(u8_t axis) {
+ 657              		.loc 1 298 0
+ 658              		.cfi_startproc
+ 659              		@ args = 0, pretend = 0, frame = 8
+ 660              		@ frame_needed = 1, uses_anonymous_args = 0
+ 661              		@ link register save eliminated.
+ 662 04a0 80B4     		push	{r7}
+ 663              	.LCFI12:
+ 664              		.cfi_def_cfa_offset 4
+ 665              		.cfi_offset 7, -4
+ 666 04a2 83B0     		sub	sp, sp, #12
+ 667              	.LCFI13:
+ 668              		.cfi_def_cfa_offset 16
+ 669 04a4 00AF     		add	r7, sp, #0
+ 670              	.LCFI14:
+ 671              		.cfi_def_cfa_register 7
+ 672 04a6 0346     		mov	r3, r0
+ 673 04a8 FB71     		strb	r3, [r7, #7]
+ 299:src/MEMS_BMC050.c **** 	if (axis != X_AXIS && axis != Y_AXIS && axis != Z_AXIS)
+ 674              		.loc 1 299 0
+ 675 04aa FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 676 04ac 012B     		cmp	r3, #1
+ 677 04ae 08D0     		beq	.L24
+ 678              		.loc 1 299 0 is_stmt 0 discriminator 1
+ 679 04b0 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 680 04b2 022B     		cmp	r3, #2
+ 681 04b4 05D0     		beq	.L24
+ 682 04b6 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 683 04b8 032B     		cmp	r3, #3
+ 684 04ba 02D0     		beq	.L24
+ 300:src/MEMS_BMC050.c **** 		return HW_ERR_ILLPARAMVAL;
+ 685              		.loc 1 300 0 is_stmt 1
+ 686 04bc 4FF00103 		mov	r3, #1
+ 687 04c0 07E0     		b	.L25
+ 688              	.L24:
+ 301:src/MEMS_BMC050.c **** 	vertical_axis = axis;
+ 689              		.loc 1 301 0
+ 690 04c2 40F20003 		movw	r3, #:lower16:vertical_axis
+ 691 04c6 C0F20003 		movt	r3, #:upper16:vertical_axis
+ 692 04ca FA79     		ldrb	r2, [r7, #7]
+ 693 04cc 1A70     		strb	r2, [r3, #0]
+ 302:src/MEMS_BMC050.c **** 	return HW_ERR_OK;
+ 694              		.loc 1 302 0
+ 695 04ce 4FF00003 		mov	r3, #0
+ 696              	.L25:
+ 303:src/MEMS_BMC050.c **** }
+ 697              		.loc 1 303 0
+ 698 04d2 1846     		mov	r0, r3
+ 699 04d4 07F10C07 		add	r7, r7, #12
+ 700 04d8 BD46     		mov	sp, r7
+ 701 04da 80BC     		pop	{r7}
+ 702 04dc 7047     		bx	lr
+ 703              		.cfi_endproc
+ 704              	.LFE117:
+ 706 04de 00BF     		.align	2
+ 707              		.global	MEMS_BMC050_GetVertialAxis
+ 708              		.thumb
+ 709              		.thumb_func
+ 711              	MEMS_BMC050_GetVertialAxis:
+ 712              	.LFB118:
+ 304:src/MEMS_BMC050.c **** 
+ 305:src/MEMS_BMC050.c **** HWStatus_t MEMS_BMC050_GetVertialAxis(u8_t *p_axis) {
+ 713              		.loc 1 305 0
+ 714              		.cfi_startproc
+ 715              		@ args = 0, pretend = 0, frame = 8
+ 716              		@ frame_needed = 1, uses_anonymous_args = 0
+ 717              		@ link register save eliminated.
+ 718 04e0 80B4     		push	{r7}
+ 719              	.LCFI15:
+ 720              		.cfi_def_cfa_offset 4
+ 721              		.cfi_offset 7, -4
+ 722 04e2 83B0     		sub	sp, sp, #12
+ 723              	.LCFI16:
+ 724              		.cfi_def_cfa_offset 16
+ 725 04e4 00AF     		add	r7, sp, #0
+ 726              	.LCFI17:
+ 727              		.cfi_def_cfa_register 7
+ 728 04e6 7860     		str	r0, [r7, #4]
+ 306:src/MEMS_BMC050.c **** 	if (!p_axis)
+ 729              		.loc 1 306 0
+ 730 04e8 7B68     		ldr	r3, [r7, #4]
+ 731 04ea 002B     		cmp	r3, #0
+ 732 04ec 02D1     		bne	.L27
+ 307:src/MEMS_BMC050.c **** 		return HW_ERR_ILLPARAMVAL;
+ 733              		.loc 1 307 0
+ 734 04ee 4FF00103 		mov	r3, #1
+ 735 04f2 08E0     		b	.L28
+ 736              	.L27:
+ 308:src/MEMS_BMC050.c **** 	*p_axis = vertical_axis;
+ 737              		.loc 1 308 0
+ 738 04f4 40F20003 		movw	r3, #:lower16:vertical_axis
+ 739 04f8 C0F20003 		movt	r3, #:upper16:vertical_axis
+ 740 04fc 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 741 04fe 7B68     		ldr	r3, [r7, #4]
+ 742 0500 1A70     		strb	r2, [r3, #0]
+ 309:src/MEMS_BMC050.c **** 	return HW_ERR_OK;
+ 743              		.loc 1 309 0
+ 744 0502 4FF00003 		mov	r3, #0
+ 745              	.L28:
+ 310:src/MEMS_BMC050.c **** }
+ 746              		.loc 1 310 0
+ 747 0506 1846     		mov	r0, r3
+ 748 0508 07F10C07 		add	r7, r7, #12
+ 749 050c BD46     		mov	sp, r7
+ 750 050e 80BC     		pop	{r7}
+ 751 0510 7047     		bx	lr
+ 752              		.cfi_endproc
+ 753              	.LFE118:
+ 755 0512 00BF     		.align	2
+ 756              		.global	AccCalRdy
+ 757              		.thumb
+ 758              		.thumb_func
+ 760              	AccCalRdy:
+ 761              	.LFB119:
+ 311:src/MEMS_BMC050.c **** 
+ 312:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 313:src/MEMS_BMC050.c **** //!	int AccCalRdy(void)
+ 314:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 315:src/MEMS_BMC050.c **** //! @brief  checks cal_rdy bit in register 0x37
+ 316:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 317:src/MEMS_BMC050.c **** int AccCalRdy(void) {
+ 762              		.loc 1 317 0
+ 763              		.cfi_startproc
+ 764              		@ args = 0, pretend = 0, frame = 24
+ 765              		@ frame_needed = 1, uses_anonymous_args = 0
+ 766 0514 80B5     		push	{r7, lr}
+ 767              	.LCFI18:
+ 768              		.cfi_def_cfa_offset 8
+ 769              		.cfi_offset 7, -8
+ 770              		.cfi_offset 14, -4
+ 771 0516 86B0     		sub	sp, sp, #24
+ 772              	.LCFI19:
+ 773              		.cfi_def_cfa_offset 32
+ 774 0518 00AF     		add	r7, sp, #0
+ 775              	.LCFI20:
+ 776              		.cfi_def_cfa_register 7
+ 318:src/MEMS_BMC050.c **** 	u8_t wBuff[bufsize];
+ 319:src/MEMS_BMC050.c **** 
+ 320:src/MEMS_BMC050.c **** 	wBuff[0] = ((1 << 7) | 0x36);  // command: read from register 36h onward
+ 777              		.loc 1 320 0
+ 778 051a 4FF0B603 		mov	r3, #182
+ 779 051e 3B71     		strb	r3, [r7, #4]
+ 321:src/MEMS_BMC050.c **** 	wBuff[1] = 0x00; // + 8 clocks for compensation configuration part I
+ 780              		.loc 1 321 0
+ 781 0520 4FF00003 		mov	r3, #0
+ 782 0524 7B71     		strb	r3, [r7, #5]
+ 322:src/MEMS_BMC050.c **** 	rwACC(wBuff, (u8_t*)&BMC050_AccCompensate, 2);
+ 783              		.loc 1 322 0
+ 784 0526 07F10403 		add	r3, r7, #4
+ 785 052a 1846     		mov	r0, r3
+ 786 052c 40F20001 		movw	r1, #:lower16:BMC050_AccCompensate
+ 787 0530 C0F20001 		movt	r1, #:upper16:BMC050_AccCompensate
+ 788 0534 4FF00202 		mov	r2, #2
+ 789 0538 00F034FF 		bl	rwACC
+ 323:src/MEMS_BMC050.c **** 
+ 324:src/MEMS_BMC050.c **** 	return !(BMC050_AccCompensate.Reg_0x36.cal_rdy);
+ 790              		.loc 1 324 0
+ 791 053c 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 792 0540 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 793 0544 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 794 0546 03F01003 		and	r3, r3, #16
+ 795 054a DBB2     		uxtb	r3, r3
+ 796 054c 002B     		cmp	r3, #0
+ 797 054e 14BF     		ite	ne
+ 798 0550 0023     		movne	r3, #0
+ 799 0552 0123     		moveq	r3, #1
+ 800 0554 DBB2     		uxtb	r3, r3
+ 325:src/MEMS_BMC050.c **** }
+ 801              		.loc 1 325 0
+ 802 0556 1846     		mov	r0, r3
+ 803 0558 07F11807 		add	r7, r7, #24
+ 804 055c BD46     		mov	sp, r7
+ 805 055e 80BD     		pop	{r7, pc}
+ 806              		.cfi_endproc
+ 807              	.LFE119:
+ 809              		.align	2
+ 810              		.global	MEMS_BMC050_SetAccCalTargets
+ 811              		.thumb
+ 812              		.thumb_func
+ 814              	MEMS_BMC050_SetAccCalTargets:
+ 815              	.LFB120:
+ 326:src/MEMS_BMC050.c **** 
+ 327:src/MEMS_BMC050.c **** 
+ 328:src/MEMS_BMC050.c **** 
+ 329:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 330:src/MEMS_BMC050.c **** //! HWStatus_t MEMS_BMC050_SetAccCalTargets(u8_t *p_x, u8_t *p_y, u8_t *p_z)
+ 331:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 332:src/MEMS_BMC050.c **** //! @brief	sets calibration targets in structure (writing to BMC050 is done
+ 333:src/MEMS_BMC050.c **** //			when starting the fast compensation!)
+ 334:src/MEMS_BMC050.c **** //			00b = 0[g], 01b = +1[g], 10b = -1[g], 11b = 0[g]
+ 335:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 336:src/MEMS_BMC050.c **** //! @param p_x	pointer to x-axis calibration target
+ 337:src/MEMS_BMC050.c **** //! @param p_y	pointer to y-axis calibration target
+ 338:src/MEMS_BMC050.c **** //! @param p_z	pointer to z-axis calibration target
+ 339:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 340:src/MEMS_BMC050.c **** //! @return one of the default HW_ERR codes
+ 341:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 342:src/MEMS_BMC050.c **** HWStatus_t MEMS_BMC050_SetAccCalTargets(u8_t *p_x, u8_t *p_y, u8_t *p_z) {
+ 816              		.loc 1 342 0
+ 817              		.cfi_startproc
+ 818              		@ args = 0, pretend = 0, frame = 16
+ 819              		@ frame_needed = 1, uses_anonymous_args = 0
+ 820              		@ link register save eliminated.
+ 821 0560 80B4     		push	{r7}
+ 822              	.LCFI21:
+ 823              		.cfi_def_cfa_offset 4
+ 824              		.cfi_offset 7, -4
+ 825 0562 85B0     		sub	sp, sp, #20
+ 826              	.LCFI22:
+ 827              		.cfi_def_cfa_offset 24
+ 828 0564 00AF     		add	r7, sp, #0
+ 829              	.LCFI23:
+ 830              		.cfi_def_cfa_register 7
+ 831 0566 F860     		str	r0, [r7, #12]
+ 832 0568 B960     		str	r1, [r7, #8]
+ 833 056a 7A60     		str	r2, [r7, #4]
+ 343:src/MEMS_BMC050.c **** 
+ 344:src/MEMS_BMC050.c **** 	if (p_x && *p_x > 0x3)
+ 834              		.loc 1 344 0
+ 835 056c FB68     		ldr	r3, [r7, #12]
+ 836 056e 002B     		cmp	r3, #0
+ 837 0570 06D0     		beq	.L32
+ 838              		.loc 1 344 0 is_stmt 0 discriminator 1
+ 839 0572 FB68     		ldr	r3, [r7, #12]
+ 840 0574 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 841 0576 032B     		cmp	r3, #3
+ 842 0578 02D9     		bls	.L32
+ 345:src/MEMS_BMC050.c **** 		return HW_ERR_ILLPARAMVAL;
+ 843              		.loc 1 345 0 is_stmt 1
+ 844 057a 4FF00103 		mov	r3, #1
+ 845 057e 45E0     		b	.L33
+ 846              	.L32:
+ 346:src/MEMS_BMC050.c **** 	if (p_y && *p_y > 0x3)
+ 847              		.loc 1 346 0
+ 848 0580 BB68     		ldr	r3, [r7, #8]
+ 849 0582 002B     		cmp	r3, #0
+ 850 0584 06D0     		beq	.L34
+ 851              		.loc 1 346 0 is_stmt 0 discriminator 1
+ 852 0586 BB68     		ldr	r3, [r7, #8]
+ 853 0588 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 854 058a 032B     		cmp	r3, #3
+ 855 058c 02D9     		bls	.L34
+ 347:src/MEMS_BMC050.c **** 		return HW_ERR_ILLPARAMVAL;
+ 856              		.loc 1 347 0 is_stmt 1
+ 857 058e 4FF00103 		mov	r3, #1
+ 858 0592 3BE0     		b	.L33
+ 859              	.L34:
+ 348:src/MEMS_BMC050.c **** 	if (p_z && *p_z > 0x3)
+ 860              		.loc 1 348 0
+ 861 0594 7B68     		ldr	r3, [r7, #4]
+ 862 0596 002B     		cmp	r3, #0
+ 863 0598 06D0     		beq	.L35
+ 864              		.loc 1 348 0 is_stmt 0 discriminator 1
+ 865 059a 7B68     		ldr	r3, [r7, #4]
+ 866 059c 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 867 059e 032B     		cmp	r3, #3
+ 868 05a0 02D9     		bls	.L35
+ 349:src/MEMS_BMC050.c **** 		return HW_ERR_ILLPARAMVAL;
+ 869              		.loc 1 349 0 is_stmt 1
+ 870 05a2 4FF00103 		mov	r3, #1
+ 871 05a6 31E0     		b	.L33
+ 872              	.L35:
+ 350:src/MEMS_BMC050.c **** 
+ 351:src/MEMS_BMC050.c **** 	if (p_x)
+ 873              		.loc 1 351 0
+ 874 05a8 FB68     		ldr	r3, [r7, #12]
+ 875 05aa 002B     		cmp	r3, #0
+ 876 05ac 0CD0     		beq	.L36
+ 352:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.Reg_0x37.OffsetTarget_X = *p_x;
+ 877              		.loc 1 352 0
+ 878 05ae FB68     		ldr	r3, [r7, #12]
+ 879 05b0 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 880 05b2 03F00303 		and	r3, r3, #3
+ 881 05b6 D9B2     		uxtb	r1, r3
+ 882 05b8 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 883 05bc C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 884 05c0 9A78     		ldrb	r2, [r3, #2]
+ 885 05c2 61F34202 		bfi	r2, r1, #1, #2
+ 886 05c6 9A70     		strb	r2, [r3, #2]
+ 887              	.L36:
+ 353:src/MEMS_BMC050.c **** 	if (p_y)
+ 888              		.loc 1 353 0
+ 889 05c8 BB68     		ldr	r3, [r7, #8]
+ 890 05ca 002B     		cmp	r3, #0
+ 891 05cc 0CD0     		beq	.L37
+ 354:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.Reg_0x37.OffsetTarget_Y = *p_y;
+ 892              		.loc 1 354 0
+ 893 05ce BB68     		ldr	r3, [r7, #8]
+ 894 05d0 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 895 05d2 03F00303 		and	r3, r3, #3
+ 896 05d6 D9B2     		uxtb	r1, r3
+ 897 05d8 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 898 05dc C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 899 05e0 9A78     		ldrb	r2, [r3, #2]
+ 900 05e2 61F3C402 		bfi	r2, r1, #3, #2
+ 901 05e6 9A70     		strb	r2, [r3, #2]
+ 902              	.L37:
+ 355:src/MEMS_BMC050.c **** 	if (p_z)
+ 903              		.loc 1 355 0
+ 904 05e8 7B68     		ldr	r3, [r7, #4]
+ 905 05ea 002B     		cmp	r3, #0
+ 906 05ec 0CD0     		beq	.L38
+ 356:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.Reg_0x37.OffsetTarget_Z = *p_z;
+ 907              		.loc 1 356 0
+ 908 05ee 7B68     		ldr	r3, [r7, #4]
+ 909 05f0 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 910 05f2 03F00303 		and	r3, r3, #3
+ 911 05f6 D9B2     		uxtb	r1, r3
+ 912 05f8 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 913 05fc C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 914 0600 9A78     		ldrb	r2, [r3, #2]
+ 915 0602 61F34612 		bfi	r2, r1, #5, #2
+ 916 0606 9A70     		strb	r2, [r3, #2]
+ 917              	.L38:
+ 357:src/MEMS_BMC050.c **** 
+ 358:src/MEMS_BMC050.c **** 	return HW_ERR_OK;
+ 918              		.loc 1 358 0
+ 919 0608 4FF00003 		mov	r3, #0
+ 920              	.L33:
+ 359:src/MEMS_BMC050.c **** }
+ 921              		.loc 1 359 0
+ 922 060c 1846     		mov	r0, r3
+ 923 060e 07F11407 		add	r7, r7, #20
+ 924 0612 BD46     		mov	sp, r7
+ 925 0614 80BC     		pop	{r7}
+ 926 0616 7047     		bx	lr
+ 927              		.cfi_endproc
+ 928              	.LFE120:
+ 930              		.align	2
+ 931              		.global	MEMS_BMC050_GetAccCalTargets
+ 932              		.thumb
+ 933              		.thumb_func
+ 935              	MEMS_BMC050_GetAccCalTargets:
+ 936              	.LFB121:
+ 360:src/MEMS_BMC050.c **** 
+ 361:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 362:src/MEMS_BMC050.c **** //! HWStatus_t MEMS_BMC050_GetAccCalTargets(u8_t *p_x, u8_t *p_y, u8_t *p_z)
+ 363:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 364:src/MEMS_BMC050.c **** //! @brief	get calibration targets
+ 365:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 366:src/MEMS_BMC050.c **** //! @param p_x	pointer to buffer for x-axis calibration target
+ 367:src/MEMS_BMC050.c **** //! @param p_y	pointer to buffer for y-axis calibration target
+ 368:src/MEMS_BMC050.c **** //! @param p_z	pointer to buffer for z-axis calibration target
+ 369:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 370:src/MEMS_BMC050.c **** //! @return one of the default HW_ERR codes
+ 371:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 372:src/MEMS_BMC050.c **** HWStatus_t MEMS_BMC050_GetAccCalTargets(u8_t *p_x, u8_t *p_y, u8_t *p_z) {
+ 937              		.loc 1 372 0
+ 938              		.cfi_startproc
+ 939              		@ args = 0, pretend = 0, frame = 16
+ 940              		@ frame_needed = 1, uses_anonymous_args = 0
+ 941              		@ link register save eliminated.
+ 942 0618 80B4     		push	{r7}
+ 943              	.LCFI24:
+ 944              		.cfi_def_cfa_offset 4
+ 945              		.cfi_offset 7, -4
+ 946 061a 85B0     		sub	sp, sp, #20
+ 947              	.LCFI25:
+ 948              		.cfi_def_cfa_offset 24
+ 949 061c 00AF     		add	r7, sp, #0
+ 950              	.LCFI26:
+ 951              		.cfi_def_cfa_register 7
+ 952 061e F860     		str	r0, [r7, #12]
+ 953 0620 B960     		str	r1, [r7, #8]
+ 954 0622 7A60     		str	r2, [r7, #4]
+ 373:src/MEMS_BMC050.c **** 
+ 374:src/MEMS_BMC050.c **** 	if (p_x)
+ 955              		.loc 1 374 0
+ 956 0624 FB68     		ldr	r3, [r7, #12]
+ 957 0626 002B     		cmp	r3, #0
+ 958 0628 0AD0     		beq	.L40
+ 375:src/MEMS_BMC050.c **** 		*p_x = BMC050_AccCompensate.Reg_0x37.OffsetTarget_X;
+ 959              		.loc 1 375 0
+ 960 062a 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 961 062e C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 962 0632 9B78     		ldrb	r3, [r3, #2]
+ 963 0634 C3F34103 		ubfx	r3, r3, #1, #2
+ 964 0638 DBB2     		uxtb	r3, r3
+ 965 063a 1A46     		mov	r2, r3
+ 966 063c FB68     		ldr	r3, [r7, #12]
+ 967 063e 1A70     		strb	r2, [r3, #0]
+ 968              	.L40:
+ 376:src/MEMS_BMC050.c **** 	if (p_y)
+ 969              		.loc 1 376 0
+ 970 0640 BB68     		ldr	r3, [r7, #8]
+ 971 0642 002B     		cmp	r3, #0
+ 972 0644 0AD0     		beq	.L41
+ 377:src/MEMS_BMC050.c **** 		*p_y = BMC050_AccCompensate.Reg_0x37.OffsetTarget_Y;
+ 973              		.loc 1 377 0
+ 974 0646 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 975 064a C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 976 064e 9B78     		ldrb	r3, [r3, #2]
+ 977 0650 C3F3C103 		ubfx	r3, r3, #3, #2
+ 978 0654 DBB2     		uxtb	r3, r3
+ 979 0656 1A46     		mov	r2, r3
+ 980 0658 BB68     		ldr	r3, [r7, #8]
+ 981 065a 1A70     		strb	r2, [r3, #0]
+ 982              	.L41:
+ 378:src/MEMS_BMC050.c **** 	if (p_z)
+ 983              		.loc 1 378 0
+ 984 065c 7B68     		ldr	r3, [r7, #4]
+ 985 065e 002B     		cmp	r3, #0
+ 986 0660 0AD0     		beq	.L42
+ 379:src/MEMS_BMC050.c **** 		*p_z = BMC050_AccCompensate.Reg_0x37.OffsetTarget_Z;
+ 987              		.loc 1 379 0
+ 988 0662 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 989 0666 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 990 066a 9B78     		ldrb	r3, [r3, #2]
+ 991 066c C3F34113 		ubfx	r3, r3, #5, #2
+ 992 0670 DBB2     		uxtb	r3, r3
+ 993 0672 1A46     		mov	r2, r3
+ 994 0674 7B68     		ldr	r3, [r7, #4]
+ 995 0676 1A70     		strb	r2, [r3, #0]
+ 996              	.L42:
+ 380:src/MEMS_BMC050.c **** 
+ 381:src/MEMS_BMC050.c **** 	return HW_ERR_OK;
+ 997              		.loc 1 381 0
+ 998 0678 4FF00003 		mov	r3, #0
+ 382:src/MEMS_BMC050.c **** }
+ 999              		.loc 1 382 0
+ 1000 067c 1846     		mov	r0, r3
+ 1001 067e 07F11407 		add	r7, r7, #20
+ 1002 0682 BD46     		mov	sp, r7
+ 1003 0684 80BC     		pop	{r7}
+ 1004 0686 7047     		bx	lr
+ 1005              		.cfi_endproc
+ 1006              	.LFE121:
+ 1008              		.align	2
+ 1009              		.global	MEMS_BMC050_GetAccCalRawValues
+ 1010              		.thumb
+ 1011              		.thumb_func
+ 1013              	MEMS_BMC050_GetAccCalRawValues:
+ 1014              	.LFB122:
+ 383:src/MEMS_BMC050.c **** 
+ 384:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 385:src/MEMS_BMC050.c **** //! HWStatus_t MEMS_BMC050_GetAccCalRawValues(u8_t *p_x, u8_t *p_y, u8_t *p_z)
+ 386:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 387:src/MEMS_BMC050.c **** //! @brief	get calibration targets
+ 388:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 389:src/MEMS_BMC050.c **** //! @param p_x	pointer to buffer for x-axis calibration value
+ 390:src/MEMS_BMC050.c **** //! @param p_y	pointer to buffer for y-axis calibration value
+ 391:src/MEMS_BMC050.c **** //! @param p_z	pointer to buffer for z-axis calibration value
+ 392:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 393:src/MEMS_BMC050.c **** //! @return one of the default HW_ERR codes
+ 394:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 395:src/MEMS_BMC050.c **** HWStatus_t MEMS_BMC050_GetAccCalRawValues(u8_t *p_x, u8_t *p_y, u8_t *p_z) {
+ 1015              		.loc 1 395 0
+ 1016              		.cfi_startproc
+ 1017              		@ args = 0, pretend = 0, frame = 16
+ 1018              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1019 0688 80B5     		push	{r7, lr}
+ 1020              	.LCFI27:
+ 1021              		.cfi_def_cfa_offset 8
+ 1022              		.cfi_offset 7, -8
+ 1023              		.cfi_offset 14, -4
+ 1024 068a 84B0     		sub	sp, sp, #16
+ 1025              	.LCFI28:
+ 1026              		.cfi_def_cfa_offset 24
+ 1027 068c 00AF     		add	r7, sp, #0
+ 1028              	.LCFI29:
+ 1029              		.cfi_def_cfa_register 7
+ 1030 068e F860     		str	r0, [r7, #12]
+ 1031 0690 B960     		str	r1, [r7, #8]
+ 1032 0692 7A60     		str	r2, [r7, #4]
+ 396:src/MEMS_BMC050.c **** 
+ 397:src/MEMS_BMC050.c **** 	readAccCompenstaionValues();
+ 1033              		.loc 1 397 0
+ 1034 0694 00F0F0FC 		bl	readAccCompenstaionValues
+ 398:src/MEMS_BMC050.c **** 
+ 399:src/MEMS_BMC050.c **** 	if (p_x)
+ 1035              		.loc 1 399 0
+ 1036 0698 FB68     		ldr	r3, [r7, #12]
+ 1037 069a 002B     		cmp	r3, #0
+ 1038 069c 06D0     		beq	.L45
+ 400:src/MEMS_BMC050.c **** 		*p_x = BMC050_AccCompensate.AccelerationComp_X;
+ 1039              		.loc 1 400 0
+ 1040 069e 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1041 06a2 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1042 06a6 9A79     		ldrb	r2, [r3, #6]	@ zero_extendqisi2
+ 1043 06a8 FB68     		ldr	r3, [r7, #12]
+ 1044 06aa 1A70     		strb	r2, [r3, #0]
+ 1045              	.L45:
+ 401:src/MEMS_BMC050.c **** 	if (p_y)
+ 1046              		.loc 1 401 0
+ 1047 06ac BB68     		ldr	r3, [r7, #8]
+ 1048 06ae 002B     		cmp	r3, #0
+ 1049 06b0 06D0     		beq	.L46
+ 402:src/MEMS_BMC050.c **** 		*p_y = BMC050_AccCompensate.AccelerationComp_Y;
+ 1050              		.loc 1 402 0
+ 1051 06b2 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1052 06b6 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1053 06ba DA79     		ldrb	r2, [r3, #7]	@ zero_extendqisi2
+ 1054 06bc BB68     		ldr	r3, [r7, #8]
+ 1055 06be 1A70     		strb	r2, [r3, #0]
+ 1056              	.L46:
+ 403:src/MEMS_BMC050.c **** 	if (p_z)
+ 1057              		.loc 1 403 0
+ 1058 06c0 7B68     		ldr	r3, [r7, #4]
+ 1059 06c2 002B     		cmp	r3, #0
+ 1060 06c4 06D0     		beq	.L47
+ 404:src/MEMS_BMC050.c **** 		*p_z = BMC050_AccCompensate.AccelerationComp_Z;
+ 1061              		.loc 1 404 0
+ 1062 06c6 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1063 06ca C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1064 06ce 1A7A     		ldrb	r2, [r3, #8]	@ zero_extendqisi2
+ 1065 06d0 7B68     		ldr	r3, [r7, #4]
+ 1066 06d2 1A70     		strb	r2, [r3, #0]
+ 1067              	.L47:
+ 405:src/MEMS_BMC050.c **** 
+ 406:src/MEMS_BMC050.c **** 	return HW_ERR_OK;
+ 1068              		.loc 1 406 0
+ 1069 06d4 4FF00003 		mov	r3, #0
+ 407:src/MEMS_BMC050.c **** }
+ 1070              		.loc 1 407 0
+ 1071 06d8 1846     		mov	r0, r3
+ 1072 06da 07F11007 		add	r7, r7, #16
+ 1073 06de BD46     		mov	sp, r7
+ 1074 06e0 80BD     		pop	{r7, pc}
+ 1075              		.cfi_endproc
+ 1076              	.LFE122:
+ 1078 06e2 00BF     		.align	2
+ 1079              		.global	MEMS_BMC050_GetAccCalFiltValues
+ 1080              		.thumb
+ 1081              		.thumb_func
+ 1083              	MEMS_BMC050_GetAccCalFiltValues:
+ 1084              	.LFB123:
+ 408:src/MEMS_BMC050.c **** 
+ 409:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 410:src/MEMS_BMC050.c **** //! HWStatus_t MEMS_BMC050_GetAccCalFiltValues(u8_t *p_x, u8_t *p_y, u8_t *p_z)
+ 411:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 412:src/MEMS_BMC050.c **** //! @brief	get calibration targets
+ 413:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 414:src/MEMS_BMC050.c **** //! @param p_x	pointer to buffer for x-axis calibration value
+ 415:src/MEMS_BMC050.c **** //! @param p_y	pointer to buffer for y-axis calibration value
+ 416:src/MEMS_BMC050.c **** //! @param p_z	pointer to buffer for z-axis calibration value
+ 417:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 418:src/MEMS_BMC050.c **** //! @return one of the default HW_ERR codes
+ 419:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 420:src/MEMS_BMC050.c **** HWStatus_t MEMS_BMC050_GetAccCalFiltValues(u8_t *p_x, u8_t *p_y, u8_t *p_z) {
+ 1085              		.loc 1 420 0
+ 1086              		.cfi_startproc
+ 1087              		@ args = 0, pretend = 0, frame = 16
+ 1088              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1089 06e4 80B5     		push	{r7, lr}
+ 1090              	.LCFI30:
+ 1091              		.cfi_def_cfa_offset 8
+ 1092              		.cfi_offset 7, -8
+ 1093              		.cfi_offset 14, -4
+ 1094 06e6 84B0     		sub	sp, sp, #16
+ 1095              	.LCFI31:
+ 1096              		.cfi_def_cfa_offset 24
+ 1097 06e8 00AF     		add	r7, sp, #0
+ 1098              	.LCFI32:
+ 1099              		.cfi_def_cfa_register 7
+ 1100 06ea F860     		str	r0, [r7, #12]
+ 1101 06ec B960     		str	r1, [r7, #8]
+ 1102 06ee 7A60     		str	r2, [r7, #4]
+ 421:src/MEMS_BMC050.c **** 
+ 422:src/MEMS_BMC050.c **** 	readAccCompenstaionValues();
+ 1103              		.loc 1 422 0
+ 1104 06f0 00F0C2FC 		bl	readAccCompenstaionValues
+ 423:src/MEMS_BMC050.c **** 
+ 424:src/MEMS_BMC050.c **** 	if (p_x)
+ 1105              		.loc 1 424 0
+ 1106 06f4 FB68     		ldr	r3, [r7, #12]
+ 1107 06f6 002B     		cmp	r3, #0
+ 1108 06f8 06D0     		beq	.L50
+ 425:src/MEMS_BMC050.c **** 		*p_x = BMC050_AccCompensate.AccelerationCompFilt_X;
+ 1109              		.loc 1 425 0
+ 1110 06fa 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1111 06fe C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1112 0702 DA78     		ldrb	r2, [r3, #3]	@ zero_extendqisi2
+ 1113 0704 FB68     		ldr	r3, [r7, #12]
+ 1114 0706 1A70     		strb	r2, [r3, #0]
+ 1115              	.L50:
+ 426:src/MEMS_BMC050.c **** 	if (p_y)
+ 1116              		.loc 1 426 0
+ 1117 0708 BB68     		ldr	r3, [r7, #8]
+ 1118 070a 002B     		cmp	r3, #0
+ 1119 070c 06D0     		beq	.L51
+ 427:src/MEMS_BMC050.c **** 		*p_y = BMC050_AccCompensate.AccelerationCompFilt_Y;
+ 1120              		.loc 1 427 0
+ 1121 070e 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1122 0712 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1123 0716 1A79     		ldrb	r2, [r3, #4]	@ zero_extendqisi2
+ 1124 0718 BB68     		ldr	r3, [r7, #8]
+ 1125 071a 1A70     		strb	r2, [r3, #0]
+ 1126              	.L51:
+ 428:src/MEMS_BMC050.c **** 	if (p_z)
+ 1127              		.loc 1 428 0
+ 1128 071c 7B68     		ldr	r3, [r7, #4]
+ 1129 071e 002B     		cmp	r3, #0
+ 1130 0720 06D0     		beq	.L52
+ 429:src/MEMS_BMC050.c **** 		*p_z = BMC050_AccCompensate.AccelerationCompFilt_Z;
+ 1131              		.loc 1 429 0
+ 1132 0722 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1133 0726 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1134 072a 5A79     		ldrb	r2, [r3, #5]	@ zero_extendqisi2
+ 1135 072c 7B68     		ldr	r3, [r7, #4]
+ 1136 072e 1A70     		strb	r2, [r3, #0]
+ 1137              	.L52:
+ 430:src/MEMS_BMC050.c **** 
+ 431:src/MEMS_BMC050.c **** 	return HW_ERR_OK;
+ 1138              		.loc 1 431 0
+ 1139 0730 4FF00003 		mov	r3, #0
+ 432:src/MEMS_BMC050.c **** }
+ 1140              		.loc 1 432 0
+ 1141 0734 1846     		mov	r0, r3
+ 1142 0736 07F11007 		add	r7, r7, #16
+ 1143 073a BD46     		mov	sp, r7
+ 1144 073c 80BD     		pop	{r7, pc}
+ 1145              		.cfi_endproc
+ 1146              	.LFE123:
+ 1148 073e 00BF     		.align	2
+ 1149              		.global	MEMS_BMC050_GetAccRange
+ 1150              		.thumb
+ 1151              		.thumb_func
+ 1153              	MEMS_BMC050_GetAccRange:
+ 1154              	.LFB124:
+ 433:src/MEMS_BMC050.c **** 
+ 434:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 435:src/MEMS_BMC050.c **** //! HWStatus_t MEMS_BMC050_GetAccRange(u8_t *p_val)
+ 436:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 437:src/MEMS_BMC050.c **** //! @brief  get range of acceleration measurement
+ 438:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 439:src/MEMS_BMC050.c **** HWStatus_t MEMS_BMC050_GetAccRange(u8_t *p_val) {
+ 1155              		.loc 1 439 0
+ 1156              		.cfi_startproc
+ 1157              		@ args = 0, pretend = 0, frame = 8
+ 1158              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1159 0740 80B5     		push	{r7, lr}
+ 1160              	.LCFI33:
+ 1161              		.cfi_def_cfa_offset 8
+ 1162              		.cfi_offset 7, -8
+ 1163              		.cfi_offset 14, -4
+ 1164 0742 82B0     		sub	sp, sp, #8
+ 1165              	.LCFI34:
+ 1166              		.cfi_def_cfa_offset 16
+ 1167 0744 00AF     		add	r7, sp, #0
+ 1168              	.LCFI35:
+ 1169              		.cfi_def_cfa_register 7
+ 1170 0746 7860     		str	r0, [r7, #4]
+ 440:src/MEMS_BMC050.c **** 	if(!p_val)
+ 1171              		.loc 1 440 0
+ 1172 0748 7B68     		ldr	r3, [r7, #4]
+ 1173 074a 002B     		cmp	r3, #0
+ 1174 074c 02D1     		bne	.L55
+ 441:src/MEMS_BMC050.c **** 		return HW_ERR_ILLPARAMVAL;
+ 1175              		.loc 1 441 0
+ 1176 074e 4FF00103 		mov	r3, #1
+ 1177 0752 29E0     		b	.L56
+ 1178              	.L55:
+ 442:src/MEMS_BMC050.c **** 	
+ 443:src/MEMS_BMC050.c **** 	if(ssp_init) 	// only try to read value if spi is already running
+ 1179              		.loc 1 443 0
+ 1180 0754 40F20003 		movw	r3, #:lower16:ssp_init
+ 1181 0758 C0F20003 		movt	r3, #:upper16:ssp_init
+ 1182 075c 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1183 075e 002B     		cmp	r3, #0
+ 1184 0760 01D0     		beq	.L57
+ 444:src/MEMS_BMC050.c **** 		readAccRange();
+ 1185              		.loc 1 444 0
+ 1186 0762 00F06BFB 		bl	readAccRange
+ 1187              	.L57:
+ 445:src/MEMS_BMC050.c **** 	
+ 446:src/MEMS_BMC050.c **** 	switch(AccSensitivity){
+ 1188              		.loc 1 446 0
+ 1189 0766 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 1190 076a C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 1191 076e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1192 0770 042B     		cmp	r3, #4
+ 1193 0772 0DD0     		beq	.L60
+ 1194 0774 082B     		cmp	r3, #8
+ 1195 0776 10D0     		beq	.L61
+ 1196 0778 022B     		cmp	r3, #2
+ 1197 077a 04D0     		beq	.L59
+ 447:src/MEMS_BMC050.c **** 	default:
+ 448:src/MEMS_BMC050.c **** 	case 1:
+ 449:src/MEMS_BMC050.c **** 		*p_val= 1;	
+ 1198              		.loc 1 449 0
+ 1199 077c 7B68     		ldr	r3, [r7, #4]
+ 1200 077e 4FF00102 		mov	r2, #1
+ 1201 0782 1A70     		strb	r2, [r3, #0]
+ 450:src/MEMS_BMC050.c **** 		break;
+ 1202              		.loc 1 450 0
+ 1203 0784 0EE0     		b	.L62
+ 1204              	.L59:
+ 451:src/MEMS_BMC050.c **** 	case 2:
+ 452:src/MEMS_BMC050.c **** 		*p_val= 2;	
+ 1205              		.loc 1 452 0
+ 1206 0786 7B68     		ldr	r3, [r7, #4]
+ 1207 0788 4FF00202 		mov	r2, #2
+ 1208 078c 1A70     		strb	r2, [r3, #0]
+ 453:src/MEMS_BMC050.c **** 		break;
+ 1209              		.loc 1 453 0
+ 1210 078e 09E0     		b	.L62
+ 1211              	.L60:
+ 454:src/MEMS_BMC050.c **** 	case 4:
+ 455:src/MEMS_BMC050.c **** 		*p_val= 3;	
+ 1212              		.loc 1 455 0
+ 1213 0790 7B68     		ldr	r3, [r7, #4]
+ 1214 0792 4FF00302 		mov	r2, #3
+ 1215 0796 1A70     		strb	r2, [r3, #0]
+ 456:src/MEMS_BMC050.c **** 		break;
+ 1216              		.loc 1 456 0
+ 1217 0798 04E0     		b	.L62
+ 1218              	.L61:
+ 457:src/MEMS_BMC050.c **** 	case 8:
+ 458:src/MEMS_BMC050.c **** 		*p_val= 4;
+ 1219              		.loc 1 458 0
+ 1220 079a 7B68     		ldr	r3, [r7, #4]
+ 1221 079c 4FF00402 		mov	r2, #4
+ 1222 07a0 1A70     		strb	r2, [r3, #0]
+ 459:src/MEMS_BMC050.c **** 		break;	
+ 1223              		.loc 1 459 0
+ 1224 07a2 00BF     		nop
+ 1225              	.L62:
+ 460:src/MEMS_BMC050.c **** 	}
+ 461:src/MEMS_BMC050.c **** 	
+ 462:src/MEMS_BMC050.c **** 	
+ 463:src/MEMS_BMC050.c **** 	return HW_ERR_OK;
+ 1226              		.loc 1 463 0
+ 1227 07a4 4FF00003 		mov	r3, #0
+ 1228              	.L56:
+ 464:src/MEMS_BMC050.c **** }
+ 1229              		.loc 1 464 0
+ 1230 07a8 1846     		mov	r0, r3
+ 1231 07aa 07F10807 		add	r7, r7, #8
+ 1232 07ae BD46     		mov	sp, r7
+ 1233 07b0 80BD     		pop	{r7, pc}
+ 1234              		.cfi_endproc
+ 1235              	.LFE124:
+ 1237 07b2 00BF     		.align	2
+ 1238              		.global	MEMS_BMC050_SetAccRange
+ 1239              		.thumb
+ 1240              		.thumb_func
+ 1242              	MEMS_BMC050_SetAccRange:
+ 1243              	.LFB125:
+ 465:src/MEMS_BMC050.c **** 
+ 466:src/MEMS_BMC050.c **** 
+ 467:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 468:src/MEMS_BMC050.c **** //! HWStatus_t MEMS_BMC050_SetAccRange(u8_t val)
+ 469:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 470:src/MEMS_BMC050.c **** //! @brief  set range of acceleration measurement
+ 471:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 472:src/MEMS_BMC050.c **** HWStatus_t MEMS_BMC050_SetAccRange(u8_t val) {
+ 1244              		.loc 1 472 0
+ 1245              		.cfi_startproc
+ 1246              		@ args = 0, pretend = 0, frame = 8
+ 1247              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1248 07b4 80B5     		push	{r7, lr}
+ 1249              	.LCFI36:
+ 1250              		.cfi_def_cfa_offset 8
+ 1251              		.cfi_offset 7, -8
+ 1252              		.cfi_offset 14, -4
+ 1253 07b6 82B0     		sub	sp, sp, #8
+ 1254              	.LCFI37:
+ 1255              		.cfi_def_cfa_offset 16
+ 1256 07b8 00AF     		add	r7, sp, #0
+ 1257              	.LCFI38:
+ 1258              		.cfi_def_cfa_register 7
+ 1259 07ba 0346     		mov	r3, r0
+ 1260 07bc FB71     		strb	r3, [r7, #7]
+ 473:src/MEMS_BMC050.c **** 	
+ 474:src/MEMS_BMC050.c **** 	if(val > 4)
+ 1261              		.loc 1 474 0
+ 1262 07be FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 1263 07c0 042B     		cmp	r3, #4
+ 1264 07c2 02D9     		bls	.L64
+ 475:src/MEMS_BMC050.c **** 		return HW_ERR_ILLPARAMVAL;
+ 1265              		.loc 1 475 0
+ 1266 07c4 4FF00103 		mov	r3, #1
+ 1267 07c8 31E0     		b	.L65
+ 1268              	.L64:
+ 476:src/MEMS_BMC050.c **** 	switch(val){
+ 1269              		.loc 1 476 0
+ 1270 07ca FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 1271 07cc 032B     		cmp	r3, #3
+ 1272 07ce 13D0     		beq	.L68
+ 1273 07d0 042B     		cmp	r3, #4
+ 1274 07d2 19D0     		beq	.L69
+ 1275 07d4 022B     		cmp	r3, #2
+ 1276 07d6 07D0     		beq	.L67
+ 477:src/MEMS_BMC050.c **** 	default:
+ 478:src/MEMS_BMC050.c **** 	case 1:
+ 479:src/MEMS_BMC050.c **** 		AccSensitivity = 1;
+ 1277              		.loc 1 479 0
+ 1278 07d8 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 1279 07dc C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 1280 07e0 4FF00102 		mov	r2, #1
+ 1281 07e4 1A70     		strb	r2, [r3, #0]
+ 480:src/MEMS_BMC050.c **** 		break;
+ 1282              		.loc 1 480 0
+ 1283 07e6 17E0     		b	.L70
+ 1284              	.L67:
+ 481:src/MEMS_BMC050.c **** 	case 2:
+ 482:src/MEMS_BMC050.c **** 		AccSensitivity = 2;
+ 1285              		.loc 1 482 0
+ 1286 07e8 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 1287 07ec C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 1288 07f0 4FF00202 		mov	r2, #2
+ 1289 07f4 1A70     		strb	r2, [r3, #0]
+ 483:src/MEMS_BMC050.c **** 		break;
+ 1290              		.loc 1 483 0
+ 1291 07f6 0FE0     		b	.L70
+ 1292              	.L68:
+ 484:src/MEMS_BMC050.c **** 	case 3:
+ 485:src/MEMS_BMC050.c **** 		AccSensitivity = 4;
+ 1293              		.loc 1 485 0
+ 1294 07f8 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 1295 07fc C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 1296 0800 4FF00402 		mov	r2, #4
+ 1297 0804 1A70     		strb	r2, [r3, #0]
+ 486:src/MEMS_BMC050.c **** 		break;
+ 1298              		.loc 1 486 0
+ 1299 0806 07E0     		b	.L70
+ 1300              	.L69:
+ 487:src/MEMS_BMC050.c **** 	case 4:
+ 488:src/MEMS_BMC050.c **** 		AccSensitivity = 8;
+ 1301              		.loc 1 488 0
+ 1302 0808 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 1303 080c C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 1304 0810 4FF00802 		mov	r2, #8
+ 1305 0814 1A70     		strb	r2, [r3, #0]
+ 489:src/MEMS_BMC050.c **** 		break;
+ 1306              		.loc 1 489 0
+ 1307 0816 00BF     		nop
+ 1308              	.L70:
+ 490:src/MEMS_BMC050.c **** 	}
+ 491:src/MEMS_BMC050.c **** 	
+ 492:src/MEMS_BMC050.c **** 	if(ssp_init) 	// only try to write value if spi is already running
+ 1309              		.loc 1 492 0
+ 1310 0818 40F20003 		movw	r3, #:lower16:ssp_init
+ 1311 081c C0F20003 		movt	r3, #:upper16:ssp_init
+ 1312 0820 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1313 0822 002B     		cmp	r3, #0
+ 1314 0824 01D0     		beq	.L71
+ 493:src/MEMS_BMC050.c **** 		setAccRange();
+ 1315              		.loc 1 493 0
+ 1316 0826 00F069FB 		bl	setAccRange
+ 1317              	.L71:
+ 494:src/MEMS_BMC050.c **** 	
+ 495:src/MEMS_BMC050.c **** 	return HW_ERR_OK;
+ 1318              		.loc 1 495 0
+ 1319 082a 4FF00003 		mov	r3, #0
+ 1320              	.L65:
+ 496:src/MEMS_BMC050.c **** }
+ 1321              		.loc 1 496 0
+ 1322 082e 1846     		mov	r0, r3
+ 1323 0830 07F10807 		add	r7, r7, #8
+ 1324 0834 BD46     		mov	sp, r7
+ 1325 0836 80BD     		pop	{r7, pc}
+ 1326              		.cfi_endproc
+ 1327              	.LFE125:
+ 1329              		.align	2
+ 1330              		.global	MEMS_BMC050_task
+ 1331              		.thumb
+ 1332              		.thumb_func
+ 1334              	MEMS_BMC050_task:
+ 1335              	.LFB126:
+ 497:src/MEMS_BMC050.c **** 
+ 498:src/MEMS_BMC050.c **** 
+ 499:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 500:src/MEMS_BMC050.c **** //! void MEMS_BMC050_task(void)
+ 501:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 502:src/MEMS_BMC050.c **** void MEMS_BMC050_task(void)
+ 503:src/MEMS_BMC050.c **** {
+ 1336              		.loc 1 503 0
+ 1337              		.cfi_startproc
+ 1338              		@ args = 0, pretend = 0, frame = 8
+ 1339              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1340 0838 80B5     		push	{r7, lr}
+ 1341              	.LCFI39:
+ 1342              		.cfi_def_cfa_offset 8
+ 1343              		.cfi_offset 7, -8
+ 1344              		.cfi_offset 14, -4
+ 1345 083a 82B0     		sub	sp, sp, #8
+ 1346              	.LCFI40:
+ 1347              		.cfi_def_cfa_offset 16
+ 1348 083c 00AF     		add	r7, sp, #0
+ 1349              	.LCFI41:
+ 1350              		.cfi_def_cfa_register 7
+ 504:src/MEMS_BMC050.c **** 	int res = 0;
+ 1351              		.loc 1 504 0
+ 1352 083e 4FF00003 		mov	r3, #0
+ 1353 0842 7B60     		str	r3, [r7, #4]
+ 505:src/MEMS_BMC050.c **** 
+ 506:src/MEMS_BMC050.c **** 	if (checkAccIRQ())
+ 1354              		.loc 1 506 0
+ 1355 0844 00F05CFC 		bl	checkAccIRQ
+ 1356 0848 0346     		mov	r3, r0
+ 1357 084a 002B     		cmp	r3, #0
+ 1358 084c 01D0     		beq	.L73
+ 507:src/MEMS_BMC050.c **** 		handleAccIRQ();
+ 1359              		.loc 1 507 0
+ 1360 084e 00F07BFC 		bl	handleAccIRQ
+ 1361              	.L73:
+ 508:src/MEMS_BMC050.c **** 	if (checkMagIRQ())
+ 1362              		.loc 1 508 0
+ 1363 0852 00F067FC 		bl	checkMagIRQ
+ 1364 0856 0346     		mov	r3, r0
+ 1365 0858 002B     		cmp	r3, #0
+ 1366 085a 01D0     		beq	.L74
+ 509:src/MEMS_BMC050.c **** 		handleMagIRQ();
+ 1367              		.loc 1 509 0
+ 1368 085c 00F080FD 		bl	handleMagIRQ
+ 1369              	.L74:
+ 510:src/MEMS_BMC050.c **** 
+ 511:src/MEMS_BMC050.c **** 	if (BMC050_Readings.data_valid == TRUE)
+ 1370              		.loc 1 511 0
+ 1371 0860 40F20003 		movw	r3, #:lower16:BMC050_Readings
+ 1372 0864 C0F20003 		movt	r3, #:upper16:BMC050_Readings
+ 1373 0868 5B7C     		ldrb	r3, [r3, #17]	@ zero_extendqisi2
+ 1374 086a 012B     		cmp	r3, #1
+ 1375 086c 00F00981 		beq	.L100
+ 1376              	.L75:
+ 512:src/MEMS_BMC050.c **** 		return;
+ 513:src/MEMS_BMC050.c **** 
+ 514:src/MEMS_BMC050.c **** 	switch (BMC050State) {
+ 1377              		.loc 1 514 0
+ 1378 0870 40F20003 		movw	r3, #:lower16:BMC050State
+ 1379 0874 C0F20003 		movt	r3, #:upper16:BMC050State
+ 1380 0878 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1381 087a 0A2B     		cmp	r3, #10
+ 1382 087c 00F20381 		bhi	.L101
+ 1383 0880 01A2     		adr	r2, .L89
+ 1384 0882 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 1385 0886 00BF     		.align	2
+ 1386              	.L89:
+ 1387 0888 B5080000 		.word	.L78+1
+ 1388 088c DB080000 		.word	.L79+1
+ 1389 0890 01090000 		.word	.L80+1
+ 1390 0894 870A0000 		.word	.L101+1
+ 1391 0898 85090000 		.word	.L82+1
+ 1392 089c AD090000 		.word	.L83+1
+ 1393 08a0 D5090000 		.word	.L84+1
+ 1394 08a4 FD090000 		.word	.L85+1
+ 1395 08a8 250A0000 		.word	.L86+1
+ 1396 08ac 870A0000 		.word	.L101+1
+ 1397 08b0 5B0A0000 		.word	.L88+1
+ 1398              	.L78:
+ 515:src/MEMS_BMC050.c **** 	case readAccelerometer:
+ 516:src/MEMS_BMC050.c **** 		res = readCurrAccelerationValues(&AccDataRaw);
+ 1399              		.loc 1 516 0
+ 1400 08b4 40F20000 		movw	r0, #:lower16:AccDataRaw
+ 1401 08b8 C0F20000 		movt	r0, #:upper16:AccDataRaw
+ 1402 08bc 00F05AFA 		bl	readCurrAccelerationValues
+ 1403 08c0 7860     		str	r0, [r7, #4]
+ 517:src/MEMS_BMC050.c **** 		if (res == 0)
+ 1404              		.loc 1 517 0
+ 1405 08c2 7B68     		ldr	r3, [r7, #4]
+ 1406 08c4 002B     		cmp	r3, #0
+ 1407 08c6 40F0E080 		bne	.L102
+ 518:src/MEMS_BMC050.c **** 			BMC050State = readMagnetometer;
+ 1408              		.loc 1 518 0
+ 1409 08ca 40F20003 		movw	r3, #:lower16:BMC050State
+ 1410 08ce C0F20003 		movt	r3, #:upper16:BMC050State
+ 1411 08d2 4FF00102 		mov	r2, #1
+ 1412 08d6 1A70     		strb	r2, [r3, #0]
+ 519:src/MEMS_BMC050.c **** 		break;
+ 1413              		.loc 1 519 0
+ 1414 08d8 D7E0     		b	.L102
+ 1415              	.L79:
+ 520:src/MEMS_BMC050.c **** 
+ 521:src/MEMS_BMC050.c **** 	case readMagnetometer:
+ 522:src/MEMS_BMC050.c **** 		res = readCurrMagValues(&CmpDataRaw);
+ 1416              		.loc 1 522 0
+ 1417 08da 40F20000 		movw	r0, #:lower16:CmpDataRaw
+ 1418 08de C0F20000 		movt	r0, #:upper16:CmpDataRaw
+ 1419 08e2 00F079FA 		bl	readCurrMagValues
+ 1420 08e6 7860     		str	r0, [r7, #4]
+ 523:src/MEMS_BMC050.c **** 		if (res == 0)
+ 1421              		.loc 1 523 0
+ 1422 08e8 7B68     		ldr	r3, [r7, #4]
+ 1423 08ea 002B     		cmp	r3, #0
+ 1424 08ec 40F0CF80 		bne	.L103
+ 524:src/MEMS_BMC050.c **** 			BMC050State = processResults;
+ 1425              		.loc 1 524 0
+ 1426 08f0 40F20003 		movw	r3, #:lower16:BMC050State
+ 1427 08f4 C0F20003 		movt	r3, #:upper16:BMC050State
+ 1428 08f8 4FF00202 		mov	r2, #2
+ 1429 08fc 1A70     		strb	r2, [r3, #0]
+ 525:src/MEMS_BMC050.c **** 		break;
+ 1430              		.loc 1 525 0
+ 1431 08fe C6E0     		b	.L103
+ 1432              	.L80:
+ 526:src/MEMS_BMC050.c **** 
+ 527:src/MEMS_BMC050.c **** 	case processResults:
+ 528:src/MEMS_BMC050.c **** 		#ifdef DEBUG
+ 529:src/MEMS_BMC050.c **** 		if (use_dbg_data){
+ 1433              		.loc 1 529 0
+ 1434 0900 40F20003 		movw	r3, #:lower16:use_dbg_data
+ 1435 0904 C0F20003 		movt	r3, #:upper16:use_dbg_data
+ 1436 0908 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1437 090a 002B     		cmp	r3, #0
+ 1438 090c 14D0     		beq	.L92
+ 530:src/MEMS_BMC050.c **** 			prcRawAccValues(&BMC050_dbg_data_acc, &BMC050_Readings);
+ 1439              		.loc 1 530 0
+ 1440 090e 40F20000 		movw	r0, #:lower16:BMC050_dbg_data_acc
+ 1441 0912 C0F20000 		movt	r0, #:upper16:BMC050_dbg_data_acc
+ 1442 0916 40F20001 		movw	r1, #:lower16:BMC050_Readings
+ 1443 091a C0F20001 		movt	r1, #:upper16:BMC050_Readings
+ 1444 091e 00F01FF9 		bl	prcRawAccValues
+ 531:src/MEMS_BMC050.c **** 			prcRawCmpValues(&BMC050_dbg_data_cmp, &BMC050_Readings);
+ 1445              		.loc 1 531 0
+ 1446 0922 40F20000 		movw	r0, #:lower16:BMC050_dbg_data_cmp
+ 1447 0926 C0F20000 		movt	r0, #:upper16:BMC050_dbg_data_cmp
+ 1448 092a 40F20001 		movw	r1, #:lower16:BMC050_Readings
+ 1449 092e C0F20001 		movt	r1, #:upper16:BMC050_Readings
+ 1450 0932 00F0B1F9 		bl	prcRawCmpValues
+ 1451 0936 13E0     		b	.L93
+ 1452              	.L92:
+ 532:src/MEMS_BMC050.c **** 		}else{
+ 533:src/MEMS_BMC050.c **** 		#endif
+ 534:src/MEMS_BMC050.c **** 		prcRawAccValues(&AccDataRaw, &BMC050_Readings);
+ 1453              		.loc 1 534 0
+ 1454 0938 40F20000 		movw	r0, #:lower16:AccDataRaw
+ 1455 093c C0F20000 		movt	r0, #:upper16:AccDataRaw
+ 1456 0940 40F20001 		movw	r1, #:lower16:BMC050_Readings
+ 1457 0944 C0F20001 		movt	r1, #:upper16:BMC050_Readings
+ 1458 0948 00F00AF9 		bl	prcRawAccValues
+ 535:src/MEMS_BMC050.c **** 		prcRawCmpValues(&CmpDataRaw, &BMC050_Readings);
+ 1459              		.loc 1 535 0
+ 1460 094c 40F20000 		movw	r0, #:lower16:CmpDataRaw
+ 1461 0950 C0F20000 		movt	r0, #:upper16:CmpDataRaw
+ 1462 0954 40F20001 		movw	r1, #:lower16:BMC050_Readings
+ 1463 0958 C0F20001 		movt	r1, #:upper16:BMC050_Readings
+ 1464 095c 00F09CF9 		bl	prcRawCmpValues
+ 1465              	.L93:
+ 536:src/MEMS_BMC050.c **** 		#ifdef DEBUG
+ 537:src/MEMS_BMC050.c **** 		}
+ 538:src/MEMS_BMC050.c **** 		#endif
+ 539:src/MEMS_BMC050.c **** 		BMC050_Readings.data_valid = TRUE; // data now ready for CAN transmission
+ 1466              		.loc 1 539 0
+ 1467 0960 40F20003 		movw	r3, #:lower16:BMC050_Readings
+ 1468 0964 C0F20003 		movt	r3, #:upper16:BMC050_Readings
+ 1469 0968 4FF00102 		mov	r2, #1
+ 1470 096c 5A74     		strb	r2, [r3, #17]
+ 540:src/MEMS_BMC050.c **** 		BMC050State = GoToState;
+ 1471              		.loc 1 540 0
+ 1472 096e 40F20003 		movw	r3, #:lower16:GoToState
+ 1473 0972 C0F20003 		movt	r3, #:upper16:GoToState
+ 1474 0976 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 1475 0978 40F20003 		movw	r3, #:lower16:BMC050State
+ 1476 097c C0F20003 		movt	r3, #:upper16:BMC050State
+ 1477 0980 1A70     		strb	r2, [r3, #0]
+ 541:src/MEMS_BMC050.c **** 		break;
+ 1478              		.loc 1 541 0
+ 1479 0982 91E0     		b	.L72
+ 1480              	.L82:
+ 542:src/MEMS_BMC050.c **** 
+ 543:src/MEMS_BMC050.c **** 	case slowCompensation:
+ 544:src/MEMS_BMC050.c **** 		break;
+ 545:src/MEMS_BMC050.c **** 
+ 546:src/MEMS_BMC050.c **** 	case startFastCompensation:
+ 547:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.data_valid = FALSE;
+ 1481              		.loc 1 547 0
+ 1482 0984 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1483 0988 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1484 098c 4FF00002 		mov	r2, #0
+ 1485 0990 5A72     		strb	r2, [r3, #9]
+ 548:src/MEMS_BMC050.c **** 		if (setAccCompensationTargets() >= 0)
+ 1486              		.loc 1 548 0
+ 1487 0992 00F059FB 		bl	setAccCompensationTargets
+ 1488 0996 0346     		mov	r3, r0
+ 1489 0998 002B     		cmp	r3, #0
+ 1490 099a 7ADB     		blt	.L104
+ 549:src/MEMS_BMC050.c **** 			BMC050State = fastCompensation_x;
+ 1491              		.loc 1 549 0
+ 1492 099c 40F20003 		movw	r3, #:lower16:BMC050State
+ 1493 09a0 C0F20003 		movt	r3, #:upper16:BMC050State
+ 1494 09a4 4FF00502 		mov	r2, #5
+ 1495 09a8 1A70     		strb	r2, [r3, #0]
+ 550:src/MEMS_BMC050.c **** 		break;
+ 1496              		.loc 1 550 0
+ 1497 09aa 72E0     		b	.L104
+ 1498              	.L83:
+ 551:src/MEMS_BMC050.c **** 
+ 552:src/MEMS_BMC050.c **** 	case fastCompensation_x:
+ 553:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.data_valid = FALSE;
+ 1499              		.loc 1 553 0
+ 1500 09ac 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1501 09b0 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1502 09b4 4FF00002 		mov	r2, #0
+ 1503 09b8 5A72     		strb	r2, [r3, #9]
+ 554:src/MEMS_BMC050.c **** 		if (accFastCompensationX() >= 0)
+ 1504              		.loc 1 554 0
+ 1505 09ba 00F009FB 		bl	accFastCompensationX
+ 1506 09be 0346     		mov	r3, r0
+ 1507 09c0 002B     		cmp	r3, #0
+ 1508 09c2 68DB     		blt	.L105
+ 555:src/MEMS_BMC050.c **** 			BMC050State = fastCompensation_y;
+ 1509              		.loc 1 555 0
+ 1510 09c4 40F20003 		movw	r3, #:lower16:BMC050State
+ 1511 09c8 C0F20003 		movt	r3, #:upper16:BMC050State
+ 1512 09cc 4FF00602 		mov	r2, #6
+ 1513 09d0 1A70     		strb	r2, [r3, #0]
+ 556:src/MEMS_BMC050.c **** 		break;
+ 1514              		.loc 1 556 0
+ 1515 09d2 60E0     		b	.L105
+ 1516              	.L84:
+ 557:src/MEMS_BMC050.c **** 
+ 558:src/MEMS_BMC050.c **** 	case fastCompensation_y:
+ 559:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.data_valid = FALSE;
+ 1517              		.loc 1 559 0
+ 1518 09d4 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1519 09d8 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1520 09dc 4FF00002 		mov	r2, #0
+ 1521 09e0 5A72     		strb	r2, [r3, #9]
+ 560:src/MEMS_BMC050.c **** 		if (accFastCompensationY() >= 0)
+ 1522              		.loc 1 560 0
+ 1523 09e2 00F009FB 		bl	accFastCompensationY
+ 1524 09e6 0346     		mov	r3, r0
+ 1525 09e8 002B     		cmp	r3, #0
+ 1526 09ea 56DB     		blt	.L106
+ 561:src/MEMS_BMC050.c **** 			BMC050State = fastCompensation_z;
+ 1527              		.loc 1 561 0
+ 1528 09ec 40F20003 		movw	r3, #:lower16:BMC050State
+ 1529 09f0 C0F20003 		movt	r3, #:upper16:BMC050State
+ 1530 09f4 4FF00702 		mov	r2, #7
+ 1531 09f8 1A70     		strb	r2, [r3, #0]
+ 562:src/MEMS_BMC050.c **** 		break;
+ 1532              		.loc 1 562 0
+ 1533 09fa 4EE0     		b	.L106
+ 1534              	.L85:
+ 563:src/MEMS_BMC050.c **** 
+ 564:src/MEMS_BMC050.c **** 	case fastCompensation_z:
+ 565:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.data_valid = FALSE;
+ 1535              		.loc 1 565 0
+ 1536 09fc 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1537 0a00 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1538 0a04 4FF00002 		mov	r2, #0
+ 1539 0a08 5A72     		strb	r2, [r3, #9]
+ 566:src/MEMS_BMC050.c **** 		if (accFastCompensationZ() >= 0)
+ 1540              		.loc 1 566 0
+ 1541 0a0a 00F009FB 		bl	accFastCompensationZ
+ 1542 0a0e 0346     		mov	r3, r0
+ 1543 0a10 002B     		cmp	r3, #0
+ 1544 0a12 44DB     		blt	.L107
+ 567:src/MEMS_BMC050.c **** 			BMC050State = readAccelerometerCompenstaionValues;
+ 1545              		.loc 1 567 0
+ 1546 0a14 40F20003 		movw	r3, #:lower16:BMC050State
+ 1547 0a18 C0F20003 		movt	r3, #:upper16:BMC050State
+ 1548 0a1c 4FF00802 		mov	r2, #8
+ 1549 0a20 1A70     		strb	r2, [r3, #0]
+ 568:src/MEMS_BMC050.c **** 		break;
+ 1550              		.loc 1 568 0
+ 1551 0a22 3CE0     		b	.L107
+ 1552              	.L86:
+ 569:src/MEMS_BMC050.c **** 
+ 570:src/MEMS_BMC050.c **** 	case readAccelerometerCompenstaionValues:
+ 571:src/MEMS_BMC050.c **** 		if (readAccCompenstaionValues() >= 0) {
+ 1553              		.loc 1 571 0
+ 1554 0a24 00F028FB 		bl	readAccCompenstaionValues
+ 1555 0a28 0346     		mov	r3, r0
+ 1556 0a2a 002B     		cmp	r3, #0
+ 1557 0a2c 39DB     		blt	.L108
+ 572:src/MEMS_BMC050.c **** 			BMC050_AccCompensate.data_valid = TRUE;
+ 1558              		.loc 1 572 0
+ 1559 0a2e 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1560 0a32 C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1561 0a36 4FF00102 		mov	r2, #1
+ 1562 0a3a 5A72     		strb	r2, [r3, #9]
+ 573:src/MEMS_BMC050.c **** 			BMC050State = readAccelerometer;
+ 1563              		.loc 1 573 0
+ 1564 0a3c 40F20003 		movw	r3, #:lower16:BMC050State
+ 1565 0a40 C0F20003 		movt	r3, #:upper16:BMC050State
+ 1566 0a44 4FF00002 		mov	r2, #0
+ 1567 0a48 1A70     		strb	r2, [r3, #0]
+ 574:src/MEMS_BMC050.c **** 			GoToState = readAccelerometer;
+ 1568              		.loc 1 574 0
+ 1569 0a4a 40F20003 		movw	r3, #:lower16:GoToState
+ 1570 0a4e C0F20003 		movt	r3, #:upper16:GoToState
+ 1571 0a52 4FF00002 		mov	r2, #0
+ 1572 0a56 1A70     		strb	r2, [r3, #0]
+ 575:src/MEMS_BMC050.c **** 		}
+ 576:src/MEMS_BMC050.c **** 		break;
+ 1573              		.loc 1 576 0
+ 1574 0a58 23E0     		b	.L108
+ 1575              	.L88:
+ 577:src/MEMS_BMC050.c **** 
+ 578:src/MEMS_BMC050.c **** 	case manualAccCompensation:
+ 579:src/MEMS_BMC050.c **** 		break;
+ 580:src/MEMS_BMC050.c **** 
+ 581:src/MEMS_BMC050.c **** 	case resetAccCompensation:
+ 582:src/MEMS_BMC050.c **** 		BMC050_AccCompensate.data_valid = FALSE;
+ 1576              		.loc 1 582 0
+ 1577 0a5a 40F20003 		movw	r3, #:lower16:BMC050_AccCompensate
+ 1578 0a5e C0F20003 		movt	r3, #:upper16:BMC050_AccCompensate
+ 1579 0a62 4FF00002 		mov	r2, #0
+ 1580 0a66 5A72     		strb	r2, [r3, #9]
+ 583:src/MEMS_BMC050.c **** 		if (resetAccCompensationValues() >= 0)
+ 1581              		.loc 1 583 0
+ 1582 0a68 00F036FB 		bl	resetAccCompensationValues
+ 1583 0a6c 0346     		mov	r3, r0
+ 1584 0a6e 002B     		cmp	r3, #0
+ 1585 0a70 19DB     		blt	.L109
+ 584:src/MEMS_BMC050.c **** 			BMC050State = readAccelerometerCompenstaionValues;
+ 1586              		.loc 1 584 0
+ 1587 0a72 40F20003 		movw	r3, #:lower16:BMC050State
+ 1588 0a76 C0F20003 		movt	r3, #:upper16:BMC050State
+ 1589 0a7a 4FF00802 		mov	r2, #8
+ 1590 0a7e 1A70     		strb	r2, [r3, #0]
+ 585:src/MEMS_BMC050.c **** 		break;
+ 1591              		.loc 1 585 0
+ 1592 0a80 11E0     		b	.L109
+ 1593              	.L100:
+ 512:src/MEMS_BMC050.c **** 		return;
+ 1594              		.loc 1 512 0
+ 1595 0a82 00BF     		nop
+ 1596 0a84 10E0     		b	.L72
+ 1597              	.L101:
+ 586:src/MEMS_BMC050.c **** 
+ 587:src/MEMS_BMC050.c **** 	// error case:
+ 588:src/MEMS_BMC050.c **** 	default:
+ 589:src/MEMS_BMC050.c **** 		break;
+ 1598              		.loc 1 589 0
+ 1599 0a86 00BF     		nop
+ 1600 0a88 0EE0     		b	.L72
+ 1601              	.L102:
+ 519:src/MEMS_BMC050.c **** 		break;
+ 1602              		.loc 1 519 0
+ 1603 0a8a 00BF     		nop
+ 1604 0a8c 0CE0     		b	.L72
+ 1605              	.L103:
+ 525:src/MEMS_BMC050.c **** 		break;
+ 1606              		.loc 1 525 0
+ 1607 0a8e 00BF     		nop
+ 1608 0a90 0AE0     		b	.L72
+ 1609              	.L104:
+ 550:src/MEMS_BMC050.c **** 		break;
+ 1610              		.loc 1 550 0
+ 1611 0a92 00BF     		nop
+ 1612 0a94 08E0     		b	.L72
+ 1613              	.L105:
+ 556:src/MEMS_BMC050.c **** 		break;
+ 1614              		.loc 1 556 0
+ 1615 0a96 00BF     		nop
+ 1616 0a98 06E0     		b	.L72
+ 1617              	.L106:
+ 562:src/MEMS_BMC050.c **** 		break;
+ 1618              		.loc 1 562 0
+ 1619 0a9a 00BF     		nop
+ 1620 0a9c 04E0     		b	.L72
+ 1621              	.L107:
+ 568:src/MEMS_BMC050.c **** 		break;
+ 1622              		.loc 1 568 0
+ 1623 0a9e 00BF     		nop
+ 1624 0aa0 02E0     		b	.L72
+ 1625              	.L108:
+ 576:src/MEMS_BMC050.c **** 		break;
+ 1626              		.loc 1 576 0
+ 1627 0aa2 00BF     		nop
+ 1628 0aa4 00E0     		b	.L72
+ 1629              	.L109:
+ 585:src/MEMS_BMC050.c **** 		break;
+ 1630              		.loc 1 585 0
+ 1631 0aa6 00BF     		nop
+ 1632              	.L72:
+ 590:src/MEMS_BMC050.c **** 		//-------------------------
+ 591:src/MEMS_BMC050.c **** 	}
+ 592:src/MEMS_BMC050.c **** 
+ 593:src/MEMS_BMC050.c **** } // MEMS_BMC050_task
+ 1633              		.loc 1 593 0
+ 1634 0aa8 07F10807 		add	r7, r7, #8
+ 1635 0aac BD46     		mov	sp, r7
+ 1636 0aae 80BD     		pop	{r7, pc}
+ 1637              		.cfi_endproc
+ 1638              	.LFE126:
+ 1640              		.align	2
+ 1641              		.thumb
+ 1642              		.thumb_func
+ 1644              	initData:
+ 1645              	.LFB127:
+ 594:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 595:src/MEMS_BMC050.c **** 
+ 596:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 597:src/MEMS_BMC050.c **** //! void initData(void)
+ 598:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 599:src/MEMS_BMC050.c **** //! @ brief initializes data structures
+ 600:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 601:src/MEMS_BMC050.c **** void initData(void)
+ 602:src/MEMS_BMC050.c **** {
+ 1646              		.loc 1 602 0
+ 1647              		.cfi_startproc
+ 1648              		@ args = 0, pretend = 0, frame = 0
+ 1649              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1650              		@ link register save eliminated.
+ 1651 0ab0 80B4     		push	{r7}
+ 1652              	.LCFI42:
+ 1653              		.cfi_def_cfa_offset 4
+ 1654              		.cfi_offset 7, -4
+ 1655 0ab2 00AF     		add	r7, sp, #0
+ 1656              	.LCFI43:
+ 1657              		.cfi_def_cfa_register 7
+ 603:src/MEMS_BMC050.c **** 	// no valid readings so far
+ 604:src/MEMS_BMC050.c **** 	BMC050_Readings.data_valid = FALSE;
+ 1658              		.loc 1 604 0
+ 1659 0ab4 40F20003 		movw	r3, #:lower16:BMC050_Readings
+ 1660 0ab8 C0F20003 		movt	r3, #:upper16:BMC050_Readings
+ 1661 0abc 4FF00002 		mov	r2, #0
+ 1662 0ac0 5A74     		strb	r2, [r3, #17]
+ 605:src/MEMS_BMC050.c **** 
+ 606:src/MEMS_BMC050.c **** 	// init local state machine
+ 607:src/MEMS_BMC050.c **** 	BMC050State = readAccelerometer;
+ 1663              		.loc 1 607 0
+ 1664 0ac2 40F20003 		movw	r3, #:lower16:BMC050State
+ 1665 0ac6 C0F20003 		movt	r3, #:upper16:BMC050State
+ 1666 0aca 4FF00002 		mov	r2, #0
+ 1667 0ace 1A70     		strb	r2, [r3, #0]
+ 608:src/MEMS_BMC050.c **** 
+ 609:src/MEMS_BMC050.c **** 	data_init = 1;
+ 1668              		.loc 1 609 0
+ 1669 0ad0 40F20003 		movw	r3, #:lower16:data_init
+ 1670 0ad4 C0F20003 		movt	r3, #:upper16:data_init
+ 1671 0ad8 4FF00102 		mov	r2, #1
+ 1672 0adc 1A70     		strb	r2, [r3, #0]
+ 610:src/MEMS_BMC050.c **** 	
+ 611:src/MEMS_BMC050.c **** 	return;
+ 1673              		.loc 1 611 0
+ 1674 0ade 00BF     		nop
+ 612:src/MEMS_BMC050.c **** }
+ 1675              		.loc 1 612 0
+ 1676 0ae0 BD46     		mov	sp, r7
+ 1677 0ae2 80BC     		pop	{r7}
+ 1678 0ae4 7047     		bx	lr
+ 1679              		.cfi_endproc
+ 1680              	.LFE127:
+ 1682 0ae6 00BF     		.align	2
+ 1683              		.thumb
+ 1684              		.thumb_func
+ 1686              	initSSP:
+ 1687              	.LFB128:
+ 613:src/MEMS_BMC050.c **** 
+ 614:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 615:src/MEMS_BMC050.c **** //! static HWStatus_t initSSP(void)
+ 616:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 617:src/MEMS_BMC050.c **** //@ brief  initializes SSP interface for communication with sensor
+ 618:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 619:src/MEMS_BMC050.c **** static HWStatus_t initSSP(void)
+ 620:src/MEMS_BMC050.c **** {
+ 1688              		.loc 1 620 0
+ 1689              		.cfi_startproc
+ 1690              		@ args = 0, pretend = 0, frame = 16
+ 1691              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1692 0ae8 80B5     		push	{r7, lr}
+ 1693              	.LCFI44:
+ 1694              		.cfi_def_cfa_offset 8
+ 1695              		.cfi_offset 7, -8
+ 1696              		.cfi_offset 14, -4
+ 1697 0aea 84B0     		sub	sp, sp, #16
+ 1698              	.LCFI45:
+ 1699              		.cfi_def_cfa_offset 24
+ 1700 0aec 00AF     		add	r7, sp, #0
+ 1701              	.LCFI46:
+ 1702              		.cfi_def_cfa_register 7
+ 621:src/MEMS_BMC050.c **** 	SSPInit_t init;
+ 622:src/MEMS_BMC050.c **** 	SSPStatus_t res=0;
+ 1703              		.loc 1 622 0
+ 1704 0aee 4FF00003 		mov	r3, #0
+ 1705 0af2 FB60     		str	r3, [r7, #12]
+ 623:src/MEMS_BMC050.c **** 
+ 624:src/MEMS_BMC050.c **** 	init.bitlen = t8_bit;
+ 1706              		.loc 1 624 0
+ 1707 0af4 4FF00703 		mov	r3, #7
+ 1708 0af8 3B70     		strb	r3, [r7, #0]
+ 625:src/MEMS_BMC050.c **** 	init.clk_phase = 1;
+ 1709              		.loc 1 625 0
+ 1710 0afa 4FF00103 		mov	r3, #1
+ 1711 0afe 7B70     		strb	r3, [r7, #1]
+ 626:src/MEMS_BMC050.c **** 	init.clk_pol = 1;
+ 1712              		.loc 1 626 0
+ 1713 0b00 4FF00103 		mov	r3, #1
+ 1714 0b04 BB70     		strb	r3, [r7, #2]
+ 627:src/MEMS_BMC050.c **** 	init.mode = 0;
+ 1715              		.loc 1 627 0
+ 1716 0b06 4FF00003 		mov	r3, #0
+ 1717 0b0a FB71     		strb	r3, [r7, #7]
+ 628:src/MEMS_BMC050.c **** 	init.frm_format = 0;
+ 1718              		.loc 1 628 0
+ 1719 0b0c 4FF00003 		mov	r3, #0
+ 1720 0b10 FB70     		strb	r3, [r7, #3]
+ 629:src/MEMS_BMC050.c **** 	init.loop_back=0;
+ 1721              		.loc 1 629 0
+ 1722 0b12 4FF00003 		mov	r3, #0
+ 1723 0b16 7B71     		strb	r3, [r7, #5]
+ 630:src/MEMS_BMC050.c **** 
+ 631:src/MEMS_BMC050.c **** //	init.ser_clk_rate = 9; 		//! 10 clocks per bit
+ 632:src/MEMS_BMC050.c **** 	init.ser_clk_rate = 0; 		//! 1 clocks per bit
+ 1724              		.loc 1 632 0
+ 1725 0b18 4FF00003 		mov	r3, #0
+ 1726 0b1c 3B71     		strb	r3, [r7, #4]
+ 633:src/MEMS_BMC050.c **** 	init.clk_prescaler = 12;
+ 1727              		.loc 1 633 0
+ 1728 0b1e 4FF00C03 		mov	r3, #12
+ 1729 0b22 3B72     		strb	r3, [r7, #8]
+ 634:src/MEMS_BMC050.c **** 
+ 635:src/MEMS_BMC050.c **** 	init.enable=1;
+ 1730              		.loc 1 635 0
+ 1731 0b24 4FF00103 		mov	r3, #1
+ 1732 0b28 BB71     		strb	r3, [r7, #6]
+ 636:src/MEMS_BMC050.c **** 
+ 637:src/MEMS_BMC050.c **** 	res = SSP_Init(SSP_2, &init);
+ 1733              		.loc 1 637 0
+ 1734 0b2a 3B46     		mov	r3, r7
+ 1735 0b2c 4FF00100 		mov	r0, #1
+ 1736 0b30 1946     		mov	r1, r3
+ 1737 0b32 FFF7FEFF 		bl	SSP_Init
+ 1738 0b36 F860     		str	r0, [r7, #12]
+ 638:src/MEMS_BMC050.c **** 	if(res != SSP_ERR_OK)
+ 1739              		.loc 1 638 0
+ 1740 0b38 FB68     		ldr	r3, [r7, #12]
+ 1741 0b3a 002B     		cmp	r3, #0
+ 1742 0b3c 02D0     		beq	.L113
+ 639:src/MEMS_BMC050.c **** 		return HW_ERR_RESOURCE;
+ 1743              		.loc 1 639 0
+ 1744 0b3e 4FF00203 		mov	r3, #2
+ 1745 0b42 08E0     		b	.L115
+ 1746              	.L113:
+ 640:src/MEMS_BMC050.c **** 
+ 641:src/MEMS_BMC050.c **** 	ssp_init=1;
+ 1747              		.loc 1 641 0
+ 1748 0b44 40F20003 		movw	r3, #:lower16:ssp_init
+ 1749 0b48 C0F20003 		movt	r3, #:upper16:ssp_init
+ 1750 0b4c 4FF00102 		mov	r2, #1
+ 1751 0b50 1A70     		strb	r2, [r3, #0]
+ 642:src/MEMS_BMC050.c **** 
+ 643:src/MEMS_BMC050.c **** 	return HW_ERR_OK;
+ 1752              		.loc 1 643 0
+ 1753 0b52 4FF00003 		mov	r3, #0
+ 1754              	.L115:
+ 644:src/MEMS_BMC050.c **** }
+ 1755              		.loc 1 644 0
+ 1756 0b56 1846     		mov	r0, r3
+ 1757 0b58 07F11007 		add	r7, r7, #16
+ 1758 0b5c BD46     		mov	sp, r7
+ 1759 0b5e 80BD     		pop	{r7, pc}
+ 1760              		.cfi_endproc
+ 1761              	.LFE128:
+ 1763              		.align	2
+ 1764              		.thumb
+ 1765              		.thumb_func
+ 1767              	prcRawAccValues:
+ 1768              	.LFB129:
+ 645:src/MEMS_BMC050.c **** //------------------------------------------------------------------------------
+ 646:src/MEMS_BMC050.c **** 
+ 647:src/MEMS_BMC050.c **** static int prcRawAccValues(MEMS_BMC050_Acc_Data_Type *pData,
+ 648:src/MEMS_BMC050.c **** 		MEMS_BMC050_Result_Type *pRes) {
+ 1769              		.loc 1 648 0
+ 1770              		.cfi_startproc
+ 1771              		@ args = 0, pretend = 0, frame = 8
+ 1772              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1773              		@ link register save eliminated.
+ 1774 0b60 80B4     		push	{r7}
+ 1775              	.LCFI47:
+ 1776              		.cfi_def_cfa_offset 4
+ 1777              		.cfi_offset 7, -4
+ 1778 0b62 83B0     		sub	sp, sp, #12
+ 1779              	.LCFI48:
+ 1780              		.cfi_def_cfa_offset 16
+ 1781 0b64 00AF     		add	r7, sp, #0
+ 1782              	.LCFI49:
+ 1783              		.cfi_def_cfa_register 7
+ 1784 0b66 7860     		str	r0, [r7, #4]
+ 1785 0b68 3960     		str	r1, [r7, #0]
+ 649:src/MEMS_BMC050.c **** 
+ 650:src/MEMS_BMC050.c **** 	pRes->AcclDevID = pData->chip_id;
+ 1786              		.loc 1 650 0
+ 1787 0b6a 7B68     		ldr	r3, [r7, #4]
+ 1788 0b6c 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 1789 0b6e 3B68     		ldr	r3, [r7, #0]
+ 1790 0b70 1A70     		strb	r2, [r3, #0]
+ 651:src/MEMS_BMC050.c **** 	pRes->Acceleration_X = ((s16_t) (pData->Reg_0x02.acc_x_lsb & 0x03)
+ 1791              		.loc 1 651 0
+ 1792 0b72 7B68     		ldr	r3, [r7, #4]
+ 1793 0b74 DB78     		ldrb	r3, [r3, #3]
+ 1794 0b76 C3F38113 		ubfx	r3, r3, #6, #2
+ 1795 0b7a DBB2     		uxtb	r3, r3
+ 1796 0b7c 1A46     		mov	r2, r3
+ 652:src/MEMS_BMC050.c **** 			| ((s16_t) pData->acc_x_msb << 2));
+ 1797              		.loc 1 652 0
+ 1798 0b7e 7B68     		ldr	r3, [r7, #4]
+ 1799 0b80 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+ 1800 0b82 4FEA8303 		lsl	r3, r3, #2
+ 651:src/MEMS_BMC050.c **** 	pRes->Acceleration_X = ((s16_t) (pData->Reg_0x02.acc_x_lsb & 0x03)
+ 1801              		.loc 1 651 0
+ 1802 0b86 9BB2     		uxth	r3, r3
+ 1803 0b88 1343     		orrs	r3, r3, r2
+ 1804 0b8a 9AB2     		uxth	r2, r3
+ 1805 0b8c 3B68     		ldr	r3, [r7, #0]
+ 1806 0b8e 5A80     		strh	r2, [r3, #2]	@ movhi
+ 653:src/MEMS_BMC050.c **** 	if (pRes->Acceleration_X & 0x0200)
+ 1807              		.loc 1 653 0
+ 1808 0b90 3B68     		ldr	r3, [r7, #0]
+ 1809 0b92 5B88     		ldrh	r3, [r3, #2]
+ 1810 0b94 9BB2     		uxth	r3, r3
+ 1811 0b96 03F40073 		and	r3, r3, #512
+ 1812 0b9a 002B     		cmp	r3, #0
+ 1813 0b9c 08D0     		beq	.L117
+ 654:src/MEMS_BMC050.c **** 		pRes->Acceleration_X |= 0xFC00;
+ 1814              		.loc 1 654 0
+ 1815 0b9e 3B68     		ldr	r3, [r7, #0]
+ 1816 0ba0 5B88     		ldrh	r3, [r3, #2]
+ 1817 0ba2 6FEA8353 		mvn	r3, r3, lsl #22
+ 1818 0ba6 6FEA9353 		mvn	r3, r3, lsr #22
+ 1819 0baa 9AB2     		uxth	r2, r3
+ 1820 0bac 3B68     		ldr	r3, [r7, #0]
+ 1821 0bae 5A80     		strh	r2, [r3, #2]	@ movhi
+ 1822              	.L117:
+ 655:src/MEMS_BMC050.c **** 	pRes->Acceleration_X *= AccSensitivity;
+ 1823              		.loc 1 655 0
+ 1824 0bb0 3B68     		ldr	r3, [r7, #0]
+ 1825 0bb2 5B88     		ldrh	r3, [r3, #2]
+ 1826 0bb4 9AB2     		uxth	r2, r3
+ 1827 0bb6 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 1828 0bba C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 1829 0bbe 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1830 0bc0 03FB02F3 		mul	r3, r3, r2
+ 1831 0bc4 9BB2     		uxth	r3, r3
+ 1832 0bc6 9AB2     		uxth	r2, r3
+ 1833 0bc8 3B68     		ldr	r3, [r7, #0]
+ 1834 0bca 5A80     		strh	r2, [r3, #2]	@ movhi
+ 656:src/MEMS_BMC050.c **** 
+ 657:src/MEMS_BMC050.c **** 	pRes->Acceleration_Y = ((s16_t) (pData->Reg_0x04.acc_y_lsb & 0x03)
+ 1835              		.loc 1 657 0
+ 1836 0bcc 7B68     		ldr	r3, [r7, #4]
+ 1837 0bce 5B79     		ldrb	r3, [r3, #5]
+ 1838 0bd0 C3F38113 		ubfx	r3, r3, #6, #2
+ 1839 0bd4 DBB2     		uxtb	r3, r3
+ 1840 0bd6 1A46     		mov	r2, r3
+ 658:src/MEMS_BMC050.c **** 			| ((s16_t) pData->acc_y_msb << 2));
+ 1841              		.loc 1 658 0
+ 1842 0bd8 7B68     		ldr	r3, [r7, #4]
+ 1843 0bda 9B79     		ldrb	r3, [r3, #6]	@ zero_extendqisi2
+ 1844 0bdc 4FEA8303 		lsl	r3, r3, #2
+ 657:src/MEMS_BMC050.c **** 	pRes->Acceleration_Y = ((s16_t) (pData->Reg_0x04.acc_y_lsb & 0x03)
+ 1845              		.loc 1 657 0
+ 1846 0be0 9BB2     		uxth	r3, r3
+ 1847 0be2 1343     		orrs	r3, r3, r2
+ 1848 0be4 9AB2     		uxth	r2, r3
+ 1849 0be6 3B68     		ldr	r3, [r7, #0]
+ 1850 0be8 9A80     		strh	r2, [r3, #4]	@ movhi
+ 659:src/MEMS_BMC050.c **** 	if (pRes->Acceleration_Y & 0x0200)
+ 1851              		.loc 1 659 0
+ 1852 0bea 3B68     		ldr	r3, [r7, #0]
+ 1853 0bec 9B88     		ldrh	r3, [r3, #4]
+ 1854 0bee 9BB2     		uxth	r3, r3
+ 1855 0bf0 03F40073 		and	r3, r3, #512
+ 1856 0bf4 002B     		cmp	r3, #0
+ 1857 0bf6 08D0     		beq	.L118
+ 660:src/MEMS_BMC050.c **** 		pRes->Acceleration_Y |= 0xFC00;
+ 1858              		.loc 1 660 0
+ 1859 0bf8 3B68     		ldr	r3, [r7, #0]
+ 1860 0bfa 9B88     		ldrh	r3, [r3, #4]
+ 1861 0bfc 6FEA8353 		mvn	r3, r3, lsl #22
+ 1862 0c00 6FEA9353 		mvn	r3, r3, lsr #22
+ 1863 0c04 9AB2     		uxth	r2, r3
+ 1864 0c06 3B68     		ldr	r3, [r7, #0]
+ 1865 0c08 9A80     		strh	r2, [r3, #4]	@ movhi
+ 1866              	.L118:
+ 661:src/MEMS_BMC050.c **** 	pRes->Acceleration_Y *= AccSensitivity;
+ 1867              		.loc 1 661 0
+ 1868 0c0a 3B68     		ldr	r3, [r7, #0]
+ 1869 0c0c 9B88     		ldrh	r3, [r3, #4]
+ 1870 0c0e 9AB2     		uxth	r2, r3
+ 1871 0c10 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 1872 0c14 C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 1873 0c18 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1874 0c1a 03FB02F3 		mul	r3, r3, r2
+ 1875 0c1e 9BB2     		uxth	r3, r3
+ 1876 0c20 9AB2     		uxth	r2, r3
+ 1877 0c22 3B68     		ldr	r3, [r7, #0]
+ 1878 0c24 9A80     		strh	r2, [r3, #4]	@ movhi
+ 662:src/MEMS_BMC050.c **** 
+ 663:src/MEMS_BMC050.c **** 	pRes->Acceleration_Z = ((s16_t) (pData->Reg_0x06.acc_z_lsb & 0x03)
+ 1879              		.loc 1 663 0
+ 1880 0c26 7B68     		ldr	r3, [r7, #4]
+ 1881 0c28 DB79     		ldrb	r3, [r3, #7]
+ 1882 0c2a C3F38113 		ubfx	r3, r3, #6, #2
+ 1883 0c2e DBB2     		uxtb	r3, r3
+ 1884 0c30 1A46     		mov	r2, r3
+ 664:src/MEMS_BMC050.c **** 			| ((s16_t) pData->acc_z_msb << 2));
+ 1885              		.loc 1 664 0
+ 1886 0c32 7B68     		ldr	r3, [r7, #4]
+ 1887 0c34 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 1888 0c36 4FEA8303 		lsl	r3, r3, #2
+ 663:src/MEMS_BMC050.c **** 	pRes->Acceleration_Z = ((s16_t) (pData->Reg_0x06.acc_z_lsb & 0x03)
+ 1889              		.loc 1 663 0
+ 1890 0c3a 9BB2     		uxth	r3, r3
+ 1891 0c3c 1343     		orrs	r3, r3, r2
+ 1892 0c3e 9AB2     		uxth	r2, r3
+ 1893 0c40 3B68     		ldr	r3, [r7, #0]
+ 1894 0c42 DA80     		strh	r2, [r3, #6]	@ movhi
+ 665:src/MEMS_BMC050.c **** 	if (pRes->Acceleration_Z & 0x0200)
+ 1895              		.loc 1 665 0
+ 1896 0c44 3B68     		ldr	r3, [r7, #0]
+ 1897 0c46 DB88     		ldrh	r3, [r3, #6]
+ 1898 0c48 9BB2     		uxth	r3, r3
+ 1899 0c4a 03F40073 		and	r3, r3, #512
+ 1900 0c4e 002B     		cmp	r3, #0
+ 1901 0c50 08D0     		beq	.L119
+ 666:src/MEMS_BMC050.c **** 		pRes->Acceleration_Z |= 0xFC00;
+ 1902              		.loc 1 666 0
+ 1903 0c52 3B68     		ldr	r3, [r7, #0]
+ 1904 0c54 DB88     		ldrh	r3, [r3, #6]
+ 1905 0c56 6FEA8353 		mvn	r3, r3, lsl #22
+ 1906 0c5a 6FEA9353 		mvn	r3, r3, lsr #22
+ 1907 0c5e 9AB2     		uxth	r2, r3
+ 1908 0c60 3B68     		ldr	r3, [r7, #0]
+ 1909 0c62 DA80     		strh	r2, [r3, #6]	@ movhi
+ 1910              	.L119:
+ 667:src/MEMS_BMC050.c **** 	pRes->Acceleration_Z *= AccSensitivity;
+ 1911              		.loc 1 667 0
+ 1912 0c64 3B68     		ldr	r3, [r7, #0]
+ 1913 0c66 DB88     		ldrh	r3, [r3, #6]
+ 1914 0c68 9AB2     		uxth	r2, r3
+ 1915 0c6a 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 1916 0c6e C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 1917 0c72 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1918 0c74 03FB02F3 		mul	r3, r3, r2
+ 1919 0c78 9BB2     		uxth	r3, r3
+ 1920 0c7a 9AB2     		uxth	r2, r3
+ 1921 0c7c 3B68     		ldr	r3, [r7, #0]
+ 1922 0c7e DA80     		strh	r2, [r3, #6]	@ movhi
+ 668:src/MEMS_BMC050.c **** 
+ 669:src/MEMS_BMC050.c **** 	pRes->Temperature = pData->temp;
+ 1923              		.loc 1 669 0
+ 1924 0c80 7B68     		ldr	r3, [r7, #4]
+ 1925 0c82 5A7A     		ldrb	r2, [r3, #9]	@ zero_extendqisi2
+ 1926 0c84 3B68     		ldr	r3, [r7, #0]
+ 1927 0c86 1A72     		strb	r2, [r3, #8]
+ 670:src/MEMS_BMC050.c **** 
+ 671:src/MEMS_BMC050.c **** 	return 0;
+ 1928              		.loc 1 671 0
+ 1929 0c88 4FF00003 		mov	r3, #0
+ 672:src/MEMS_BMC050.c **** }
+ 1930              		.loc 1 672 0
+ 1931 0c8c 1846     		mov	r0, r3
+ 1932 0c8e 07F10C07 		add	r7, r7, #12
+ 1933 0c92 BD46     		mov	sp, r7
+ 1934 0c94 80BC     		pop	{r7}
+ 1935 0c96 7047     		bx	lr
+ 1936              		.cfi_endproc
+ 1937              	.LFE129:
+ 1939              		.align	2
+ 1940              		.thumb
+ 1941              		.thumb_func
+ 1943              	prcRawCmpValues:
+ 1944              	.LFB130:
+ 673:src/MEMS_BMC050.c **** 
+ 674:src/MEMS_BMC050.c **** static int prcRawCmpValues(MEMS_BMC050_Mag_Data_Type *pData,
+ 675:src/MEMS_BMC050.c **** 		MEMS_BMC050_Result_Type *pRes) {
+ 1945              		.loc 1 675 0
+ 1946              		.cfi_startproc
+ 1947              		@ args = 0, pretend = 0, frame = 8
+ 1948              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1949              		@ link register save eliminated.
+ 1950 0c98 80B4     		push	{r7}
+ 1951              	.LCFI50:
+ 1952              		.cfi_def_cfa_offset 4
+ 1953              		.cfi_offset 7, -4
+ 1954 0c9a 83B0     		sub	sp, sp, #12
+ 1955              	.LCFI51:
+ 1956              		.cfi_def_cfa_offset 16
+ 1957 0c9c 00AF     		add	r7, sp, #0
+ 1958              	.LCFI52:
+ 1959              		.cfi_def_cfa_register 7
+ 1960 0c9e 7860     		str	r0, [r7, #4]
+ 1961 0ca0 3960     		str	r1, [r7, #0]
+ 676:src/MEMS_BMC050.c **** 
+ 677:src/MEMS_BMC050.c **** 	pRes->CompDevID = pData->chip_id;
+ 1962              		.loc 1 677 0
+ 1963 0ca2 7B68     		ldr	r3, [r7, #4]
+ 1964 0ca4 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 1965 0ca6 3B68     		ldr	r3, [r7, #0]
+ 1966 0ca8 5A70     		strb	r2, [r3, #1]
+ 678:src/MEMS_BMC050.c **** 
+ 679:src/MEMS_BMC050.c **** 	pRes->MagField_X = (s16_t) pData->Reg_0x42.mag_x_lsb
+ 1967              		.loc 1 679 0
+ 1968 0caa 7B68     		ldr	r3, [r7, #4]
+ 1969 0cac DB78     		ldrb	r3, [r3, #3]
+ 1970 0cae C3F3C403 		ubfx	r3, r3, #3, #5
+ 1971 0cb2 DBB2     		uxtb	r3, r3
+ 1972 0cb4 1A46     		mov	r2, r3
+ 680:src/MEMS_BMC050.c **** 			| (s16_t) pData->mag_x_msb << 5;
+ 1973              		.loc 1 680 0
+ 1974 0cb6 7B68     		ldr	r3, [r7, #4]
+ 1975 0cb8 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+ 1976 0cba 4FEA4313 		lsl	r3, r3, #5
+ 679:src/MEMS_BMC050.c **** 	pRes->MagField_X = (s16_t) pData->Reg_0x42.mag_x_lsb
+ 1977              		.loc 1 679 0
+ 1978 0cbe 9BB2     		uxth	r3, r3
+ 1979 0cc0 1343     		orrs	r3, r3, r2
+ 1980 0cc2 9AB2     		uxth	r2, r3
+ 1981 0cc4 3B68     		ldr	r3, [r7, #0]
+ 1982 0cc6 5A81     		strh	r2, [r3, #10]	@ movhi
+ 681:src/MEMS_BMC050.c **** 	if (pRes->MagField_X & 0x1000)
+ 1983              		.loc 1 681 0
+ 1984 0cc8 3B68     		ldr	r3, [r7, #0]
+ 1985 0cca 5B89     		ldrh	r3, [r3, #10]
+ 1986 0ccc 9BB2     		uxth	r3, r3
+ 1987 0cce 03F48053 		and	r3, r3, #4096
+ 1988 0cd2 002B     		cmp	r3, #0
+ 1989 0cd4 08D0     		beq	.L122
+ 682:src/MEMS_BMC050.c **** 		pRes->MagField_X |= 0xE000;
+ 1990              		.loc 1 682 0
+ 1991 0cd6 3B68     		ldr	r3, [r7, #0]
+ 1992 0cd8 5B89     		ldrh	r3, [r3, #10]
+ 1993 0cda 6FEAC343 		mvn	r3, r3, lsl #19
+ 1994 0cde 6FEAD343 		mvn	r3, r3, lsr #19
+ 1995 0ce2 9AB2     		uxth	r2, r3
+ 1996 0ce4 3B68     		ldr	r3, [r7, #0]
+ 1997 0ce6 5A81     		strh	r2, [r3, #10]	@ movhi
+ 1998              	.L122:
+ 683:src/MEMS_BMC050.c **** 
+ 684:src/MEMS_BMC050.c **** 	pRes->MagField_Y = (s16_t) pData->Reg_0x44.mag_y_lsb
+ 1999              		.loc 1 684 0
+ 2000 0ce8 7B68     		ldr	r3, [r7, #4]
+ 2001 0cea 5B79     		ldrb	r3, [r3, #5]
+ 2002 0cec C3F3C403 		ubfx	r3, r3, #3, #5
+ 2003 0cf0 DBB2     		uxtb	r3, r3
+ 2004 0cf2 1A46     		mov	r2, r3
+ 685:src/MEMS_BMC050.c **** 			| (s16_t) pData->mag_y_msb << 5;
+ 2005              		.loc 1 685 0
+ 2006 0cf4 7B68     		ldr	r3, [r7, #4]
+ 2007 0cf6 9B79     		ldrb	r3, [r3, #6]	@ zero_extendqisi2
+ 2008 0cf8 4FEA4313 		lsl	r3, r3, #5
+ 684:src/MEMS_BMC050.c **** 	pRes->MagField_Y = (s16_t) pData->Reg_0x44.mag_y_lsb
+ 2009              		.loc 1 684 0
+ 2010 0cfc 9BB2     		uxth	r3, r3
+ 2011 0cfe 1343     		orrs	r3, r3, r2
+ 2012 0d00 9AB2     		uxth	r2, r3
+ 2013 0d02 3B68     		ldr	r3, [r7, #0]
+ 2014 0d04 9A81     		strh	r2, [r3, #12]	@ movhi
+ 686:src/MEMS_BMC050.c **** 	if (pRes->MagField_Y & 0x1000)
+ 2015              		.loc 1 686 0
+ 2016 0d06 3B68     		ldr	r3, [r7, #0]
+ 2017 0d08 9B89     		ldrh	r3, [r3, #12]
+ 2018 0d0a 9BB2     		uxth	r3, r3
+ 2019 0d0c 03F48053 		and	r3, r3, #4096
+ 2020 0d10 002B     		cmp	r3, #0
+ 2021 0d12 08D0     		beq	.L123
+ 687:src/MEMS_BMC050.c **** 		pRes->MagField_Y |= 0xE000;
+ 2022              		.loc 1 687 0
+ 2023 0d14 3B68     		ldr	r3, [r7, #0]
+ 2024 0d16 9B89     		ldrh	r3, [r3, #12]
+ 2025 0d18 6FEAC343 		mvn	r3, r3, lsl #19
+ 2026 0d1c 6FEAD343 		mvn	r3, r3, lsr #19
+ 2027 0d20 9AB2     		uxth	r2, r3
+ 2028 0d22 3B68     		ldr	r3, [r7, #0]
+ 2029 0d24 9A81     		strh	r2, [r3, #12]	@ movhi
+ 2030              	.L123:
+ 688:src/MEMS_BMC050.c **** 
+ 689:src/MEMS_BMC050.c **** 	pRes->MagField_Z = (s16_t) pData->Reg_0x46.mag_z_lsb
+ 2031              		.loc 1 689 0
+ 2032 0d26 7B68     		ldr	r3, [r7, #4]
+ 2033 0d28 DB79     		ldrb	r3, [r3, #7]
+ 2034 0d2a C3F34603 		ubfx	r3, r3, #1, #7
+ 2035 0d2e DBB2     		uxtb	r3, r3
+ 2036 0d30 1A46     		mov	r2, r3
+ 690:src/MEMS_BMC050.c **** 			| (s16_t) pData->mag_z_msb << 7;
+ 2037              		.loc 1 690 0
+ 2038 0d32 7B68     		ldr	r3, [r7, #4]
+ 2039 0d34 1B7A     		ldrb	r3, [r3, #8]	@ zero_extendqisi2
+ 2040 0d36 4FEAC313 		lsl	r3, r3, #7
+ 689:src/MEMS_BMC050.c **** 	pRes->MagField_Z = (s16_t) pData->Reg_0x46.mag_z_lsb
+ 2041              		.loc 1 689 0
+ 2042 0d3a 9BB2     		uxth	r3, r3
+ 2043 0d3c 1343     		orrs	r3, r3, r2
+ 2044 0d3e 9AB2     		uxth	r2, r3
+ 2045 0d40 3B68     		ldr	r3, [r7, #0]
+ 2046 0d42 DA81     		strh	r2, [r3, #14]	@ movhi
+ 691:src/MEMS_BMC050.c **** 	if (pRes->MagField_Z & 0x4000)
+ 2047              		.loc 1 691 0
+ 2048 0d44 3B68     		ldr	r3, [r7, #0]
+ 2049 0d46 DB89     		ldrh	r3, [r3, #14]
+ 2050 0d48 9BB2     		uxth	r3, r3
+ 2051 0d4a 03F48043 		and	r3, r3, #16384
+ 2052 0d4e 002B     		cmp	r3, #0
+ 2053 0d50 08D0     		beq	.L124
+ 692:src/MEMS_BMC050.c **** 		pRes->MagField_Z |= 0x8000;
+ 2054              		.loc 1 692 0
+ 2055 0d52 3B68     		ldr	r3, [r7, #0]
+ 2056 0d54 DB89     		ldrh	r3, [r3, #14]
+ 2057 0d56 6FEA4343 		mvn	r3, r3, lsl #17
+ 2058 0d5a 6FEA5343 		mvn	r3, r3, lsr #17
+ 2059 0d5e 9AB2     		uxth	r2, r3
+ 2060 0d60 3B68     		ldr	r3, [r7, #0]
+ 2061 0d62 DA81     		strh	r2, [r3, #14]	@ movhi
+ 2062              	.L124:
+ 693:src/MEMS_BMC050.c **** 
+ 694:src/MEMS_BMC050.c **** 	return 0;
+ 2063              		.loc 1 694 0
+ 2064 0d64 4FF00003 		mov	r3, #0
+ 695:src/MEMS_BMC050.c **** }
+ 2065              		.loc 1 695 0
+ 2066 0d68 1846     		mov	r0, r3
+ 2067 0d6a 07F10C07 		add	r7, r7, #12
+ 2068 0d6e BD46     		mov	sp, r7
+ 2069 0d70 80BC     		pop	{r7}
+ 2070 0d72 7047     		bx	lr
+ 2071              		.cfi_endproc
+ 2072              	.LFE130:
+ 2074              		.align	2
+ 2075              		.thumb
+ 2076              		.thumb_func
+ 2078              	readCurrAccelerationValues:
+ 2079              	.LFB131:
+ 696:src/MEMS_BMC050.c **** 
+ 697:src/MEMS_BMC050.c **** static int readCurrAccelerationValues(MEMS_BMC050_Acc_Data_Type *pBuff) {
+ 2080              		.loc 1 697 0
+ 2081              		.cfi_startproc
+ 2082              		@ args = 0, pretend = 0, frame = 32
+ 2083              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2084 0d74 80B5     		push	{r7, lr}
+ 2085              	.LCFI53:
+ 2086              		.cfi_def_cfa_offset 8
+ 2087              		.cfi_offset 7, -8
+ 2088              		.cfi_offset 14, -4
+ 2089 0d76 88B0     		sub	sp, sp, #32
+ 2090              	.LCFI54:
+ 2091              		.cfi_def_cfa_offset 40
+ 2092 0d78 00AF     		add	r7, sp, #0
+ 2093              	.LCFI55:
+ 2094              		.cfi_def_cfa_register 7
+ 2095 0d7a 7860     		str	r0, [r7, #4]
+ 698:src/MEMS_BMC050.c **** 	u8_t wBuff_Accl[bufsize] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 2096              		.loc 1 698 0
+ 2097 0d7c 07F10C03 		add	r3, r7, #12
+ 2098 0d80 4FF00002 		mov	r2, #0
+ 2099 0d84 1A60     		str	r2, [r3, #0]
+ 2100 0d86 03F10403 		add	r3, r3, #4
+ 2101 0d8a 4FF00002 		mov	r2, #0
+ 2102 0d8e 1A60     		str	r2, [r3, #0]
+ 2103 0d90 03F10403 		add	r3, r3, #4
+ 2104 0d94 4FF00002 		mov	r2, #0
+ 2105 0d98 1A60     		str	r2, [r3, #0]
+ 2106 0d9a 03F10403 		add	r3, r3, #4
+ 2107 0d9e 4FF00002 		mov	r2, #0
+ 2108 0da2 1A60     		str	r2, [r3, #0]
+ 2109 0da4 03F10403 		add	r3, r3, #4
+ 2110 0da8 4FF00002 		mov	r2, #0
+ 2111 0dac 1A70     		strb	r2, [r3, #0]
+ 2112 0dae 03F10103 		add	r3, r3, #1
+ 699:src/MEMS_BMC050.c **** 			0 };
+ 700:src/MEMS_BMC050.c **** 
+ 701:src/MEMS_BMC050.c **** 	wBuff_Accl[0] = ((1 << 7) | 0x00); // command: read from register 40h onward
+ 2113              		.loc 1 701 0
+ 2114 0db2 4FF08003 		mov	r3, #128
+ 2115 0db6 3B73     		strb	r3, [r7, #12]
+ 702:src/MEMS_BMC050.c **** 	rwACC(wBuff_Accl, (u8_t*) pBuff, 10);
+ 2116              		.loc 1 702 0
+ 2117 0db8 07F10C03 		add	r3, r7, #12
+ 2118 0dbc 1846     		mov	r0, r3
+ 2119 0dbe 7968     		ldr	r1, [r7, #4]
+ 2120 0dc0 4FF00A02 		mov	r2, #10
+ 2121 0dc4 00F0EEFA 		bl	rwACC
+ 703:src/MEMS_BMC050.c **** 
+ 704:src/MEMS_BMC050.c **** 	return 0;
+ 2122              		.loc 1 704 0
+ 2123 0dc8 4FF00003 		mov	r3, #0
+ 705:src/MEMS_BMC050.c **** }
+ 2124              		.loc 1 705 0
+ 2125 0dcc 1846     		mov	r0, r3
+ 2126 0dce 07F12007 		add	r7, r7, #32
+ 2127 0dd2 BD46     		mov	sp, r7
+ 2128 0dd4 80BD     		pop	{r7, pc}
+ 2129              		.cfi_endproc
+ 2130              	.LFE131:
+ 2132 0dd6 00BF     		.align	2
+ 2133              		.thumb
+ 2134              		.thumb_func
+ 2136              	readCurrMagValues:
+ 2137              	.LFB132:
+ 706:src/MEMS_BMC050.c **** 
+ 707:src/MEMS_BMC050.c **** static int readCurrMagValues(MEMS_BMC050_Mag_Data_Type *pBuff) {
+ 2138              		.loc 1 707 0
+ 2139              		.cfi_startproc
+ 2140              		@ args = 0, pretend = 0, frame = 32
+ 2141              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2142 0dd8 80B5     		push	{r7, lr}
+ 2143              	.LCFI56:
+ 2144              		.cfi_def_cfa_offset 8
+ 2145              		.cfi_offset 7, -8
+ 2146              		.cfi_offset 14, -4
+ 2147 0dda 88B0     		sub	sp, sp, #32
+ 2148              	.LCFI57:
+ 2149              		.cfi_def_cfa_offset 40
+ 2150 0ddc 00AF     		add	r7, sp, #0
+ 2151              	.LCFI58:
+ 2152              		.cfi_def_cfa_register 7
+ 2153 0dde 7860     		str	r0, [r7, #4]
+ 708:src/MEMS_BMC050.c **** 	u8_t wBuff_Comp[bufsize] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ 2154              		.loc 1 708 0
+ 2155 0de0 07F10C03 		add	r3, r7, #12
+ 2156 0de4 4FF00002 		mov	r2, #0
+ 2157 0de8 1A60     		str	r2, [r3, #0]
+ 2158 0dea 03F10403 		add	r3, r3, #4
+ 2159 0dee 4FF00002 		mov	r2, #0
+ 2160 0df2 1A60     		str	r2, [r3, #0]
+ 2161 0df4 03F10403 		add	r3, r3, #4
+ 2162 0df8 4FF00002 		mov	r2, #0
+ 2163 0dfc 1A60     		str	r2, [r3, #0]
+ 2164 0dfe 03F10403 		add	r3, r3, #4
+ 2165 0e02 4FF00002 		mov	r2, #0
+ 2166 0e06 1A60     		str	r2, [r3, #0]
+ 2167 0e08 03F10403 		add	r3, r3, #4
+ 2168 0e0c 4FF00002 		mov	r2, #0
+ 2169 0e10 1A70     		strb	r2, [r3, #0]
+ 2170 0e12 03F10103 		add	r3, r3, #1
+ 709:src/MEMS_BMC050.c **** 
+ 710:src/MEMS_BMC050.c **** 	wBuff_Comp[0] = ((1 << 7) | 0x40); // command: read from register 40h onward
+ 2171              		.loc 1 710 0
+ 2172 0e16 4FF0C003 		mov	r3, #192
+ 2173 0e1a 3B73     		strb	r3, [r7, #12]
+ 711:src/MEMS_BMC050.c **** 	rwMAG(wBuff_Comp, (u8_t*) pBuff, 9);
+ 2174              		.loc 1 711 0
+ 2175 0e1c 07F10C03 		add	r3, r7, #12
+ 2176 0e20 1846     		mov	r0, r3
+ 2177 0e22 7968     		ldr	r1, [r7, #4]
+ 2178 0e24 4FF00902 		mov	r2, #9
+ 2179 0e28 00F02CFB 		bl	rwMAG
+ 712:src/MEMS_BMC050.c **** 
+ 713:src/MEMS_BMC050.c **** 	return 0;
+ 2180              		.loc 1 713 0
+ 2181 0e2c 4FF00003 		mov	r3, #0
+ 714:src/MEMS_BMC050.c **** }
+ 2182              		.loc 1 714 0
+ 2183 0e30 1846     		mov	r0, r3
+ 2184 0e32 07F12007 		add	r7, r7, #32
+ 2185 0e36 BD46     		mov	sp, r7
+ 2186 0e38 80BD     		pop	{r7, pc}
+ 2187              		.cfi_endproc
+ 2188              	.LFE132:
+ 2190 0e3a 00BF     		.align	2
+ 2191              		.thumb
+ 2192              		.thumb_func
+ 2194              	readAccRange:
+ 2195              	.LFB133:
+ 715:src/MEMS_BMC050.c **** 
+ 716:src/MEMS_BMC050.c **** static int readAccRange(void) {
+ 2196              		.loc 1 716 0
+ 2197              		.cfi_startproc
+ 2198              		@ args = 0, pretend = 0, frame = 48
+ 2199              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2200 0e3c 80B5     		push	{r7, lr}
+ 2201              	.LCFI59:
+ 2202              		.cfi_def_cfa_offset 8
+ 2203              		.cfi_offset 7, -8
+ 2204              		.cfi_offset 14, -4
+ 2205 0e3e 8CB0     		sub	sp, sp, #48
+ 2206              	.LCFI60:
+ 2207              		.cfi_def_cfa_offset 56
+ 2208 0e40 00AF     		add	r7, sp, #0
+ 2209              	.LCFI61:
+ 2210              		.cfi_def_cfa_register 7
+ 717:src/MEMS_BMC050.c **** 	u8_t wBuff[bufsize];
+ 718:src/MEMS_BMC050.c **** 	u8_t rBuff[bufsize];
+ 719:src/MEMS_BMC050.c **** 	int ret = 0;
+ 2211              		.loc 1 719 0
+ 2212 0e42 4FF00003 		mov	r3, #0
+ 2213 0e46 FB62     		str	r3, [r7, #44]
+ 720:src/MEMS_BMC050.c **** 
+ 721:src/MEMS_BMC050.c **** 	wBuff[0] = ((1 << 7) | 0x0F);  // command: read from register 0Fh onward
+ 2214              		.loc 1 721 0
+ 2215 0e48 4FF08F03 		mov	r3, #143
+ 2216 0e4c 3B76     		strb	r3, [r7, #24]
+ 722:src/MEMS_BMC050.c **** 	wBuff[1] = *((u8_t*) &(BMC050_AccCompensate.Reg_0x37));
+ 2217              		.loc 1 722 0
+ 2218 0e4e 2A4B     		ldr	r3, .L139
+ 2219 0e50 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 2220 0e52 7B76     		strb	r3, [r7, #25]
+ 723:src/MEMS_BMC050.c **** 	rwACC(wBuff, rBuff, 2);
+ 2221              		.loc 1 723 0
+ 2222 0e54 07F11802 		add	r2, r7, #24
+ 2223 0e58 07F10403 		add	r3, r7, #4
+ 2224 0e5c 1046     		mov	r0, r2
+ 2225 0e5e 1946     		mov	r1, r3
+ 2226 0e60 4FF00202 		mov	r2, #2
+ 2227 0e64 00F09EFA 		bl	rwACC
+ 724:src/MEMS_BMC050.c **** 
+ 725:src/MEMS_BMC050.c **** 	switch (rBuff[1] & 0xF) {
+ 2228              		.loc 1 725 0
+ 2229 0e68 7B79     		ldrb	r3, [r7, #5]	@ zero_extendqisi2
+ 2230 0e6a 03F00F03 		and	r3, r3, #15
+ 2231 0e6e A3F10303 		sub	r3, r3, #3
+ 2232 0e72 092B     		cmp	r3, #9
+ 2233 0e74 36D8     		bhi	.L131
+ 2234 0e76 01A2     		adr	r2, .L136
+ 2235 0e78 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 2236              		.align	2
+ 2237              	.L136:
+ 2238 0e7c A50E0000 		.word	.L132+1
+ 2239 0e80 E50E0000 		.word	.L131+1
+ 2240 0e84 B50E0000 		.word	.L133+1
+ 2241 0e88 E50E0000 		.word	.L131+1
+ 2242 0e8c E50E0000 		.word	.L131+1
+ 2243 0e90 C50E0000 		.word	.L134+1
+ 2244 0e94 E50E0000 		.word	.L131+1
+ 2245 0e98 E50E0000 		.word	.L131+1
+ 2246 0e9c E50E0000 		.word	.L131+1
+ 2247 0ea0 D50E0000 		.word	.L135+1
+ 2248              	.L132:
+ 726:src/MEMS_BMC050.c **** 	case 0x03:
+ 727:src/MEMS_BMC050.c **** 		/* +- 2g range */
+ 728:src/MEMS_BMC050.c **** 		AccSensitivity = 1;
+ 2249              		.loc 1 728 0
+ 2250 0ea4 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 2251 0ea8 C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 2252 0eac 4FF00102 		mov	r2, #1
+ 2253 0eb0 1A70     		strb	r2, [r3, #0]
+ 729:src/MEMS_BMC050.c **** 		break;
+ 2254              		.loc 1 729 0
+ 2255 0eb2 1BE0     		b	.L137
+ 2256              	.L133:
+ 730:src/MEMS_BMC050.c **** 	case 0x05:
+ 731:src/MEMS_BMC050.c **** 		/* +- 4g range */
+ 732:src/MEMS_BMC050.c **** 		AccSensitivity = 2;
+ 2257              		.loc 1 732 0
+ 2258 0eb4 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 2259 0eb8 C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 2260 0ebc 4FF00202 		mov	r2, #2
+ 2261 0ec0 1A70     		strb	r2, [r3, #0]
+ 733:src/MEMS_BMC050.c **** 		break;
+ 2262              		.loc 1 733 0
+ 2263 0ec2 13E0     		b	.L137
+ 2264              	.L134:
+ 734:src/MEMS_BMC050.c **** 	case 0x08:
+ 735:src/MEMS_BMC050.c **** 		/* +- 8g range */
+ 736:src/MEMS_BMC050.c **** 		AccSensitivity = 4;
+ 2265              		.loc 1 736 0
+ 2266 0ec4 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 2267 0ec8 C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 2268 0ecc 4FF00402 		mov	r2, #4
+ 2269 0ed0 1A70     		strb	r2, [r3, #0]
+ 737:src/MEMS_BMC050.c **** 		break;
+ 2270              		.loc 1 737 0
+ 2271 0ed2 0BE0     		b	.L137
+ 2272              	.L135:
+ 738:src/MEMS_BMC050.c **** 	case 0x0C:
+ 739:src/MEMS_BMC050.c **** 		/* +- 16g range */
+ 740:src/MEMS_BMC050.c **** 		AccSensitivity = 8;
+ 2273              		.loc 1 740 0
+ 2274 0ed4 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 2275 0ed8 C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 2276 0edc 4FF00802 		mov	r2, #8
+ 2277 0ee0 1A70     		strb	r2, [r3, #0]
+ 741:src/MEMS_BMC050.c **** 		break;
+ 2278              		.loc 1 741 0
+ 2279 0ee2 03E0     		b	.L137
+ 2280              	.L131:
+ 742:src/MEMS_BMC050.c **** 	default:
+ 743:src/MEMS_BMC050.c **** 		ret = -1;
+ 2281              		.loc 1 743 0
+ 2282 0ee4 4FF0FF33 		mov	r3, #-1
+ 2283 0ee8 FB62     		str	r3, [r7, #44]
+ 744:src/MEMS_BMC050.c **** 		break;
+ 2284              		.loc 1 744 0
+ 2285 0eea 00BF     		nop
+ 2286              	.L137:
+ 745:src/MEMS_BMC050.c **** 	}
+ 746:src/MEMS_BMC050.c **** 
+ 747:src/MEMS_BMC050.c **** 	return ret;
+ 2287              		.loc 1 747 0
+ 2288 0eec FB6A     		ldr	r3, [r7, #44]
+ 748:src/MEMS_BMC050.c **** }
+ 2289              		.loc 1 748 0
+ 2290 0eee 1846     		mov	r0, r3
+ 2291 0ef0 07F13007 		add	r7, r7, #48
+ 2292 0ef4 BD46     		mov	sp, r7
+ 2293 0ef6 80BD     		pop	{r7, pc}
+ 2294              	.L140:
+ 2295              		.align	2
+ 2296              	.L139:
+ 2297 0ef8 02000000 		.word	BMC050_AccCompensate+2
+ 2298              		.cfi_endproc
+ 2299              	.LFE133:
+ 2301              		.align	2
+ 2302              		.thumb
+ 2303              		.thumb_func
+ 2305              	setAccRange:
+ 2306              	.LFB134:
+ 749:src/MEMS_BMC050.c **** 
+ 750:src/MEMS_BMC050.c **** static void setAccRange(void){
+ 2307              		.loc 1 750 0
+ 2308              		.cfi_startproc
+ 2309              		@ args = 0, pretend = 0, frame = 0
+ 2310              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2311 0efc 80B5     		push	{r7, lr}
+ 2312              	.LCFI62:
+ 2313              		.cfi_def_cfa_offset 8
+ 2314              		.cfi_offset 7, -8
+ 2315              		.cfi_offset 14, -4
+ 2316 0efe 00AF     		add	r7, sp, #0
+ 2317              	.LCFI63:
+ 2318              		.cfi_def_cfa_register 7
+ 751:src/MEMS_BMC050.c **** 	
+ 752:src/MEMS_BMC050.c **** 	switch(AccSensitivity){
+ 2319              		.loc 1 752 0
+ 2320 0f00 40F20003 		movw	r3, #:lower16:AccSensitivity
+ 2321 0f04 C0F20003 		movt	r3, #:upper16:AccSensitivity
+ 2322 0f08 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 2323 0f0a 042B     		cmp	r3, #4
+ 2324 0f0c 11D0     		beq	.L144
+ 2325 0f0e 082B     		cmp	r3, #8
+ 2326 0f10 16D0     		beq	.L145
+ 2327 0f12 022B     		cmp	r3, #2
+ 2328 0f14 06D0     		beq	.L143
+ 753:src/MEMS_BMC050.c **** 	default:	
+ 754:src/MEMS_BMC050.c **** 	case 1:
+ 755:src/MEMS_BMC050.c **** 		/* +- 2g range */
+ 756:src/MEMS_BMC050.c **** 		wAccReg(0x0F, 0x03);
+ 2329              		.loc 1 756 0
+ 2330 0f16 4FF00F00 		mov	r0, #15
+ 2331 0f1a 4FF00301 		mov	r1, #3
+ 2332 0f1e 00F025FA 		bl	wAccReg
+ 757:src/MEMS_BMC050.c **** 		break;
+ 2333              		.loc 1 757 0
+ 2334 0f22 14E0     		b	.L146
+ 2335              	.L143:
+ 758:src/MEMS_BMC050.c **** 	case 2:
+ 759:src/MEMS_BMC050.c **** 		/* +- 4g range */
+ 760:src/MEMS_BMC050.c **** 		wAccReg(0x0F, 0x05);
+ 2336              		.loc 1 760 0
+ 2337 0f24 4FF00F00 		mov	r0, #15
+ 2338 0f28 4FF00501 		mov	r1, #5
+ 2339 0f2c 00F01EFA 		bl	wAccReg
+ 761:src/MEMS_BMC050.c **** 		break;
+ 2340              		.loc 1 761 0
+ 2341 0f30 0DE0     		b	.L146
+ 2342              	.L144:
+ 762:src/MEMS_BMC050.c **** 	case 4:
+ 763:src/MEMS_BMC050.c **** 		/* +- 8g range */
+ 764:src/MEMS_BMC050.c **** 		wAccReg(0x0F, 0x08);
+ 2343              		.loc 1 764 0
+ 2344 0f32 4FF00F00 		mov	r0, #15
+ 2345 0f36 4FF00801 		mov	r1, #8
+ 2346 0f3a 00F017FA 		bl	wAccReg
+ 765:src/MEMS_BMC050.c **** 		break;
+ 2347              		.loc 1 765 0
+ 2348 0f3e 06E0     		b	.L146
+ 2349              	.L145:
+ 766:src/MEMS_BMC050.c **** 	case 8:
+ 767:src/MEMS_BMC050.c **** 		/* +- 16g range */
+ 768:src/MEMS_BMC050.c **** 		wAccReg(0x0F, 0x0C);
+ 2350              		.loc 1 768 0
+ 2351 0f40 4FF00F00 		mov	r0, #15
+ 2352 0f44 4FF00C01 		mov	r1, #12
+ 2353 0f48 00F010FA 		bl	wAccReg
+ 769:src/MEMS_BMC050.c **** 		break;
+ 2354              		.loc 1 769 0
+ 2355 0f4c 00BF     		nop
+ 2356              	.L146:
+ 770:src/MEMS_BMC050.c **** 	}
+ 771:src/MEMS_BMC050.c **** 	return;
+ 2357              		.loc 1 771 0
+ 2358 0f4e 00BF     		nop
+ 772:src/MEMS_BMC050.c **** }
+ 2359              		.loc 1 772 0
+ 2360 0f50 80BD     		pop	{r7, pc}
+ 2361              		.cfi_endproc
+ 2362              	.LFE134:
+ 2364 0f52 00BF     		.align	2
+ 2365              		.thumb
+ 2366              		.thumb_func
+ 2368              	readAccIRQConfig:
+ 2369              	.LFB135:
+ 773:src/MEMS_BMC050.c **** 
+ 774:src/MEMS_BMC050.c **** static int readAccIRQConfig(void) {
+ 2370              		.loc 1 774 0
+ 2371              		.cfi_startproc
+ 2372              		@ args = 0, pretend = 0, frame = 32
+ 2373              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2374 0f54 80B5     		push	{r7, lr}
+ 2375              	.LCFI64:
+ 2376              		.cfi_def_cfa_offset 8
+ 2377              		.cfi_offset 7, -8
+ 2378              		.cfi_offset 14, -4
+ 2379 0f56 88B0     		sub	sp, sp, #32
+ 2380              	.LCFI65:
+ 2381              		.cfi_def_cfa_offset 40
+ 2382 0f58 00AF     		add	r7, sp, #0
+ 2383              	.LCFI66:
+ 2384              		.cfi_def_cfa_register 7
+ 775:src/MEMS_BMC050.c **** 	u8_t wBuff[26]={0,0,0,0,0,0,0,0,0,0,
+ 2385              		.loc 1 775 0
+ 2386 0f5a 3B46     		mov	r3, r7
+ 2387 0f5c 4FF00002 		mov	r2, #0
+ 2388 0f60 1A60     		str	r2, [r3, #0]
+ 2389 0f62 03F10403 		add	r3, r3, #4
+ 2390 0f66 4FF00002 		mov	r2, #0
+ 2391 0f6a 1A60     		str	r2, [r3, #0]
+ 2392 0f6c 03F10403 		add	r3, r3, #4
+ 2393 0f70 4FF00002 		mov	r2, #0
+ 2394 0f74 1A60     		str	r2, [r3, #0]
+ 2395 0f76 03F10403 		add	r3, r3, #4
+ 2396 0f7a 4FF00002 		mov	r2, #0
+ 2397 0f7e 1A60     		str	r2, [r3, #0]
+ 2398 0f80 03F10403 		add	r3, r3, #4
+ 2399 0f84 4FF00002 		mov	r2, #0
+ 2400 0f88 1A60     		str	r2, [r3, #0]
+ 2401 0f8a 03F10403 		add	r3, r3, #4
+ 2402 0f8e 4FF00002 		mov	r2, #0
+ 2403 0f92 1A60     		str	r2, [r3, #0]
+ 2404 0f94 03F10403 		add	r3, r3, #4
+ 2405 0f98 4FF00002 		mov	r2, #0
+ 2406 0f9c 1A80     		strh	r2, [r3, #0]	@ movhi
+ 2407 0f9e 03F10203 		add	r3, r3, #2
+ 776:src/MEMS_BMC050.c **** 					0,0,0,0,0,0,0,0,0,0,
+ 777:src/MEMS_BMC050.c **** 					0,0,0,0,0,0};
+ 778:src/MEMS_BMC050.c **** 	int ret = 0;
+ 2408              		.loc 1 778 0
+ 2409 0fa2 4FF00003 		mov	r3, #0
+ 2410 0fa6 FB61     		str	r3, [r7, #28]
+ 779:src/MEMS_BMC050.c **** 
+ 780:src/MEMS_BMC050.c **** 	wBuff[0] = ((1 << 7) | 0x16);  // command: read from register 16h onward
+ 2411              		.loc 1 780 0
+ 2412 0fa8 4FF09603 		mov	r3, #150
+ 2413 0fac 3B70     		strb	r3, [r7, #0]
+ 781:src/MEMS_BMC050.c **** 	rwACC(wBuff, (u8_t*)&AccIRQConfig, 26);
+ 2414              		.loc 1 781 0
+ 2415 0fae 3B46     		mov	r3, r7
+ 2416 0fb0 1846     		mov	r0, r3
+ 2417 0fb2 40F20001 		movw	r1, #:lower16:AccIRQConfig
+ 2418 0fb6 C0F20001 		movt	r1, #:upper16:AccIRQConfig
+ 2419 0fba 4FF01A02 		mov	r2, #26
+ 2420 0fbe 00F0F1F9 		bl	rwACC
+ 782:src/MEMS_BMC050.c **** 
+ 783:src/MEMS_BMC050.c **** 	return ret;
+ 2421              		.loc 1 783 0
+ 2422 0fc2 FB69     		ldr	r3, [r7, #28]
+ 784:src/MEMS_BMC050.c **** }
+ 2423              		.loc 1 784 0
+ 2424 0fc4 1846     		mov	r0, r3
+ 2425 0fc6 07F12007 		add	r7, r7, #32
+ 2426 0fca BD46     		mov	sp, r7
+ 2427 0fcc 80BD     		pop	{r7, pc}
+ 2428              		.cfi_endproc
+ 2429              	.LFE135:
+ 2431 0fce 00BF     		.align	2
+ 2432              		.thumb
+ 2433              		.thumb_func
+ 2435              	accFastCompensationX:
+ 2436              	.LFB136:
+ 785:src/MEMS_BMC050.c **** 
+ 786:src/MEMS_BMC050.c **** static int accFastCompensationX(void) {
+ 2437              		.loc 1 786 0
+ 2438              		.cfi_startproc
+ 2439              		@ args = 0, pretend = 0, frame = 0
+ 2440              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2441 0fd0 80B5     		push	{r7, lr}
+ 2442              	.LCFI67:
+ 2443              		.cfi_def_cfa_offset 8
+ 2444              		.cfi_offset 7, -8
+ 2445              		.cfi_offset 14, -4
+ 2446 0fd2 00AF     		add	r7, sp, #0
+ 2447              	.LCFI68:
+ 2448              		.cfi_def_cfa_register 7
+ 787:src/MEMS_BMC050.c **** 
+ 788:src/MEMS_BMC050.c **** 	if (AccCalRdy())
+ 2449              		.loc 1 788 0
+ 2450 0fd4 FFF7FEFF 		bl	AccCalRdy
+ 2451 0fd8 0346     		mov	r3, r0
+ 2452 0fda 002B     		cmp	r3, #0
+ 2453 0fdc 02D0     		beq	.L151
+ 789:src/MEMS_BMC050.c **** 		return -1;
+ 2454              		.loc 1 789 0
+ 2455 0fde 4FF0FF33 		mov	r3, #-1
+ 2456 0fe2 07E0     		b	.L152
+ 2457              	.L151:
+ 790:src/MEMS_BMC050.c **** 
+ 791:src/MEMS_BMC050.c **** 	wAccReg(0x36, 0x20);
+ 2458              		.loc 1 791 0
+ 2459 0fe4 4FF03600 		mov	r0, #54
+ 2460 0fe8 4FF02001 		mov	r1, #32
+ 2461 0fec 00F0BEF9 		bl	wAccReg
+ 792:src/MEMS_BMC050.c **** 
+ 793:src/MEMS_BMC050.c **** 	return 0;
+ 2462              		.loc 1 793 0
+ 2463 0ff0 4FF00003 		mov	r3, #0
+ 2464              	.L152:
+ 794:src/MEMS_BMC050.c **** }
+ 2465              		.loc 1 794 0
+ 2466 0ff4 1846     		mov	r0, r3
+ 2467 0ff6 80BD     		pop	{r7, pc}
+ 2468              		.cfi_endproc
+ 2469              	.LFE136:
+ 2471              		.align	2
+ 2472              		.thumb
+ 2473              		.thumb_func
+ 2475              	accFastCompensationY:
+ 2476              	.LFB137:
+ 795:src/MEMS_BMC050.c **** 
+ 796:src/MEMS_BMC050.c **** static int accFastCompensationY(void) {
+ 2477              		.loc 1 796 0
+ 2478              		.cfi_startproc
+ 2479              		@ args = 0, pretend = 0, frame = 0
+ 2480              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2481 0ff8 80B5     		push	{r7, lr}
+ 2482              	.LCFI69:
+ 2483              		.cfi_def_cfa_offset 8
+ 2484              		.cfi_offset 7, -8
+ 2485              		.cfi_offset 14, -4
+ 2486 0ffa 00AF     		add	r7, sp, #0
+ 2487              	.LCFI70:
+ 2488              		.cfi_def_cfa_register 7
+ 797:src/MEMS_BMC050.c **** 
+ 798:src/MEMS_BMC050.c **** 	if (AccCalRdy())
+ 2489              		.loc 1 798 0
+ 2490 0ffc FFF7FEFF 		bl	AccCalRdy
+ 2491 1000 0346     		mov	r3, r0
+ 2492 1002 002B     		cmp	r3, #0
+ 2493 1004 02D0     		beq	.L154
+ 799:src/MEMS_BMC050.c **** 		return -1;
+ 2494              		.loc 1 799 0
+ 2495 1006 4FF0FF33 		mov	r3, #-1
+ 2496 100a 07E0     		b	.L155
+ 2497              	.L154:
+ 800:src/MEMS_BMC050.c **** 
+ 801:src/MEMS_BMC050.c **** 	wAccReg(0x36, 0x40);
+ 2498              		.loc 1 801 0
+ 2499 100c 4FF03600 		mov	r0, #54
+ 2500 1010 4FF04001 		mov	r1, #64
+ 2501 1014 00F0AAF9 		bl	wAccReg
+ 802:src/MEMS_BMC050.c **** 
+ 803:src/MEMS_BMC050.c **** 	return 0;
+ 2502              		.loc 1 803 0
+ 2503 1018 4FF00003 		mov	r3, #0
+ 2504              	.L155:
+ 804:src/MEMS_BMC050.c **** }
+ 2505              		.loc 1 804 0
+ 2506 101c 1846     		mov	r0, r3
+ 2507 101e 80BD     		pop	{r7, pc}
+ 2508              		.cfi_endproc
+ 2509              	.LFE137:
+ 2511              		.align	2
+ 2512              		.thumb
+ 2513              		.thumb_func
+ 2515              	accFastCompensationZ:
+ 2516              	.LFB138:
+ 805:src/MEMS_BMC050.c **** 
+ 806:src/MEMS_BMC050.c **** static int accFastCompensationZ(void) {
+ 2517              		.loc 1 806 0
+ 2518              		.cfi_startproc
+ 2519              		@ args = 0, pretend = 0, frame = 0
+ 2520              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2521 1020 80B5     		push	{r7, lr}
+ 2522              	.LCFI71:
+ 2523              		.cfi_def_cfa_offset 8
+ 2524              		.cfi_offset 7, -8
+ 2525              		.cfi_offset 14, -4
+ 2526 1022 00AF     		add	r7, sp, #0
+ 2527              	.LCFI72:
+ 2528              		.cfi_def_cfa_register 7
+ 807:src/MEMS_BMC050.c **** 	
+ 808:src/MEMS_BMC050.c **** 	if (AccCalRdy())
+ 2529              		.loc 1 808 0
+ 2530 1024 FFF7FEFF 		bl	AccCalRdy
+ 2531 1028 0346     		mov	r3, r0
+ 2532 102a 002B     		cmp	r3, #0
+ 2533 102c 02D0     		beq	.L157
+ 809:src/MEMS_BMC050.c **** 		return -1;
+ 2534              		.loc 1 809 0
+ 2535 102e 4FF0FF33 		mov	r3, #-1
+ 2536 1032 07E0     		b	.L158
+ 2537              	.L157:
+ 810:src/MEMS_BMC050.c **** 
+ 811:src/MEMS_BMC050.c **** 	wAccReg(0x36, 0x60);
+ 2538              		.loc 1 811 0
+ 2539 1034 4FF03600 		mov	r0, #54
+ 2540 1038 4FF06001 		mov	r1, #96
+ 2541 103c 00F096F9 		bl	wAccReg
+ 812:src/MEMS_BMC050.c **** 
+ 813:src/MEMS_BMC050.c **** 	return 0;
+ 2542              		.loc 1 813 0
+ 2543 1040 4FF00003 		mov	r3, #0
+ 2544              	.L158:
+ 814:src/MEMS_BMC050.c **** }
+ 2545              		.loc 1 814 0
+ 2546 1044 1846     		mov	r0, r3
+ 2547 1046 80BD     		pop	{r7, pc}
+ 2548              		.cfi_endproc
+ 2549              	.LFE138:
+ 2551              		.align	2
+ 2552              		.thumb
+ 2553              		.thumb_func
+ 2555              	setAccCompensationTargets:
+ 2556              	.LFB139:
+ 815:src/MEMS_BMC050.c **** 
+ 816:src/MEMS_BMC050.c **** static int setAccCompensationTargets(void) {
+ 2557              		.loc 1 816 0
+ 2558              		.cfi_startproc
+ 2559              		@ args = 0, pretend = 0, frame = 0
+ 2560              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2561 1048 80B5     		push	{r7, lr}
+ 2562              	.LCFI73:
+ 2563              		.cfi_def_cfa_offset 8
+ 2564              		.cfi_offset 7, -8
+ 2565              		.cfi_offset 14, -4
+ 2566 104a 00AF     		add	r7, sp, #0
+ 2567              	.LCFI74:
+ 2568              		.cfi_def_cfa_register 7
+ 817:src/MEMS_BMC050.c **** 
+ 818:src/MEMS_BMC050.c **** 	if (AccCalRdy())
+ 2569              		.loc 1 818 0
+ 2570 104c FFF7FEFF 		bl	AccCalRdy
+ 2571 1050 0346     		mov	r3, r0
+ 2572 1052 002B     		cmp	r3, #0
+ 2573 1054 02D0     		beq	.L160
+ 819:src/MEMS_BMC050.c **** 		return -1;
+ 2574              		.loc 1 819 0
+ 2575 1056 4FF0FF33 		mov	r3, #-1
+ 2576 105a 08E0     		b	.L161
+ 2577              	.L160:
+ 820:src/MEMS_BMC050.c **** 
+ 821:src/MEMS_BMC050.c **** 	wAccReg(0x37, *((u8_t*) &(BMC050_AccCompensate.Reg_0x37)));
+ 2578              		.loc 1 821 0
+ 2579 105c 054B     		ldr	r3, .L162
+ 2580 105e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 2581 1060 4FF03700 		mov	r0, #55
+ 2582 1064 1946     		mov	r1, r3
+ 2583 1066 00F081F9 		bl	wAccReg
+ 822:src/MEMS_BMC050.c **** 
+ 823:src/MEMS_BMC050.c **** 	return 0;
+ 2584              		.loc 1 823 0
+ 2585 106a 4FF00003 		mov	r3, #0
+ 2586              	.L161:
+ 824:src/MEMS_BMC050.c **** }
+ 2587              		.loc 1 824 0
+ 2588 106e 1846     		mov	r0, r3
+ 2589 1070 80BD     		pop	{r7, pc}
+ 2590              	.L163:
+ 2591 1072 00BF     		.align	2
+ 2592              	.L162:
+ 2593 1074 02000000 		.word	BMC050_AccCompensate+2
+ 2594              		.cfi_endproc
+ 2595              	.LFE139:
+ 2597              		.align	2
+ 2598              		.thumb
+ 2599              		.thumb_func
+ 2601              	readAccCompenstaionValues:
+ 2602              	.LFB140:
+ 825:src/MEMS_BMC050.c **** 
+ 826:src/MEMS_BMC050.c **** static int readAccCompenstaionValues(void) {
+ 2603              		.loc 1 826 0
+ 2604              		.cfi_startproc
+ 2605              		@ args = 0, pretend = 0, frame = 24
+ 2606              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2607 1078 80B5     		push	{r7, lr}
+ 2608              	.LCFI75:
+ 2609              		.cfi_def_cfa_offset 8
+ 2610              		.cfi_offset 7, -8
+ 2611              		.cfi_offset 14, -4
+ 2612 107a 86B0     		sub	sp, sp, #24
+ 2613              	.LCFI76:
+ 2614              		.cfi_def_cfa_offset 32
+ 2615 107c 00AF     		add	r7, sp, #0
+ 2616              	.LCFI77:
+ 2617              		.cfi_def_cfa_register 7
+ 827:src/MEMS_BMC050.c **** 	u8_t wBuff[bufsize];
+ 828:src/MEMS_BMC050.c **** 
+ 829:src/MEMS_BMC050.c **** 	wBuff[0] = ((1 << 7) | 0x36);  // command: read from register 36h onward
+ 2618              		.loc 1 829 0
+ 2619 107e 4FF0B603 		mov	r3, #182
+ 2620 1082 3B71     		strb	r3, [r7, #4]
+ 830:src/MEMS_BMC050.c **** 	wBuff[1] = 0x00; // + 8 clocks for compensation configuration part I
+ 2621              		.loc 1 830 0
+ 2622 1084 4FF00003 		mov	r3, #0
+ 2623 1088 7B71     		strb	r3, [r7, #5]
+ 831:src/MEMS_BMC050.c **** 	wBuff[2] = 0x00; // + 8 clocks for compensation configuration part II
+ 2624              		.loc 1 831 0
+ 2625 108a 4FF00003 		mov	r3, #0
+ 2626 108e BB71     		strb	r3, [r7, #6]
+ 832:src/MEMS_BMC050.c **** 	wBuff[3] = 0x00; // + 8 clocks for compensation value for filtered data for the x-axis
+ 2627              		.loc 1 832 0
+ 2628 1090 4FF00003 		mov	r3, #0
+ 2629 1094 FB71     		strb	r3, [r7, #7]
+ 833:src/MEMS_BMC050.c **** 	wBuff[4] = 0x00; // + 8 clocks for compensation value for filtered data for the y-axis.
+ 2630              		.loc 1 833 0
+ 2631 1096 4FF00003 		mov	r3, #0
+ 2632 109a 3B72     		strb	r3, [r7, #8]
+ 834:src/MEMS_BMC050.c **** 	wBuff[5] = 0x00; // + 8 clocks for compensation value for filtered data for the z-axis.
+ 2633              		.loc 1 834 0
+ 2634 109c 4FF00003 		mov	r3, #0
+ 2635 10a0 7B72     		strb	r3, [r7, #9]
+ 835:src/MEMS_BMC050.c **** 	wBuff[6] = 0x00; // + 8 clocks for compensation value for unfiltered data for the x-axis.
+ 2636              		.loc 1 835 0
+ 2637 10a2 4FF00003 		mov	r3, #0
+ 2638 10a6 BB72     		strb	r3, [r7, #10]
+ 836:src/MEMS_BMC050.c **** 	wBuff[7] = 0x00; // + 8 clocks for compensation value for unfiltered data for the y-axis.
+ 2639              		.loc 1 836 0
+ 2640 10a8 4FF00003 		mov	r3, #0
+ 2641 10ac FB72     		strb	r3, [r7, #11]
+ 837:src/MEMS_BMC050.c **** 	wBuff[8] = 0x00; // + 8 clocks for compensation value for unfiltered data for the z-axis.
+ 2642              		.loc 1 837 0
+ 2643 10ae 4FF00003 		mov	r3, #0
+ 2644 10b2 3B73     		strb	r3, [r7, #12]
+ 838:src/MEMS_BMC050.c **** 	rwACC(wBuff, (u8_t*)&BMC050_AccCompensate, 9);
+ 2645              		.loc 1 838 0
+ 2646 10b4 07F10403 		add	r3, r7, #4
+ 2647 10b8 1846     		mov	r0, r3
+ 2648 10ba 40F20001 		movw	r1, #:lower16:BMC050_AccCompensate
+ 2649 10be C0F20001 		movt	r1, #:upper16:BMC050_AccCompensate
+ 2650 10c2 4FF00902 		mov	r2, #9
+ 2651 10c6 00F06DF9 		bl	rwACC
+ 839:src/MEMS_BMC050.c **** 
+ 840:src/MEMS_BMC050.c **** 	return 0;
+ 2652              		.loc 1 840 0
+ 2653 10ca 4FF00003 		mov	r3, #0
+ 841:src/MEMS_BMC050.c **** }
+ 2654              		.loc 1 841 0
+ 2655 10ce 1846     		mov	r0, r3
+ 2656 10d0 07F11807 		add	r7, r7, #24
+ 2657 10d4 BD46     		mov	sp, r7
+ 2658 10d6 80BD     		pop	{r7, pc}
+ 2659              		.cfi_endproc
+ 2660              	.LFE140:
+ 2662              		.align	2
+ 2663              		.thumb
+ 2664              		.thumb_func
+ 2666              	resetAccCompensationValues:
+ 2667              	.LFB141:
+ 842:src/MEMS_BMC050.c **** 
+ 843:src/MEMS_BMC050.c **** static int resetAccCompensationValues(void) {
+ 2668              		.loc 1 843 0
+ 2669              		.cfi_startproc
+ 2670              		@ args = 0, pretend = 0, frame = 0
+ 2671              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2672 10d8 80B5     		push	{r7, lr}
+ 2673              	.LCFI78:
+ 2674              		.cfi_def_cfa_offset 8
+ 2675              		.cfi_offset 7, -8
+ 2676              		.cfi_offset 14, -4
+ 2677 10da 00AF     		add	r7, sp, #0
+ 2678              	.LCFI79:
+ 2679              		.cfi_def_cfa_register 7
+ 844:src/MEMS_BMC050.c **** 
+ 845:src/MEMS_BMC050.c **** 	if (AccCalRdy())
+ 2680              		.loc 1 845 0
+ 2681 10dc FFF7FEFF 		bl	AccCalRdy
+ 2682 10e0 0346     		mov	r3, r0
+ 2683 10e2 002B     		cmp	r3, #0
+ 2684 10e4 02D0     		beq	.L167
+ 846:src/MEMS_BMC050.c **** 		return -1;
+ 2685              		.loc 1 846 0
+ 2686 10e6 4FF0FF33 		mov	r3, #-1
+ 2687 10ea 07E0     		b	.L168
+ 2688              	.L167:
+ 847:src/MEMS_BMC050.c **** 
+ 848:src/MEMS_BMC050.c **** 	wAccReg(0x36, 0x80);
+ 2689              		.loc 1 848 0
+ 2690 10ec 4FF03600 		mov	r0, #54
+ 2691 10f0 4FF08001 		mov	r1, #128
+ 2692 10f4 00F03AF9 		bl	wAccReg
+ 849:src/MEMS_BMC050.c **** 
+ 850:src/MEMS_BMC050.c **** 	return 0;
+ 2693              		.loc 1 850 0
+ 2694 10f8 4FF00003 		mov	r3, #0
+ 2695              	.L168:
+ 851:src/MEMS_BMC050.c **** }
+ 2696              		.loc 1 851 0
+ 2697 10fc 1846     		mov	r0, r3
+ 2698 10fe 80BD     		pop	{r7, pc}
+ 2699              		.cfi_endproc
+ 2700              	.LFE141:
+ 2702              		.align	2
+ 2703              		.thumb
+ 2704              		.thumb_func
+ 2706              	checkAccIRQ:
+ 2707              	.LFB142:
+ 852:src/MEMS_BMC050.c **** 
+ 853:src/MEMS_BMC050.c **** static u8_t checkAccIRQ(void) {
+ 2708              		.loc 1 853 0
+ 2709              		.cfi_startproc
+ 2710              		@ args = 0, pretend = 0, frame = 0
+ 2711              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2712              		@ link register save eliminated.
+ 2713 1100 80B4     		push	{r7}
+ 2714              	.LCFI80:
+ 2715              		.cfi_def_cfa_offset 4
+ 2716              		.cfi_offset 7, -4
+ 2717 1102 00AF     		add	r7, sp, #0
+ 2718              	.LCFI81:
+ 2719              		.cfi_def_cfa_register 7
+ 854:src/MEMS_BMC050.c **** 	return((LPC_GPIO2->PIN>>5)&1);
+ 2720              		.loc 1 854 0
+ 2721 1104 48F24003 		movw	r3, #32832
+ 2722 1108 C2F20903 		movt	r3, 8201
+ 2723 110c 5B69     		ldr	r3, [r3, #20]
+ 2724 110e 4FEA5313 		lsr	r3, r3, #5
+ 2725 1112 DBB2     		uxtb	r3, r3
+ 2726 1114 03F00103 		and	r3, r3, #1
+ 2727 1118 DBB2     		uxtb	r3, r3
+ 855:src/MEMS_BMC050.c **** }
+ 2728              		.loc 1 855 0
+ 2729 111a 1846     		mov	r0, r3
+ 2730 111c BD46     		mov	sp, r7
+ 2731 111e 80BC     		pop	{r7}
+ 2732 1120 7047     		bx	lr
+ 2733              		.cfi_endproc
+ 2734              	.LFE142:
+ 2736 1122 00BF     		.align	2
+ 2737              		.thumb
+ 2738              		.thumb_func
+ 2740              	checkMagIRQ:
+ 2741              	.LFB143:
+ 856:src/MEMS_BMC050.c **** 
+ 857:src/MEMS_BMC050.c **** static u8_t checkMagIRQ(void) {
+ 2742              		.loc 1 857 0
+ 2743              		.cfi_startproc
+ 2744              		@ args = 0, pretend = 0, frame = 0
+ 2745              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2746              		@ link register save eliminated.
+ 2747 1124 80B4     		push	{r7}
+ 2748              	.LCFI82:
+ 2749              		.cfi_def_cfa_offset 4
+ 2750              		.cfi_offset 7, -4
+ 2751 1126 00AF     		add	r7, sp, #0
+ 2752              	.LCFI83:
+ 2753              		.cfi_def_cfa_register 7
+ 858:src/MEMS_BMC050.c **** 	return ((LPC_GPIO2->PIN>>6)&1);
+ 2754              		.loc 1 858 0
+ 2755 1128 48F24003 		movw	r3, #32832
+ 2756 112c C2F20903 		movt	r3, 8201
+ 2757 1130 5B69     		ldr	r3, [r3, #20]
+ 2758 1132 4FEA9313 		lsr	r3, r3, #6
+ 2759 1136 DBB2     		uxtb	r3, r3
+ 2760 1138 03F00103 		and	r3, r3, #1
+ 2761 113c DBB2     		uxtb	r3, r3
+ 859:src/MEMS_BMC050.c **** }
+ 2762              		.loc 1 859 0
+ 2763 113e 1846     		mov	r0, r3
+ 2764 1140 BD46     		mov	sp, r7
+ 2765 1142 80BC     		pop	{r7}
+ 2766 1144 7047     		bx	lr
+ 2767              		.cfi_endproc
+ 2768              	.LFE143:
+ 2770 1146 00BF     		.align	2
+ 2771              		.thumb
+ 2772              		.thumb_func
+ 2774              	handleAccIRQ:
+ 2775              	.LFB144:
+ 860:src/MEMS_BMC050.c **** 
+ 861:src/MEMS_BMC050.c **** static void handleAccIRQ(void) {
+ 2776              		.loc 1 861 0
+ 2777              		.cfi_startproc
+ 2778              		@ args = 0, pretend = 0, frame = 32
+ 2779              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2780 1148 80B5     		push	{r7, lr}
+ 2781              	.LCFI84:
+ 2782              		.cfi_def_cfa_offset 8
+ 2783              		.cfi_offset 7, -8
+ 2784              		.cfi_offset 14, -4
+ 2785 114a 88B0     		sub	sp, sp, #32
+ 2786              	.LCFI85:
+ 2787              		.cfi_def_cfa_offset 40
+ 2788 114c 00AF     		add	r7, sp, #0
+ 2789              	.LCFI86:
+ 2790              		.cfi_def_cfa_register 7
+ 862:src/MEMS_BMC050.c **** 	u8_t wBuff[bufsize];
+ 863:src/MEMS_BMC050.c **** 	MEMS_BMC050_Acc_IRQ_Type irqReg;
+ 864:src/MEMS_BMC050.c **** 
+ 865:src/MEMS_BMC050.c **** 	wBuff[0] = ((1 << 7) | 0x09);  // command: read from register 09h onward
+ 2791              		.loc 1 865 0
+ 2792 114e 4FF08903 		mov	r3, #137
+ 2793 1152 3B73     		strb	r3, [r7, #12]
+ 866:src/MEMS_BMC050.c **** 	wBuff[1] = 0x00; // + 8 clocks for IRQ part 1
+ 2794              		.loc 1 866 0
+ 2795 1154 4FF00003 		mov	r3, #0
+ 2796 1158 7B73     		strb	r3, [r7, #13]
+ 867:src/MEMS_BMC050.c **** 	wBuff[2] = 0x00; // + 8 clocks for IRQ part 2
+ 2797              		.loc 1 867 0
+ 2798 115a 4FF00003 		mov	r3, #0
+ 2799 115e BB73     		strb	r3, [r7, #14]
+ 868:src/MEMS_BMC050.c **** 	wBuff[3] = 0x00; // + 8 clocks for IRQ part 3
+ 2800              		.loc 1 868 0
+ 2801 1160 4FF00003 		mov	r3, #0
+ 2802 1164 FB73     		strb	r3, [r7, #15]
+ 869:src/MEMS_BMC050.c **** 	wBuff[4] = 0x00; // + 8 clocks for IRQ part 4
+ 2803              		.loc 1 869 0
+ 2804 1166 4FF00003 		mov	r3, #0
+ 2805 116a 3B74     		strb	r3, [r7, #16]
+ 870:src/MEMS_BMC050.c **** 	rwACC(wBuff, (u8_t*)&irqReg, 5);
+ 2806              		.loc 1 870 0
+ 2807 116c 07F10C02 		add	r2, r7, #12
+ 2808 1170 07F10403 		add	r3, r7, #4
+ 2809 1174 1046     		mov	r0, r2
+ 2810 1176 1946     		mov	r1, r3
+ 2811 1178 4FF00502 		mov	r2, #5
+ 2812 117c 00F012F9 		bl	rwACC
+ 871:src/MEMS_BMC050.c **** 
+ 872:src/MEMS_BMC050.c **** 	irqReg.Reg_0x09.reseved = 0;
+ 2813              		.loc 1 872 0
+ 2814 1180 7B79     		ldrb	r3, [r7, #5]
+ 2815 1182 6FF3C303 		bfc	r3, #3, #1
+ 2816 1186 7B71     		strb	r3, [r7, #5]
+ 873:src/MEMS_BMC050.c **** 	irqReg.Reg_0x0A.reseved = 0;
+ 2817              		.loc 1 873 0
+ 2818 1188 BB79     		ldrb	r3, [r7, #6]
+ 2819 118a 6FF30603 		bfc	r3, #0, #7
+ 2820 118e BB71     		strb	r3, [r7, #6]
+ 874:src/MEMS_BMC050.c **** 	/**************************/
+ 875:src/MEMS_BMC050.c **** 	/* handle interrupts here */
+ 876:src/MEMS_BMC050.c **** 	/**************************/
+ 877:src/MEMS_BMC050.c **** 	while (*((u8_t*)&irqReg.Reg_0x0A) != 0 || *((u8_t*)&irqReg.Reg_0x09) != 0) {
+ 2821              		.loc 1 877 0
+ 2822 1190 C1E0     		b	.L174
+ 2823              	.L191:
+ 878:src/MEMS_BMC050.c **** 		irqReg.Reg_0x09.reseved = 0;
+ 2824              		.loc 1 878 0
+ 2825 1192 7B79     		ldrb	r3, [r7, #5]
+ 2826 1194 6FF3C303 		bfc	r3, #3, #1
+ 2827 1198 7B71     		strb	r3, [r7, #5]
+ 879:src/MEMS_BMC050.c **** 		irqReg.Reg_0x0A.reseved = 0;
+ 2828              		.loc 1 879 0
+ 2829 119a BB79     		ldrb	r3, [r7, #6]
+ 2830 119c 6FF30603 		bfc	r3, #0, #7
+ 2831 11a0 BB71     		strb	r3, [r7, #6]
+ 880:src/MEMS_BMC050.c **** 
+ 881:src/MEMS_BMC050.c **** 		if (irqReg.Reg_0x09.flat_int) {
+ 2832              		.loc 1 881 0
+ 2833 11a2 7B79     		ldrb	r3, [r7, #5]	@ zero_extendqisi2
+ 2834 11a4 23F07F03 		bic	r3, r3, #127
+ 2835 11a8 DBB2     		uxtb	r3, r3
+ 2836 11aa 002B     		cmp	r3, #0
+ 2837 11ac 1FD0     		beq	.L175
+ 882:src/MEMS_BMC050.c **** 			/* flat interrupt */
+ 883:src/MEMS_BMC050.c **** 			if (irqReg.Reg_0x0C.orient_z){
+ 2838              		.loc 1 883 0
+ 2839 11ae 3B7A     		ldrb	r3, [r7, #8]	@ zero_extendqisi2
+ 2840 11b0 03F04003 		and	r3, r3, #64
+ 2841 11b4 DBB2     		uxtb	r3, r3
+ 2842 11b6 002B     		cmp	r3, #0
+ 2843 11b8 07D0     		beq	.L176
+ 884:src/MEMS_BMC050.c **** 				BMC050_Readings.orientation = flat_upside_down;
+ 2844              		.loc 1 884 0
+ 2845 11ba 40F20003 		movw	r3, #:lower16:BMC050_Readings
+ 2846 11be C0F20003 		movt	r3, #:upper16:BMC050_Readings
+ 2847 11c2 4FF00102 		mov	r2, #1
+ 2848 11c6 1A74     		strb	r2, [r3, #16]
+ 2849 11c8 06E0     		b	.L177
+ 2850              	.L176:
+ 885:src/MEMS_BMC050.c **** 			}else{
+ 886:src/MEMS_BMC050.c **** 				BMC050_Readings.orientation = flat;
+ 2851              		.loc 1 886 0
+ 2852 11ca 40F20003 		movw	r3, #:lower16:BMC050_Readings
+ 2853 11ce C0F20003 		movt	r3, #:upper16:BMC050_Readings
+ 2854 11d2 4FF00002 		mov	r2, #0
+ 2855 11d6 1A74     		strb	r2, [r3, #16]
+ 2856              	.L177:
+ 887:src/MEMS_BMC050.c **** 			}
+ 888:src/MEMS_BMC050.c **** 			vertical_axis = Z_AXIS;
+ 2857              		.loc 1 888 0
+ 2858 11d8 40F20003 		movw	r3, #:lower16:vertical_axis
+ 2859 11dc C0F20003 		movt	r3, #:upper16:vertical_axis
+ 2860 11e0 4FF00302 		mov	r2, #3
+ 2861 11e4 1A70     		strb	r2, [r3, #0]
+ 889:src/MEMS_BMC050.c **** 			irqReg.Reg_0x09.flat_int = 0;
+ 2862              		.loc 1 889 0
+ 2863 11e6 7B79     		ldrb	r3, [r7, #5]
+ 2864 11e8 6FF3C713 		bfc	r3, #7, #1
+ 2865 11ec 7B71     		strb	r3, [r7, #5]
+ 2866              	.L175:
+ 890:src/MEMS_BMC050.c **** 		}
+ 891:src/MEMS_BMC050.c **** 
+ 892:src/MEMS_BMC050.c **** 		if (irqReg.Reg_0x09.orient_int) {
+ 2867              		.loc 1 892 0
+ 2868 11ee 7B79     		ldrb	r3, [r7, #5]	@ zero_extendqisi2
+ 2869 11f0 03F04003 		and	r3, r3, #64
+ 2870 11f4 DBB2     		uxtb	r3, r3
+ 2871 11f6 002B     		cmp	r3, #0
+ 2872 11f8 51D0     		beq	.L178
+ 893:src/MEMS_BMC050.c **** 			/* orientation interrupt */
+ 894:src/MEMS_BMC050.c **** 			switch (irqReg.Reg_0x0C.orient_xy) {
+ 2873              		.loc 1 894 0
+ 2874 11fa 3B7A     		ldrb	r3, [r7, #8]
+ 2875 11fc C3F30113 		ubfx	r3, r3, #4, #2
+ 2876 1200 DBB2     		uxtb	r3, r3
+ 2877 1202 032B     		cmp	r3, #3
+ 2878 1204 46D8     		bhi	.L193
+ 2879 1206 01A2     		adr	r2, .L184
+ 2880 1208 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 2881              		.align	2
+ 2882              	.L184:
+ 2883 120c 1D120000 		.word	.L180+1
+ 2884 1210 3B120000 		.word	.L181+1
+ 2885 1214 59120000 		.word	.L182+1
+ 2886 1218 77120000 		.word	.L183+1
+ 2887              	.L180:
+ 895:src/MEMS_BMC050.c **** 			case 0:
+ 896:src/MEMS_BMC050.c **** 				/* portrait upright */
+ 897:src/MEMS_BMC050.c **** 				BMC050_Readings.orientation = portrait_upside_down;
+ 2888              		.loc 1 897 0
+ 2889 121c 40F20003 		movw	r3, #:lower16:BMC050_Readings
+ 2890 1220 C0F20003 		movt	r3, #:upper16:BMC050_Readings
+ 2891 1224 4FF00502 		mov	r2, #5
+ 2892 1228 1A74     		strb	r2, [r3, #16]
+ 898:src/MEMS_BMC050.c **** 				vertical_axis = X_AXIS;
+ 2893              		.loc 1 898 0
+ 2894 122a 40F20003 		movw	r3, #:lower16:vertical_axis
+ 2895 122e C0F20003 		movt	r3, #:upper16:vertical_axis
+ 2896 1232 4FF00102 		mov	r2, #1
+ 2897 1236 1A70     		strb	r2, [r3, #0]
+ 899:src/MEMS_BMC050.c **** 				break;
+ 2898              		.loc 1 899 0
+ 2899 1238 2DE0     		b	.L185
+ 2900              	.L181:
+ 900:src/MEMS_BMC050.c **** 			case 1:
+ 901:src/MEMS_BMC050.c **** 				/* portrait upside down */
+ 902:src/MEMS_BMC050.c **** 				BMC050_Readings.orientation = portrait;
+ 2901              		.loc 1 902 0
+ 2902 123a 40F20003 		movw	r3, #:lower16:BMC050_Readings
+ 2903 123e C0F20003 		movt	r3, #:upper16:BMC050_Readings
+ 2904 1242 4FF00402 		mov	r2, #4
+ 2905 1246 1A74     		strb	r2, [r3, #16]
+ 903:src/MEMS_BMC050.c **** 				vertical_axis = X_AXIS;
+ 2906              		.loc 1 903 0
+ 2907 1248 40F20003 		movw	r3, #:lower16:vertical_axis
+ 2908 124c C0F20003 		movt	r3, #:upper16:vertical_axis
+ 2909 1250 4FF00102 		mov	r2, #1
+ 2910 1254 1A70     		strb	r2, [r3, #0]
+ 904:src/MEMS_BMC050.c **** 				break;
+ 2911              		.loc 1 904 0
+ 2912 1256 1EE0     		b	.L185
+ 2913              	.L182:
+ 905:src/MEMS_BMC050.c **** 			case 2:
+ 906:src/MEMS_BMC050.c **** 				/* landscape left */
+ 907:src/MEMS_BMC050.c **** 				BMC050_Readings.orientation = landscape_left;
+ 2914              		.loc 1 907 0
+ 2915 1258 40F20003 		movw	r3, #:lower16:BMC050_Readings
+ 2916 125c C0F20003 		movt	r3, #:upper16:BMC050_Readings
+ 2917 1260 4FF00202 		mov	r2, #2
+ 2918 1264 1A74     		strb	r2, [r3, #16]
+ 908:src/MEMS_BMC050.c **** 				vertical_axis = Y_AXIS;
+ 2919              		.loc 1 908 0
+ 2920 1266 40F20003 		movw	r3, #:lower16:vertical_axis
+ 2921 126a C0F20003 		movt	r3, #:upper16:vertical_axis
+ 2922 126e 4FF00202 		mov	r2, #2
+ 2923 1272 1A70     		strb	r2, [r3, #0]
+ 909:src/MEMS_BMC050.c **** 				break;
+ 2924              		.loc 1 909 0
+ 2925 1274 0FE0     		b	.L185
+ 2926              	.L183:
+ 910:src/MEMS_BMC050.c **** 			case 3:
+ 911:src/MEMS_BMC050.c **** 				/* landscape right */
+ 912:src/MEMS_BMC050.c **** 				BMC050_Readings.orientation = landscape_right;
+ 2927              		.loc 1 912 0
+ 2928 1276 40F20003 		movw	r3, #:lower16:BMC050_Readings
+ 2929 127a C0F20003 		movt	r3, #:upper16:BMC050_Readings
+ 2930 127e 4FF00302 		mov	r2, #3
+ 2931 1282 1A74     		strb	r2, [r3, #16]
+ 913:src/MEMS_BMC050.c **** 				vertical_axis = Y_AXIS;
+ 2932              		.loc 1 913 0
+ 2933 1284 40F20003 		movw	r3, #:lower16:vertical_axis
+ 2934 1288 C0F20003 		movt	r3, #:upper16:vertical_axis
+ 2935 128c 4FF00202 		mov	r2, #2
+ 2936 1290 1A70     		strb	r2, [r3, #0]
+ 914:src/MEMS_BMC050.c **** 				break;
+ 2937              		.loc 1 914 0
+ 2938 1292 00E0     		b	.L185
+ 2939              	.L193:
+ 915:src/MEMS_BMC050.c **** 			default:
+ 916:src/MEMS_BMC050.c **** 				break;
+ 2940              		.loc 1 916 0
+ 2941 1294 00BF     		nop
+ 2942              	.L185:
+ 917:src/MEMS_BMC050.c **** 			}
+ 918:src/MEMS_BMC050.c **** 
+ 919:src/MEMS_BMC050.c **** 			irqReg.Reg_0x09.orient_int = 0;
+ 2943              		.loc 1 919 0
+ 2944 1296 7B79     		ldrb	r3, [r7, #5]
+ 2945 1298 6FF38613 		bfc	r3, #6, #1
+ 2946 129c 7B71     		strb	r3, [r7, #5]
+ 2947              	.L178:
+ 920:src/MEMS_BMC050.c **** 		}
+ 921:src/MEMS_BMC050.c **** 
+ 922:src/MEMS_BMC050.c **** 		if (irqReg.Reg_0x09.s_tap_int) {
+ 2948              		.loc 1 922 0
+ 2949 129e 7B79     		ldrb	r3, [r7, #5]	@ zero_extendqisi2
+ 2950 12a0 03F02003 		and	r3, r3, #32
+ 2951 12a4 DBB2     		uxtb	r3, r3
+ 2952 12a6 002B     		cmp	r3, #0
+ 2953 12a8 03D0     		beq	.L186
+ 923:src/MEMS_BMC050.c **** 			/* single tap interrupt */
+ 924:src/MEMS_BMC050.c **** 			irqReg.Reg_0x09.s_tap_int = 0;
+ 2954              		.loc 1 924 0
+ 2955 12aa 7B79     		ldrb	r3, [r7, #5]
+ 2956 12ac 6FF34513 		bfc	r3, #5, #1
+ 2957 12b0 7B71     		strb	r3, [r7, #5]
+ 2958              	.L186:
+ 925:src/MEMS_BMC050.c **** 		}
+ 926:src/MEMS_BMC050.c **** 
+ 927:src/MEMS_BMC050.c **** 		if (irqReg.Reg_0x09.d_tap_int) {
+ 2959              		.loc 1 927 0
+ 2960 12b2 7B79     		ldrb	r3, [r7, #5]	@ zero_extendqisi2
+ 2961 12b4 03F01003 		and	r3, r3, #16
+ 2962 12b8 DBB2     		uxtb	r3, r3
+ 2963 12ba 002B     		cmp	r3, #0
+ 2964 12bc 03D0     		beq	.L187
+ 928:src/MEMS_BMC050.c **** 			/* double tap interrupt */
+ 929:src/MEMS_BMC050.c **** 			irqReg.Reg_0x09.d_tap_int = 0;
+ 2965              		.loc 1 929 0
+ 2966 12be 7B79     		ldrb	r3, [r7, #5]
+ 2967 12c0 6FF30413 		bfc	r3, #4, #1
+ 2968 12c4 7B71     		strb	r3, [r7, #5]
+ 2969              	.L187:
+ 930:src/MEMS_BMC050.c **** 		}
+ 931:src/MEMS_BMC050.c **** 
+ 932:src/MEMS_BMC050.c **** 		if (irqReg.Reg_0x09.slope_int) {
+ 2970              		.loc 1 932 0
+ 2971 12c6 7B79     		ldrb	r3, [r7, #5]	@ zero_extendqisi2
+ 2972 12c8 03F00403 		and	r3, r3, #4
+ 2973 12cc DBB2     		uxtb	r3, r3
+ 2974 12ce 002B     		cmp	r3, #0
+ 2975 12d0 03D0     		beq	.L188
+ 933:src/MEMS_BMC050.c **** 			/* slope interrupt */
+ 934:src/MEMS_BMC050.c **** 			irqReg.Reg_0x09.slope_int = 0;
+ 2976              		.loc 1 934 0
+ 2977 12d2 7B79     		ldrb	r3, [r7, #5]
+ 2978 12d4 6FF38203 		bfc	r3, #2, #1
+ 2979 12d8 7B71     		strb	r3, [r7, #5]
+ 2980              	.L188:
+ 935:src/MEMS_BMC050.c **** 		}
+ 936:src/MEMS_BMC050.c **** 
+ 937:src/MEMS_BMC050.c **** 		if (irqReg.Reg_0x09.high_int) {
+ 2981              		.loc 1 937 0
+ 2982 12da 7B79     		ldrb	r3, [r7, #5]	@ zero_extendqisi2
+ 2983 12dc 03F00203 		and	r3, r3, #2
+ 2984 12e0 DBB2     		uxtb	r3, r3
+ 2985 12e2 002B     		cmp	r3, #0
+ 2986 12e4 03D0     		beq	.L189
+ 938:src/MEMS_BMC050.c **** 			/* high-g interrupt */
+ 939:src/MEMS_BMC050.c **** 			irqReg.Reg_0x09.high_int = 0;
+ 2987              		.loc 1 939 0
+ 2988 12e6 7B79     		ldrb	r3, [r7, #5]
+ 2989 12e8 6FF34103 		bfc	r3, #1, #1
+ 2990 12ec 7B71     		strb	r3, [r7, #5]
+ 2991              	.L189:
+ 940:src/MEMS_BMC050.c **** 		}
+ 941:src/MEMS_BMC050.c **** 
+ 942:src/MEMS_BMC050.c **** 		if (irqReg.Reg_0x09.low_int) {
+ 2992              		.loc 1 942 0
+ 2993 12ee 7B79     		ldrb	r3, [r7, #5]	@ zero_extendqisi2
+ 2994 12f0 03F00103 		and	r3, r3, #1
+ 2995 12f4 DBB2     		uxtb	r3, r3
+ 2996 12f6 002B     		cmp	r3, #0
+ 2997 12f8 03D0     		beq	.L190
+ 943:src/MEMS_BMC050.c **** 			/* low-g interrupt */
+ 944:src/MEMS_BMC050.c **** 			irqReg.Reg_0x09.low_int = 0;
+ 2998              		.loc 1 944 0
+ 2999 12fa 7B79     		ldrb	r3, [r7, #5]
+ 3000 12fc 6FF30003 		bfc	r3, #0, #1
+ 3001 1300 7B71     		strb	r3, [r7, #5]
+ 3002              	.L190:
+ 945:src/MEMS_BMC050.c **** 		}
+ 946:src/MEMS_BMC050.c **** 
+ 947:src/MEMS_BMC050.c **** 		if (irqReg.Reg_0x0A.data_int) {
+ 3003              		.loc 1 947 0
+ 3004 1302 BB79     		ldrb	r3, [r7, #6]	@ zero_extendqisi2
+ 3005 1304 23F07F03 		bic	r3, r3, #127
+ 3006 1308 DBB2     		uxtb	r3, r3
+ 3007 130a 002B     		cmp	r3, #0
+ 3008 130c 03D0     		beq	.L174
+ 948:src/MEMS_BMC050.c **** 			/* new data interrupt */
+ 949:src/MEMS_BMC050.c **** 			irqReg.Reg_0x0A.data_int = 0;
+ 3009              		.loc 1 949 0
+ 3010 130e BB79     		ldrb	r3, [r7, #6]
+ 3011 1310 6FF3C713 		bfc	r3, #7, #1
+ 3012 1314 BB71     		strb	r3, [r7, #6]
+ 3013              	.L174:
+ 877:src/MEMS_BMC050.c **** 	while (*((u8_t*)&irqReg.Reg_0x0A) != 0 || *((u8_t*)&irqReg.Reg_0x09) != 0) {
+ 3014              		.loc 1 877 0 discriminator 1
+ 3015 1316 07F10403 		add	r3, r7, #4
+ 3016 131a 03F10203 		add	r3, r3, #2
+ 3017 131e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 3018 1320 002B     		cmp	r3, #0
+ 3019 1322 7FF436AF 		bne	.L191
+ 877:src/MEMS_BMC050.c **** 	while (*((u8_t*)&irqReg.Reg_0x0A) != 0 || *((u8_t*)&irqReg.Reg_0x09) != 0) {
+ 3020              		.loc 1 877 0 is_stmt 0 discriminator 2
+ 3021 1326 07F10403 		add	r3, r7, #4
+ 3022 132a 03F10103 		add	r3, r3, #1
+ 3023 132e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 3024 1330 002B     		cmp	r3, #0
+ 3025 1332 7FF42EAF 		bne	.L191
+ 950:src/MEMS_BMC050.c **** 		}
+ 951:src/MEMS_BMC050.c **** 	}
+ 952:src/MEMS_BMC050.c **** 
+ 953:src/MEMS_BMC050.c **** 	AccIRQConfig.Reg_0x21.reset_int = 1;
+ 3026              		.loc 1 953 0 is_stmt 1
+ 3027 1336 40F20003 		movw	r3, #:lower16:AccIRQConfig
+ 3028 133a C0F20003 		movt	r3, #:upper16:AccIRQConfig
+ 3029 133e 1A7B     		ldrb	r2, [r3, #12]
+ 3030 1340 42F08002 		orr	r2, r2, #128
+ 3031 1344 1A73     		strb	r2, [r3, #12]
+ 954:src/MEMS_BMC050.c **** 	wAccReg(0x21, *((u8_t*)&AccIRQConfig.Reg_0x21));
+ 3032              		.loc 1 954 0
+ 3033 1346 054B     		ldr	r3, .L194
+ 3034 1348 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 3035 134a 4FF02100 		mov	r0, #33
+ 3036 134e 1946     		mov	r1, r3
+ 3037 1350 00F00CF8 		bl	wAccReg
+ 955:src/MEMS_BMC050.c **** 	
+ 956:src/MEMS_BMC050.c **** 	return;
+ 957:src/MEMS_BMC050.c **** }
+ 3038              		.loc 1 957 0
+ 3039 1354 07F12007 		add	r7, r7, #32
+ 3040 1358 BD46     		mov	sp, r7
+ 3041 135a 80BD     		pop	{r7, pc}
+ 3042              	.L195:
+ 3043              		.align	2
+ 3044              	.L194:
+ 3045 135c 10000000 		.word	AccIRQConfig+12
+ 3046              		.cfi_endproc
+ 3047              	.LFE144:
+ 3049              		.align	2
+ 3050              		.thumb
+ 3051              		.thumb_func
+ 3053              	handleMagIRQ:
+ 3054              	.LFB145:
+ 958:src/MEMS_BMC050.c **** 
+ 959:src/MEMS_BMC050.c **** static void handleMagIRQ(void) {
+ 3055              		.loc 1 959 0
+ 3056              		.cfi_startproc
+ 3057              		@ args = 0, pretend = 0, frame = 0
+ 3058              		@ frame_needed = 1, uses_anonymous_args = 0
+ 3059              		@ link register save eliminated.
+ 3060 1360 80B4     		push	{r7}
+ 3061              	.LCFI87:
+ 3062              		.cfi_def_cfa_offset 4
+ 3063              		.cfi_offset 7, -4
+ 3064 1362 00AF     		add	r7, sp, #0
+ 3065              	.LCFI88:
+ 3066              		.cfi_def_cfa_register 7
+ 960:src/MEMS_BMC050.c **** 
+ 961:src/MEMS_BMC050.c **** 	return;
+ 3067              		.loc 1 961 0
+ 3068 1364 00BF     		nop
+ 962:src/MEMS_BMC050.c **** }
+ 3069              		.loc 1 962 0
+ 3070 1366 BD46     		mov	sp, r7
+ 3071 1368 80BC     		pop	{r7}
+ 3072 136a 7047     		bx	lr
+ 3073              		.cfi_endproc
+ 3074              	.LFE145:
+ 3076              		.align	2
+ 3077              		.thumb
+ 3078              		.thumb_func
+ 3080              	wAccReg:
+ 3081              	.LFB146:
+ 963:src/MEMS_BMC050.c **** 
+ 964:src/MEMS_BMC050.c **** // write single ACC register
+ 965:src/MEMS_BMC050.c **** static u8_t wAccReg(u8_t reg, u8_t val){
+ 3082              		.loc 1 965 0
+ 3083              		.cfi_startproc
+ 3084              		@ args = 0, pretend = 0, frame = 16
+ 3085              		@ frame_needed = 1, uses_anonymous_args = 0
+ 3086 136c 80B5     		push	{r7, lr}
+ 3087              	.LCFI89:
+ 3088              		.cfi_def_cfa_offset 8
+ 3089              		.cfi_offset 7, -8
+ 3090              		.cfi_offset 14, -4
+ 3091 136e 84B0     		sub	sp, sp, #16
+ 3092              	.LCFI90:
+ 3093              		.cfi_def_cfa_offset 24
+ 3094 1370 00AF     		add	r7, sp, #0
+ 3095              	.LCFI91:
+ 3096              		.cfi_def_cfa_register 7
+ 3097 1372 0246     		mov	r2, r0
+ 3098 1374 0B46     		mov	r3, r1
+ 3099 1376 FA71     		strb	r2, [r7, #7]
+ 3100 1378 BB71     		strb	r3, [r7, #6]
+ 966:src/MEMS_BMC050.c **** 	u8_t wbuff[2];
+ 967:src/MEMS_BMC050.c **** 	u8_t rbuff[2];
+ 968:src/MEMS_BMC050.c **** 
+ 969:src/MEMS_BMC050.c **** 	wbuff[0]=reg;
+ 3101              		.loc 1 969 0
+ 3102 137a FB79     		ldrb	r3, [r7, #7]
+ 3103 137c 3B73     		strb	r3, [r7, #12]
+ 970:src/MEMS_BMC050.c **** 	wbuff[1]=val;
+ 3104              		.loc 1 970 0
+ 3105 137e BB79     		ldrb	r3, [r7, #6]
+ 3106 1380 7B73     		strb	r3, [r7, #13]
+ 971:src/MEMS_BMC050.c **** 	return rwACC(wbuff, rbuff, 2);
+ 3107              		.loc 1 971 0
+ 3108 1382 07F10C02 		add	r2, r7, #12
+ 3109 1386 07F10803 		add	r3, r7, #8
+ 3110 138a 1046     		mov	r0, r2
+ 3111 138c 1946     		mov	r1, r3
+ 3112 138e 4FF00202 		mov	r2, #2
+ 3113 1392 00F007F8 		bl	rwACC
+ 3114 1396 0346     		mov	r3, r0
+ 972:src/MEMS_BMC050.c **** }
+ 3115              		.loc 1 972 0
+ 3116 1398 1846     		mov	r0, r3
+ 3117 139a 07F11007 		add	r7, r7, #16
+ 3118 139e BD46     		mov	sp, r7
+ 3119 13a0 80BD     		pop	{r7, pc}
+ 3120              		.cfi_endproc
+ 3121              	.LFE146:
+ 3123 13a2 00BF     		.align	2
+ 3124              		.thumb
+ 3125              		.thumb_func
+ 3127              	rwACC:
+ 3128              	.LFB147:
+ 973:src/MEMS_BMC050.c **** 
+ 974:src/MEMS_BMC050.c **** static u8_t rwACC(u8_t *p_wBuff, u8_t *p_rBuff, u8_t len){
+ 3129              		.loc 1 974 0
+ 3130              		.cfi_startproc
+ 3131              		@ args = 0, pretend = 0, frame = 16
+ 3132              		@ frame_needed = 1, uses_anonymous_args = 0
+ 3133 13a4 80B5     		push	{r7, lr}
+ 3134              	.LCFI92:
+ 3135              		.cfi_def_cfa_offset 8
+ 3136              		.cfi_offset 7, -8
+ 3137              		.cfi_offset 14, -4
+ 3138 13a6 84B0     		sub	sp, sp, #16
+ 3139              	.LCFI93:
+ 3140              		.cfi_def_cfa_offset 24
+ 3141 13a8 00AF     		add	r7, sp, #0
+ 3142              	.LCFI94:
+ 3143              		.cfi_def_cfa_register 7
+ 3144 13aa F860     		str	r0, [r7, #12]
+ 3145 13ac B960     		str	r1, [r7, #8]
+ 3146 13ae 1346     		mov	r3, r2
+ 3147 13b0 FB71     		strb	r3, [r7, #7]
+ 975:src/MEMS_BMC050.c **** 	//SSP_DATA_SETUP_Type SSPdata;
+ 976:src/MEMS_BMC050.c **** 
+ 977:src/MEMS_BMC050.c **** 	//if(!p_rBuff)
+ 978:src/MEMS_BMC050.c **** 	//	return 1;
+ 979:src/MEMS_BMC050.c **** 	if(!p_wBuff)
+ 3148              		.loc 1 979 0
+ 3149 13b2 FB68     		ldr	r3, [r7, #12]
+ 3150 13b4 002B     		cmp	r3, #0
+ 3151 13b6 02D1     		bne	.L201
+ 980:src/MEMS_BMC050.c **** 		return 1;
+ 3152              		.loc 1 980 0
+ 3153 13b8 4FF00103 		mov	r3, #1
+ 3154 13bc 12E0     		b	.L202
+ 3155              	.L201:
+ 981:src/MEMS_BMC050.c **** 	if(!len)
+ 3156              		.loc 1 981 0
+ 3157 13be FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 3158 13c0 002B     		cmp	r3, #0
+ 3159 13c2 02D1     		bne	.L203
+ 982:src/MEMS_BMC050.c **** 		return 1;
+ 3160              		.loc 1 982 0
+ 3161 13c4 4FF00103 		mov	r3, #1
+ 3162 13c8 0CE0     		b	.L202
+ 3163              	.L203:
+ 983:src/MEMS_BMC050.c **** 
+ 984:src/MEMS_BMC050.c **** 	HW_BMC_CsAccelerationOn();
+ 3164              		.loc 1 984 0
+ 3165 13ca FFF7FEFF 		bl	HW_BMC_CsAccelerationOn
+ 985:src/MEMS_BMC050.c **** 	SSP_ReadWrite(SSP_2, p_rBuff, p_wBuff,len);
+ 3166              		.loc 1 985 0
+ 3167 13ce FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 3168 13d0 4FF00100 		mov	r0, #1
+ 3169 13d4 B968     		ldr	r1, [r7, #8]
+ 3170 13d6 FA68     		ldr	r2, [r7, #12]
+ 3171 13d8 FFF7FEFF 		bl	SSP_ReadWrite
+ 986:src/MEMS_BMC050.c **** 	HW_BMC_CsAccelerationOff();
+ 3172              		.loc 1 986 0
+ 3173 13dc FFF7FEFF 		bl	HW_BMC_CsAccelerationOff
+ 987:src/MEMS_BMC050.c **** 
+ 988:src/MEMS_BMC050.c **** 	return 0;
+ 3174              		.loc 1 988 0
+ 3175 13e0 4FF00003 		mov	r3, #0
+ 3176              	.L202:
+ 989:src/MEMS_BMC050.c **** }
+ 3177              		.loc 1 989 0
+ 3178 13e4 1846     		mov	r0, r3
+ 3179 13e6 07F11007 		add	r7, r7, #16
+ 3180 13ea BD46     		mov	sp, r7
+ 3181 13ec 80BD     		pop	{r7, pc}
+ 3182              		.cfi_endproc
+ 3183              	.LFE147:
+ 3185 13ee 00BF     		.align	2
+ 3186              		.thumb
+ 3187              		.thumb_func
+ 3189              	wMagReg:
+ 3190              	.LFB148:
+ 990:src/MEMS_BMC050.c **** 
+ 991:src/MEMS_BMC050.c **** // write single magnetometer register
+ 992:src/MEMS_BMC050.c **** static u8_t wMagReg(u8_t reg, u8_t val){
+ 3191              		.loc 1 992 0
+ 3192              		.cfi_startproc
+ 3193              		@ args = 0, pretend = 0, frame = 16
+ 3194              		@ frame_needed = 1, uses_anonymous_args = 0
+ 3195 13f0 80B5     		push	{r7, lr}
+ 3196              	.LCFI95:
+ 3197              		.cfi_def_cfa_offset 8
+ 3198              		.cfi_offset 7, -8
+ 3199              		.cfi_offset 14, -4
+ 3200 13f2 84B0     		sub	sp, sp, #16
+ 3201              	.LCFI96:
+ 3202              		.cfi_def_cfa_offset 24
+ 3203 13f4 00AF     		add	r7, sp, #0
+ 3204              	.LCFI97:
+ 3205              		.cfi_def_cfa_register 7
+ 3206 13f6 0246     		mov	r2, r0
+ 3207 13f8 0B46     		mov	r3, r1
+ 3208 13fa FA71     		strb	r2, [r7, #7]
+ 3209 13fc BB71     		strb	r3, [r7, #6]
+ 993:src/MEMS_BMC050.c **** 	u8_t wbuff[2];
+ 994:src/MEMS_BMC050.c **** 	u8_t rbuff[2];
+ 995:src/MEMS_BMC050.c **** 
+ 996:src/MEMS_BMC050.c **** 	wbuff[0]=reg;
+ 3210              		.loc 1 996 0
+ 3211 13fe FB79     		ldrb	r3, [r7, #7]
+ 3212 1400 3B73     		strb	r3, [r7, #12]
+ 997:src/MEMS_BMC050.c **** 	wbuff[1]=val;
+ 3213              		.loc 1 997 0
+ 3214 1402 BB79     		ldrb	r3, [r7, #6]
+ 3215 1404 7B73     		strb	r3, [r7, #13]
+ 998:src/MEMS_BMC050.c **** 	return rwMAG(wbuff, rbuff, 2);
+ 3216              		.loc 1 998 0
+ 3217 1406 07F10C02 		add	r2, r7, #12
+ 3218 140a 07F10803 		add	r3, r7, #8
+ 3219 140e 1046     		mov	r0, r2
+ 3220 1410 1946     		mov	r1, r3
+ 3221 1412 4FF00202 		mov	r2, #2
+ 3222 1416 00F035F8 		bl	rwMAG
+ 3223 141a 0346     		mov	r3, r0
+ 999:src/MEMS_BMC050.c **** }
+ 3224              		.loc 1 999 0
+ 3225 141c 1846     		mov	r0, r3
+ 3226 141e 07F11007 		add	r7, r7, #16
+ 3227 1422 BD46     		mov	sp, r7
+ 3228 1424 80BD     		pop	{r7, pc}
+ 3229              		.cfi_endproc
+ 3230              	.LFE148:
+ 3232 1426 00BF     		.align	2
+ 3233              		.thumb
+ 3234              		.thumb_func
+ 3236              	rMagReg:
+ 3237              	.LFB149:
+1000:src/MEMS_BMC050.c **** 
+1001:src/MEMS_BMC050.c **** // read single magnetometer register
+1002:src/MEMS_BMC050.c **** static u8_t rMagReg(u8_t reg, u8_t *p_val){
+ 3238              		.loc 1 1002 0
+ 3239              		.cfi_startproc
+ 3240              		@ args = 0, pretend = 0, frame = 16
+ 3241              		@ frame_needed = 1, uses_anonymous_args = 0
+ 3242 1428 80B5     		push	{r7, lr}
+ 3243              	.LCFI98:
+ 3244              		.cfi_def_cfa_offset 8
+ 3245              		.cfi_offset 7, -8
+ 3246              		.cfi_offset 14, -4
+ 3247 142a 84B0     		sub	sp, sp, #16
+ 3248              	.LCFI99:
+ 3249              		.cfi_def_cfa_offset 24
+ 3250 142c 00AF     		add	r7, sp, #0
+ 3251              	.LCFI100:
+ 3252              		.cfi_def_cfa_register 7
+ 3253 142e 0346     		mov	r3, r0
+ 3254 1430 3960     		str	r1, [r7, #0]
+ 3255 1432 FB71     		strb	r3, [r7, #7]
+1003:src/MEMS_BMC050.c **** 	u8_t wbuff[2];
+1004:src/MEMS_BMC050.c **** 	u8_t rbuff[2];
+1005:src/MEMS_BMC050.c **** 
+1006:src/MEMS_BMC050.c **** 	if(!p_val)
+ 3256              		.loc 1 1006 0
+ 3257 1434 3B68     		ldr	r3, [r7, #0]
+ 3258 1436 002B     		cmp	r3, #0
+ 3259 1438 02D1     		bne	.L207
+1007:src/MEMS_BMC050.c **** 		return 1;
+ 3260              		.loc 1 1007 0
+ 3261 143a 4FF00103 		mov	r3, #1
+ 3262 143e 1CE0     		b	.L210
+ 3263              	.L207:
+1008:src/MEMS_BMC050.c **** 
+1009:src/MEMS_BMC050.c **** 	wbuff[0]=reg | 1<<7;
+ 3264              		.loc 1 1009 0
+ 3265 1440 FB79     		ldrb	r3, [r7, #7]
+ 3266 1442 63F07F03 		orn	r3, r3, #127
+ 3267 1446 DBB2     		uxtb	r3, r3
+ 3268 1448 3B73     		strb	r3, [r7, #12]
+1010:src/MEMS_BMC050.c **** 	wbuff[1]=0x00;
+ 3269              		.loc 1 1010 0
+ 3270 144a 4FF00003 		mov	r3, #0
+ 3271 144e 7B73     		strb	r3, [r7, #13]
+1011:src/MEMS_BMC050.c **** 
+1012:src/MEMS_BMC050.c **** 	if(rwMAG(wbuff, rbuff, 2)!=0)
+ 3272              		.loc 1 1012 0
+ 3273 1450 07F10C02 		add	r2, r7, #12
+ 3274 1454 07F10803 		add	r3, r7, #8
+ 3275 1458 1046     		mov	r0, r2
+ 3276 145a 1946     		mov	r1, r3
+ 3277 145c 4FF00202 		mov	r2, #2
+ 3278 1460 00F010F8 		bl	rwMAG
+ 3279 1464 0346     		mov	r3, r0
+ 3280 1466 002B     		cmp	r3, #0
+ 3281 1468 02D0     		beq	.L209
+1013:src/MEMS_BMC050.c **** 		return 1;
+ 3282              		.loc 1 1013 0
+ 3283 146a 4FF00103 		mov	r3, #1
+ 3284 146e 04E0     		b	.L210
+ 3285              	.L209:
+1014:src/MEMS_BMC050.c **** 
+1015:src/MEMS_BMC050.c **** 	*p_val=rbuff[1];
+ 3286              		.loc 1 1015 0
+ 3287 1470 7A7A     		ldrb	r2, [r7, #9]	@ zero_extendqisi2
+ 3288 1472 3B68     		ldr	r3, [r7, #0]
+ 3289 1474 1A70     		strb	r2, [r3, #0]
+1016:src/MEMS_BMC050.c **** 
+1017:src/MEMS_BMC050.c **** 	return 0;
+ 3290              		.loc 1 1017 0
+ 3291 1476 4FF00003 		mov	r3, #0
+ 3292              	.L210:
+1018:src/MEMS_BMC050.c **** }
+ 3293              		.loc 1 1018 0
+ 3294 147a 1846     		mov	r0, r3
+ 3295 147c 07F11007 		add	r7, r7, #16
+ 3296 1480 BD46     		mov	sp, r7
+ 3297 1482 80BD     		pop	{r7, pc}
+ 3298              		.cfi_endproc
+ 3299              	.LFE149:
+ 3301              		.align	2
+ 3302              		.thumb
+ 3303              		.thumb_func
+ 3305              	rwMAG:
+ 3306              	.LFB150:
+1019:src/MEMS_BMC050.c **** 
+1020:src/MEMS_BMC050.c **** static u8_t rwMAG(u8_t *p_wBuff, u8_t *p_rBuff, u8_t len){
+ 3307              		.loc 1 1020 0
+ 3308              		.cfi_startproc
+ 3309              		@ args = 0, pretend = 0, frame = 16
+ 3310              		@ frame_needed = 1, uses_anonymous_args = 0
+ 3311 1484 80B5     		push	{r7, lr}
+ 3312              	.LCFI101:
+ 3313              		.cfi_def_cfa_offset 8
+ 3314              		.cfi_offset 7, -8
+ 3315              		.cfi_offset 14, -4
+ 3316 1486 84B0     		sub	sp, sp, #16
+ 3317              	.LCFI102:
+ 3318              		.cfi_def_cfa_offset 24
+ 3319 1488 00AF     		add	r7, sp, #0
+ 3320              	.LCFI103:
+ 3321              		.cfi_def_cfa_register 7
+ 3322 148a F860     		str	r0, [r7, #12]
+ 3323 148c B960     		str	r1, [r7, #8]
+ 3324 148e 1346     		mov	r3, r2
+ 3325 1490 FB71     		strb	r3, [r7, #7]
+1021:src/MEMS_BMC050.c **** 	//SSP_DATA_SETUP_Type SSPdata;
+1022:src/MEMS_BMC050.c **** 
+1023:src/MEMS_BMC050.c **** 	//if(!p_rBuff)
+1024:src/MEMS_BMC050.c **** 	//	return 1;
+1025:src/MEMS_BMC050.c **** 	if(!p_wBuff)
+ 3326              		.loc 1 1025 0
+ 3327 1492 FB68     		ldr	r3, [r7, #12]
+ 3328 1494 002B     		cmp	r3, #0
+ 3329 1496 02D1     		bne	.L212
+1026:src/MEMS_BMC050.c **** 		return 1;
+ 3330              		.loc 1 1026 0
+ 3331 1498 4FF00103 		mov	r3, #1
+ 3332 149c 12E0     		b	.L213
+ 3333              	.L212:
+1027:src/MEMS_BMC050.c **** 	if(!len)
+ 3334              		.loc 1 1027 0
+ 3335 149e FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 3336 14a0 002B     		cmp	r3, #0
+ 3337 14a2 02D1     		bne	.L214
+1028:src/MEMS_BMC050.c **** 		return 1;
+ 3338              		.loc 1 1028 0
+ 3339 14a4 4FF00103 		mov	r3, #1
+ 3340 14a8 0CE0     		b	.L213
+ 3341              	.L214:
+1029:src/MEMS_BMC050.c **** 
+1030:src/MEMS_BMC050.c **** 	HW_BMC_CsMagnetometerOn();
+ 3342              		.loc 1 1030 0
+ 3343 14aa FFF7FEFF 		bl	HW_BMC_CsMagnetometerOn
+1031:src/MEMS_BMC050.c **** 	SSP_ReadWrite(SSP_2, p_rBuff, p_wBuff,len);
+ 3344              		.loc 1 1031 0
+ 3345 14ae FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 3346 14b0 4FF00100 		mov	r0, #1
+ 3347 14b4 B968     		ldr	r1, [r7, #8]
+ 3348 14b6 FA68     		ldr	r2, [r7, #12]
+ 3349 14b8 FFF7FEFF 		bl	SSP_ReadWrite
+1032:src/MEMS_BMC050.c **** 	HW_BMC_CsMagnetometerOff();
+ 3350              		.loc 1 1032 0
+ 3351 14bc FFF7FEFF 		bl	HW_BMC_CsMagnetometerOff
+1033:src/MEMS_BMC050.c **** 
+1034:src/MEMS_BMC050.c **** 	return 0;
+ 3352              		.loc 1 1034 0
+ 3353 14c0 4FF00003 		mov	r3, #0
+ 3354              	.L213:
+1035:src/MEMS_BMC050.c **** }
+ 3355              		.loc 1 1035 0
+ 3356 14c4 1846     		mov	r0, r3
+ 3357 14c6 07F11007 		add	r7, r7, #16
+ 3358 14ca BD46     		mov	sp, r7
+ 3359 14cc 80BD     		pop	{r7, pc}
+ 3360              		.cfi_endproc
+ 3361              	.LFE150:
+ 3363              	.Letext0:
+ 3364              		.file 2 "c:/tools/pcan-router/yagarto-20121222/lib/gcc/../../arm-none-eabi/sys-include/stdint.h"
+ 3365              		.file 3 "./inc/lpc407x_8x_177x_8x.h"
+ 3366              		.file 4 "./inc/typedefs.h"
+ 3367              		.file 5 "./inc/lib/ssp.h"
+ 3368              		.file 6 "./inc/MEMS_BMC050.h"
+ 3369              		.file 7 "./inc/core_cm4.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 MEMS_BMC050.c
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:19     .bss:00000000 use_dbg_data
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:20     .bss:00000000 $d
+                            *COM*:0000000b BMC050_dbg_data_cmp
+                            *COM*:0000000a BMC050_dbg_data_acc
+                            *COM*:00000012 BMC050_Readings
+                            *COM*:0000000a BMC050_AccCompensate
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:25     .bss:00000001 BMC050State
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:27     .bss:00000002 GoToState
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:30     .bss:00000004 AccIRQConfig
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:33     .bss:00000020 AccBWPwrConfig
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:38     .data:00000000 vertical_axis
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:42     .bss:00000024 AccDataRaw
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:45     .bss:00000030 CmpDataRaw
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:47     .bss:0000003b ssp_init
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:49     .bss:0000003c data_init
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:54     .data:00000001 AccSensitivity
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:57     .text:00000000 $t
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:62     .text:00000000 MEMS_BMC050_init_Accelerometer
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:1686   .text:00000ae8 initSSP
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:1644   .text:00000ab0 initData
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:3080   .text:0000136c wAccReg
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2305   .text:00000efc setAccRange
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:3127   .text:000013a4 rwACC
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2368   .text:00000f54 readAccIRQConfig
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:383    .text:00000310 $d
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:391    .text:00000324 $t
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:396    .text:00000324 MEMS_BMC050_init_Magnetometer
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:3189   .text:000013f0 wMagReg
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:562    .text:00000458 MEMS_BMC050_readAccCompValues
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:593    .text:00000470 MEMS_BMC050_StartFastAccCompensation
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:624    .text:00000488 MEMS_BMC050_ResetAccCompensation
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:655    .text:000004a0 MEMS_BMC050_SetVertialAxis
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:711    .text:000004e0 MEMS_BMC050_GetVertialAxis
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:760    .text:00000514 AccCalRdy
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:814    .text:00000560 MEMS_BMC050_SetAccCalTargets
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:935    .text:00000618 MEMS_BMC050_GetAccCalTargets
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:1013   .text:00000688 MEMS_BMC050_GetAccCalRawValues
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2601   .text:00001078 readAccCompenstaionValues
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:1083   .text:000006e4 MEMS_BMC050_GetAccCalFiltValues
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:1153   .text:00000740 MEMS_BMC050_GetAccRange
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2194   .text:00000e3c readAccRange
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:1242   .text:000007b4 MEMS_BMC050_SetAccRange
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:1334   .text:00000838 MEMS_BMC050_task
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2706   .text:00001100 checkAccIRQ
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2774   .text:00001148 handleAccIRQ
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2740   .text:00001124 checkMagIRQ
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:3053   .text:00001360 handleMagIRQ
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:1387   .text:00000888 $d
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:1400   .text:000008b4 $t
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2078   .text:00000d74 readCurrAccelerationValues
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2136   .text:00000dd8 readCurrMagValues
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:1767   .text:00000b60 prcRawAccValues
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:1943   .text:00000c98 prcRawCmpValues
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2555   .text:00001048 setAccCompensationTargets
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2435   .text:00000fd0 accFastCompensationX
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2475   .text:00000ff8 accFastCompensationY
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2515   .text:00001020 accFastCompensationZ
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2666   .text:000010d8 resetAccCompensationValues
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:3305   .text:00001484 rwMAG
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2238   .text:00000e7c $d
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2250   .text:00000ea4 $t
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2297   .text:00000ef8 $d
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2301   .text:00000efc $t
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2593   .text:00001074 $d
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2597   .text:00001078 $t
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2883   .text:0000120c $d
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:2889   .text:0000121c $t
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:3045   .text:0000135c $d
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:3049   .text:00001360 $t
+C:\Users\Ian\AppData\Local\Temp\ccC0LmwK.s:3236   .text:00001428 rMagReg
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+cfg_data
+Wait_Usec
+SSP_Init
+HW_BMC_CsAccelerationOn
+SSP_ReadWrite
+HW_BMC_CsAccelerationOff
+HW_BMC_CsMagnetometerOn
+HW_BMC_CsMagnetometerOff

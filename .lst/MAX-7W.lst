@@ -1,0 +1,2894 @@
+   1              		.syntax unified
+   2              		.cpu cortex-m4
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"MAX-7W.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.comm	MAX7W_Readings,56,4
+  19              		.bss
+  20              	nmea_str_complete:
+  21 0000 00       		.space	1
+  22 0001 000000   		.align	2
+  23              	TxFifo:
+  24 0004 00000000 		.space	64
+  24      00000000 
+  24      00000000 
+  24      00000000 
+  24      00000000 
+  25              		.align	2
+  26              	RxFifo:
+  27 0044 00000000 		.space	128
+  27      00000000 
+  27      00000000 
+  27      00000000 
+  27      00000000 
+  28              		.global	__aeabi_ui2d
+  29              		.global	__aeabi_ddiv
+  30              		.global	__aeabi_dadd
+  31              		.global	__aeabi_d2uiz
+  32              		.text
+  33              		.align	2
+  34              		.global	Init_UART2
+  35              		.thumb
+  36              		.thumb_func
+  38              	Init_UART2:
+  39              	.LFB112:
+  40              		.file 1 "src/MAX-7W.c"
+   1:src/MAX-7W.c  **** /*******************************************************************************
+   2:src/MAX-7W.c  ****  *
+   3:src/MAX-7W.c  ****  * Project  :	PCAN-GPS
+   4:src/MAX-7W.c  ****  * Module   :
+   5:src/MAX-7W.c  ****  * Filename :	UBLOX_MAX7W.c
+   6:src/MAX-7W.c  ****  * System   :
+   7:src/MAX-7W.c  ****  * Compiler :
+   8:src/MAX-7W.c  ****  * Switches :
+   9:src/MAX-7W.c  ****  * Rights   : 	(c) PEAK-System Technik GmbH
+  10:src/MAX-7W.c  ****  *            	www.peak-system.com
+  11:src/MAX-7W.c  ****  *
+  12:src/MAX-7W.c  ****  *******************************************************************************
+  13:src/MAX-7W.c  ****  * Implementation description
+  14:src/MAX-7W.c  ****  *
+  15:src/MAX-7W.c  ****  *
+  16:src/MAX-7W.c  ****  *
+  17:src/MAX-7W.c  ****  *******************************************************************************
+  18:src/MAX-7W.c  ****  * History: (newer entries first!)
+  19:src/MAX-7W.c  ****  *------------------------------------------------------------------------------
+  20:src/MAX-7W.c  ****  * Date / Name      Vers.   changes made
+  21:src/MAX-7W.c  ****  *------------------------------------------------------------------------------ 
+  22:src/MAX-7W.c  ****  * 2015 June 02/StM	0.0.3	added check of message length in validate_csum()
+  23:src/MAX-7W.c  ****  * 2014 June 04/StM	0.0.2	cleaned code, changed evaluation of substrings,
+  24:src/MAX-7W.c  ****  * 							added HDOP, VDOP and PDOP
+  25:src/MAX-7W.c  ****  * 							removed some unnecessary buffers
+  26:src/MAX-7W.c  ****  * 2013 Sep xx/StS	0.0.1	Initial Version
+  27:src/MAX-7W.c  ****  ******************************************************************************/
+  28:src/MAX-7W.c  **** 
+  29:src/MAX-7W.c  **** /*******************************************************************************
+  30:src/MAX-7W.c  ****  include files
+  31:src/MAX-7W.c  ****  ******************************************************************************/
+  32:src/MAX-7W.c  **** //
+  33:src/MAX-7W.c  **** // System header files
+  34:src/MAX-7W.c  **** //
+  35:src/MAX-7W.c  **** #include <stdio.h>      /* printf, NULL */
+  36:src/MAX-7W.c  **** #include <stdlib.h>     /* strtof */
+  37:src/MAX-7W.c  **** #include <string.h>
+  38:src/MAX-7W.c  **** #include <lpc407x_8x_177x_8x.h>
+  39:src/MAX-7W.c  **** 
+  40:src/MAX-7W.c  **** //
+  41:src/MAX-7W.c  **** // Library header files
+  42:src/MAX-7W.c  **** //
+  43:src/MAX-7W.c  **** #include "typedefs.h"
+  44:src/MAX-7W.c  **** #include "hardware.h"
+  45:src/MAX-7W.c  **** #include "serial.h"
+  46:src/MAX-7W.c  **** 
+  47:src/MAX-7W.c  **** //
+  48:src/MAX-7W.c  **** // Source code header files
+  49:src/MAX-7W.c  **** //
+  50:src/MAX-7W.c  **** #include "MAX-7W.h"
+  51:src/MAX-7W.c  **** 
+  52:src/MAX-7W.c  **** /*******************************************************************************
+  53:src/MAX-7W.c  ****  global definitions
+  54:src/MAX-7W.c  ****  ******************************************************************************/
+  55:src/MAX-7W.c  **** 
+  56:src/MAX-7W.c  **** /*******************************************************************************
+  57:src/MAX-7W.c  ****  local definitions
+  58:src/MAX-7W.c  ****  ******************************************************************************/
+  59:src/MAX-7W.c  **** 
+  60:src/MAX-7W.c  **** #undef DEBUG_RAW_POS
+  61:src/MAX-7W.c  **** //#define DEBUG_RAW_POS 1
+  62:src/MAX-7W.c  **** 
+  63:src/MAX-7W.c  **** //! size of uart reception buffer (data from gps-receiver, should be >=83)
+  64:src/MAX-7W.c  **** #define GPS_BUF_SZ 128
+  65:src/MAX-7W.c  **** #define SER_TX_FIFO_SIZE  64 	//!< size of TX soft-fifo
+  66:src/MAX-7W.c  **** #define SER_RX_FIFO_SIZE 128 	//!< size of RX soft-fifo
+  67:src/MAX-7W.c  **** #define	SER_BAUD_GPS	9600	//!< baudrate GPS-UART
+  68:src/MAX-7W.c  **** 
+  69:src/MAX-7W.c  **** #define TXT_ELEM_CNT 5		//!< number of elements in $GPTXT message buffer
+  70:src/MAX-7W.c  **** #define RMC_ELEM_CNT 14		//!< number of elements in $GPRMC message buffer
+  71:src/MAX-7W.c  **** #define VTG_ELEM_CNT 11		//!< number of elements in $GPVTG message buffer
+  72:src/MAX-7W.c  **** #define GGA_ELEM_CNT 16		//!< number of elements in $GPGGA message buffer
+  73:src/MAX-7W.c  **** #define GSA_ELEM_CNT 19		//!< number of elements in $GPGSA message buffer
+  74:src/MAX-7W.c  **** #define GLL_ELEM_CNT 9		//!< number of elements in $GPGLL message buffer
+  75:src/MAX-7W.c  **** 
+  76:src/MAX-7W.c  **** UBLOX_MAX7W_Result_Type MAX7W_Readings; //!< received data of the MAX7W module
+  77:src/MAX-7W.c  **** 
+  78:src/MAX-7W.c  **** //! flag set if received NMEA string is ready to be evaluated
+  79:src/MAX-7W.c  **** static u8_t nmea_str_complete = 0;
+  80:src/MAX-7W.c  **** 
+  81:src/MAX-7W.c  **** //! TX Fifo (soft-fifo read by TX complete interrupt)
+  82:src/MAX-7W.c  **** static u8_t TxFifo[SER_TX_FIFO_SIZE];
+  83:src/MAX-7W.c  **** //! RX Fifo (soft-fifo write by RX complete interrupt)
+  84:src/MAX-7W.c  **** static u8_t RxFifo[SER_RX_FIFO_SIZE];
+  85:src/MAX-7W.c  **** 
+  86:src/MAX-7W.c  **** /*******************************************************************************
+  87:src/MAX-7W.c  ****  local function prototypes
+  88:src/MAX-7W.c  ****  ******************************************************************************/
+  89:src/MAX-7W.c  **** static void evaluate_$GPTXT(char *p_msg, u16_t msg_len);
+  90:src/MAX-7W.c  **** static void evaluate_$GPRMC(char *p_msg, u16_t msg_len);
+  91:src/MAX-7W.c  **** static void evaluate_$GPVTG(char *p_msg, u16_t msg_len);
+  92:src/MAX-7W.c  **** static void evaluate_$GPGGA(char *p_msg, u16_t msg_len);
+  93:src/MAX-7W.c  **** static void evaluate_$GPGSA(char *p_msg, u16_t msg_len);
+  94:src/MAX-7W.c  **** static void evaluate_$GPGLL(char *p_msg, u16_t msg_len);
+  95:src/MAX-7W.c  **** static int validate_csum(char *p_msg, unsigned int msg_len);
+  96:src/MAX-7W.c  **** static int spltStr(char *p_str, u16_t sz, char delim, char **pp_res, u8_t cnt);
+  97:src/MAX-7W.c  **** static u8_t hex2ascii(u8_t chr);
+  98:src/MAX-7W.c  **** static u8_t ascii2hex(u8_t chr);
+  99:src/MAX-7W.c  **** 
+ 100:src/MAX-7W.c  **** /*******************************************************************************
+ 101:src/MAX-7W.c  ****  global functions
+ 102:src/MAX-7W.c  ****  ******************************************************************************/
+ 103:src/MAX-7W.c  **** 
+ 104:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 105:src/MAX-7W.c  **** //! void Init_UART2(void)
+ 106:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 107:src/MAX-7W.c  **** //! @brief	initializes UART for usage with GPS module
+ 108:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 109:src/MAX-7W.c  **** void Init_UART2(void){
+  41              		.loc 1 109 0
+  42              		.cfi_startproc
+  43              		@ args = 0, pretend = 0, frame = 32
+  44              		@ frame_needed = 1, uses_anonymous_args = 0
+  45 0000 B0B5     		push	{r4, r5, r7, lr}
+  46              	.LCFI0:
+  47              		.cfi_def_cfa_offset 16
+  48              		.cfi_offset 4, -16
+  49              		.cfi_offset 5, -12
+  50              		.cfi_offset 7, -8
+  51              		.cfi_offset 14, -4
+  52 0002 88B0     		sub	sp, sp, #32
+  53              	.LCFI1:
+  54              		.cfi_def_cfa_offset 48
+  55 0004 00AF     		add	r7, sp, #0
+  56              	.LCFI2:
+  57              		.cfi_def_cfa_register 7
+ 110:src/MAX-7W.c  **** 
+ 111:src/MAX-7W.c  **** 	SERInit_t params;
+ 112:src/MAX-7W.c  **** 
+ 113:src/MAX-7W.c  **** 	//params.prescaler = (PCLK + 8 * SER_BAUD_3) / ( 16 * SER_BAUD_3);
+ 114:src/MAX-7W.c  **** 	params.mulval = 4;
+  58              		.loc 1 114 0
+  59 0006 4FF00403 		mov	r3, #4
+  60 000a BB60     		str	r3, [r7, #8]
+ 115:src/MAX-7W.c  **** 	params.divadd = 1;
+  61              		.loc 1 115 0
+  62 000c 4FF00103 		mov	r3, #1
+  63 0010 FB60     		str	r3, [r7, #12]
+ 116:src/MAX-7W.c  **** 	params.dlval = ((u32_t) ((double) PCLK / SER_BAUD_GPS / 16
+ 117:src/MAX-7W.c  **** 			/ (1 + (double) params.divadd / params.mulval)));
+  64              		.loc 1 117 0
+  65 0012 FB68     		ldr	r3, [r7, #12]
+  66 0014 1846     		mov	r0, r3
+  67 0016 FFF7FEFF 		bl	__aeabi_ui2d
+  68 001a 0446     		mov	r4, r0
+  69 001c 0D46     		mov	r5, r1
+  70 001e BB68     		ldr	r3, [r7, #8]
+  71 0020 1846     		mov	r0, r3
+  72 0022 FFF7FEFF 		bl	__aeabi_ui2d
+  73 0026 0246     		mov	r2, r0
+  74 0028 0B46     		mov	r3, r1
+  75 002a 2046     		mov	r0, r4
+  76 002c 2946     		mov	r1, r5
+  77 002e FFF7FEFF 		bl	__aeabi_ddiv
+  78 0032 0246     		mov	r2, r0
+  79 0034 0B46     		mov	r3, r1
+  80 0036 1046     		mov	r0, r2
+  81 0038 1946     		mov	r1, r3
+  82 003a 4FF00002 		mov	r2, #0
+  83 003e 4FF07F53 		mov	r3, #1069547520
+  84 0042 03F54013 		add	r3, r3, #3145728
+  85 0046 FFF7FEFF 		bl	__aeabi_dadd
+  86 004a 0246     		mov	r2, r0
+  87 004c 0B46     		mov	r3, r1
+  88 004e 18A1     		adr	r1, .L3
+  89 0050 D1E90001 		ldrd	r0, [r1]
+  90 0054 FFF7FEFF 		bl	__aeabi_ddiv
+  91 0058 0246     		mov	r2, r0
+  92 005a 0B46     		mov	r3, r1
+ 116:src/MAX-7W.c  **** 	params.dlval = ((u32_t) ((double) PCLK / SER_BAUD_GPS / 16
+  93              		.loc 1 116 0
+  94 005c 1046     		mov	r0, r2
+  95 005e 1946     		mov	r1, r3
+  96 0060 FFF7FEFF 		bl	__aeabi_d2uiz
+  97 0064 0346     		mov	r3, r0
+  98 0066 7B60     		str	r3, [r7, #4]
+ 118:src/MAX-7W.c  **** 
+ 119:src/MAX-7W.c  **** 	params.databits = 8;
+  99              		.loc 1 119 0
+ 100 0068 4FF00803 		mov	r3, #8
+ 101 006c 3B76     		strb	r3, [r7, #24]
+ 120:src/MAX-7W.c  **** 	params.stopbits = 1;
+ 102              		.loc 1 120 0
+ 103 006e 4FF00103 		mov	r3, #1
+ 104 0072 7B76     		strb	r3, [r7, #25]
+ 121:src/MAX-7W.c  **** 	params.parity = SER_PARITY_NONE;
+ 105              		.loc 1 121 0
+ 106 0074 4FF00003 		mov	r3, #0
+ 107 0078 BB76     		strb	r3, [r7, #26]
+ 122:src/MAX-7W.c  **** 
+ 123:src/MAX-7W.c  **** 	params.pTxFifo = &TxFifo;
+ 108              		.loc 1 123 0
+ 109 007a 40F20003 		movw	r3, #:lower16:TxFifo
+ 110 007e C0F20003 		movt	r3, #:upper16:TxFifo
+ 111 0082 3B61     		str	r3, [r7, #16]
+ 124:src/MAX-7W.c  **** 	params.pRxFifo = &RxFifo;
+ 112              		.loc 1 124 0
+ 113 0084 40F20003 		movw	r3, #:lower16:RxFifo
+ 114 0088 C0F20003 		movt	r3, #:upper16:RxFifo
+ 115 008c 7B61     		str	r3, [r7, #20]
+ 125:src/MAX-7W.c  **** 
+ 126:src/MAX-7W.c  **** 	params.TxFifoSize = SER_TX_FIFO_SIZE;
+ 116              		.loc 1 126 0
+ 117 008e 4FF04003 		mov	r3, #64
+ 118 0092 FB76     		strb	r3, [r7, #27]
+ 127:src/MAX-7W.c  **** 	params.RxFifoSize = SER_RX_FIFO_SIZE;
+ 119              		.loc 1 127 0
+ 120 0094 4FF08003 		mov	r3, #128
+ 121 0098 3B77     		strb	r3, [r7, #28]
+ 128:src/MAX-7W.c  **** 
+ 129:src/MAX-7W.c  **** 	SER_Initialize(SER_PORT3, &params);
+ 122              		.loc 1 129 0
+ 123 009a 07F10403 		add	r3, r7, #4
+ 124 009e 4FF00200 		mov	r0, #2
+ 125 00a2 1946     		mov	r1, r3
+ 126 00a4 FFF7FEFF 		bl	SER_Initialize
+ 130:src/MAX-7W.c  **** 
+ 131:src/MAX-7W.c  **** 	return;
+ 132:src/MAX-7W.c  **** }
+ 127              		.loc 1 132 0
+ 128 00a8 07F12007 		add	r7, r7, #32
+ 129 00ac BD46     		mov	sp, r7
+ 130 00ae B0BD     		pop	{r4, r5, r7, pc}
+ 131              	.L4:
+ 132              		.align	3
+ 133              	.L3:
+ 134 00b0 00000000 		.word	0
+ 135 00b4 006A8840 		.word	1082681856
+ 136              		.cfi_endproc
+ 137              	.LFE112:
+ 139              		.align	2
+ 140              		.global	UBLOX_MAX7W_init
+ 141              		.thumb
+ 142              		.thumb_func
+ 144              	UBLOX_MAX7W_init:
+ 145              	.LFB113:
+ 133:src/MAX-7W.c  **** 
+ 134:src/MAX-7W.c  **** 
+ 135:src/MAX-7W.c  **** 
+ 136:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 137:src/MAX-7W.c  **** //! s32_t UBLOX_MAX7W_init(void)
+ 138:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 139:src/MAX-7W.c  **** //! @brief	initializes UART and variables, activates power supply of GPS module
+ 140:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 141:src/MAX-7W.c  **** s32_t UBLOX_MAX7W_init(void){
+ 146              		.loc 1 141 0
+ 147              		.cfi_startproc
+ 148              		@ args = 0, pretend = 0, frame = 8
+ 149              		@ frame_needed = 1, uses_anonymous_args = 0
+ 150 00b8 80B5     		push	{r7, lr}
+ 151              	.LCFI3:
+ 152              		.cfi_def_cfa_offset 8
+ 153              		.cfi_offset 7, -8
+ 154              		.cfi_offset 14, -4
+ 155 00ba 82B0     		sub	sp, sp, #8
+ 156              	.LCFI4:
+ 157              		.cfi_def_cfa_offset 16
+ 158 00bc 00AF     		add	r7, sp, #0
+ 159              	.LCFI5:
+ 160              		.cfi_def_cfa_register 7
+ 142:src/MAX-7W.c  **** 	s32_t res = 0;
+ 161              		.loc 1 142 0
+ 162 00be 4FF00003 		mov	r3, #0
+ 163 00c2 7B60     		str	r3, [r7, #4]
+ 143:src/MAX-7W.c  **** 	Init_UART2();
+ 164              		.loc 1 143 0
+ 165 00c4 FFF7FEFF 		bl	Init_UART2
+ 144:src/MAX-7W.c  **** 
+ 145:src/MAX-7W.c  **** 	HW_GPS_PowerOn();
+ 166              		.loc 1 145 0
+ 167 00c8 FFF7FEFF 		bl	HW_GPS_PowerOn
+ 146:src/MAX-7W.c  **** 
+ 147:src/MAX-7W.c  **** 	nmea_str_complete = 0;
+ 168              		.loc 1 147 0
+ 169 00cc 40F20003 		movw	r3, #:lower16:nmea_str_complete
+ 170 00d0 C0F20003 		movt	r3, #:upper16:nmea_str_complete
+ 171 00d4 4FF00002 		mov	r2, #0
+ 172 00d8 1A70     		strb	r2, [r3, #0]
+ 148:src/MAX-7W.c  **** 
+ 149:src/MAX-7W.c  **** 	return res;
+ 173              		.loc 1 149 0
+ 174 00da 7B68     		ldr	r3, [r7, #4]
+ 150:src/MAX-7W.c  **** }
+ 175              		.loc 1 150 0
+ 176 00dc 1846     		mov	r0, r3
+ 177 00de 07F10807 		add	r7, r7, #8
+ 178 00e2 BD46     		mov	sp, r7
+ 179 00e4 80BD     		pop	{r7, pc}
+ 180              		.cfi_endproc
+ 181              	.LFE113:
+ 183              		.section	.rodata
+ 184              		.align	2
+ 185              	.LC0:
+ 186 0000 24475052 		.ascii	"$GPRMC\000"
+ 186      4D4300
+ 187 0007 00       		.align	2
+ 188              	.LC1:
+ 189 0008 24475056 		.ascii	"$GPVTG\000"
+ 189      544700
+ 190 000f 00       		.align	2
+ 191              	.LC2:
+ 192 0010 24475047 		.ascii	"$GPGGA\000"
+ 192      474100
+ 193 0017 00       		.align	2
+ 194              	.LC3:
+ 195 0018 24475047 		.ascii	"$GPGSA\000"
+ 195      534100
+ 196 001f 00       		.align	2
+ 197              	.LC4:
+ 198 0020 24475047 		.ascii	"$GPGLL\000"
+ 198      4C4C00
+ 199 0027 00       		.align	2
+ 200              	.LC5:
+ 201 0028 24475054 		.ascii	"$GPTXT\000"
+ 201      585400
+ 202              		.text
+ 203 00e6 00BF     		.align	2
+ 204              		.global	UBLOX_MAX7W_task
+ 205              		.thumb
+ 206              		.thumb_func
+ 208              	UBLOX_MAX7W_task:
+ 209              	.LFB114:
+ 151:src/MAX-7W.c  **** 
+ 152:src/MAX-7W.c  **** 
+ 153:src/MAX-7W.c  **** 
+ 154:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 155:src/MAX-7W.c  **** //! void UBLOX_MAX7W_task(void)
+ 156:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 157:src/MAX-7W.c  **** //! @brief	reads chars from GPS UART, stores them and extracts data from
+ 158:src/MAX-7W.c  **** //!			received messages
+ 159:src/MAX-7W.c  **** //!			should be called from main loop as often as possible
+ 160:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 161:src/MAX-7W.c  **** void UBLOX_MAX7W_task(void){
+ 210              		.loc 1 161 0
+ 211              		.cfi_startproc
+ 212              		@ args = 0, pretend = 0, frame = 16
+ 213              		@ frame_needed = 1, uses_anonymous_args = 0
+ 214 00e8 80B5     		push	{r7, lr}
+ 215              	.LCFI6:
+ 216              		.cfi_def_cfa_offset 8
+ 217              		.cfi_offset 7, -8
+ 218              		.cfi_offset 14, -4
+ 219 00ea 84B0     		sub	sp, sp, #16
+ 220              	.LCFI7:
+ 221              		.cfi_def_cfa_offset 24
+ 222 00ec 00AF     		add	r7, sp, #0
+ 223              	.LCFI8:
+ 224              		.cfi_def_cfa_register 7
+ 162:src/MAX-7W.c  **** 	static u8_t rx_buff_ptr = 0; 		//!< index of current buffer element
+ 163:src/MAX-7W.c  **** 	static char rx_buff[GPS_BUF_SZ];	//!< uart reception buffer
+ 164:src/MAX-7W.c  **** 	u8_t msg_len = 0; 	//!< length of received message-3 for CS calculation
+ 225              		.loc 1 164 0
+ 226 00ee 4FF00003 		mov	r3, #0
+ 227 00f2 FB73     		strb	r3, [r7, #15]
+ 165:src/MAX-7W.c  **** 	u8_t cur_chr, rd;
+ 166:src/MAX-7W.c  **** 	s32_t res;
+ 167:src/MAX-7W.c  **** 
+ 168:src/MAX-7W.c  **** 	res = SER_Read(SER_PORT3, &cur_chr, 1, &rd);
+ 228              		.loc 1 168 0
+ 229 00f4 07F10702 		add	r2, r7, #7
+ 230 00f8 07F10603 		add	r3, r7, #6
+ 231 00fc 4FF00200 		mov	r0, #2
+ 232 0100 1146     		mov	r1, r2
+ 233 0102 4FF00102 		mov	r2, #1
+ 234 0106 FFF7FEFF 		bl	SER_Read
+ 235 010a 0346     		mov	r3, r0
+ 236 010c BB60     		str	r3, [r7, #8]
+ 169:src/MAX-7W.c  **** 	if ((res != SER_ERR_OK) || (rd < 1))
+ 237              		.loc 1 169 0
+ 238 010e BB68     		ldr	r3, [r7, #8]
+ 239 0110 002B     		cmp	r3, #0
+ 240 0112 40F01281 		bne	.L7
+ 241              		.loc 1 169 0 is_stmt 0 discriminator 1
+ 242 0116 BB79     		ldrb	r3, [r7, #6]	@ zero_extendqisi2
+ 243 0118 002B     		cmp	r3, #0
+ 244 011a 00F00E81 		beq	.L7
+ 170:src/MAX-7W.c  **** 		return;
+ 171:src/MAX-7W.c  **** 
+ 172:src/MAX-7W.c  **** #if DEBUG_RAW_POS>0
+ 173:src/MAX-7W.c  **** 	SER_Write(SER_PORT1, &cur_chr, rd);
+ 174:src/MAX-7W.c  **** #endif
+ 175:src/MAX-7W.c  **** 
+ 176:src/MAX-7W.c  **** 	// store char and increase pointer up to GPS_BUF_SZ
+ 177:src/MAX-7W.c  **** 	// overwrite uppermost entry with all subsequent chars
+ 178:src/MAX-7W.c  **** 	rx_buff[rx_buff_ptr] = cur_chr;
+ 245              		.loc 1 178 0 is_stmt 1
+ 246 011e 40F20003 		movw	r3, #:lower16:rx_buff_ptr.7499
+ 247 0122 C0F20003 		movt	r3, #:upper16:rx_buff_ptr.7499
+ 248 0126 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 249 0128 1A46     		mov	r2, r3
+ 250 012a F979     		ldrb	r1, [r7, #7]	@ zero_extendqisi2
+ 251 012c 40F20003 		movw	r3, #:lower16:rx_buff.7500
+ 252 0130 C0F20003 		movt	r3, #:upper16:rx_buff.7500
+ 253 0134 9954     		strb	r1, [r3, r2]
+ 179:src/MAX-7W.c  **** 	if (rx_buff_ptr < GPS_BUF_SZ)
+ 254              		.loc 1 179 0
+ 255 0136 40F20003 		movw	r3, #:lower16:rx_buff_ptr.7499
+ 256 013a C0F20003 		movt	r3, #:upper16:rx_buff_ptr.7499
+ 257 013e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 258 0140 DBB2     		uxtb	r3, r3
+ 259 0142 5BB2     		sxtb	r3, r3
+ 260 0144 002B     		cmp	r3, #0
+ 261 0146 0CDB     		blt	.L9
+ 180:src/MAX-7W.c  **** 		rx_buff_ptr++;
+ 262              		.loc 1 180 0
+ 263 0148 40F20003 		movw	r3, #:lower16:rx_buff_ptr.7499
+ 264 014c C0F20003 		movt	r3, #:upper16:rx_buff_ptr.7499
+ 265 0150 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 266 0152 03F10103 		add	r3, r3, #1
+ 267 0156 DAB2     		uxtb	r2, r3
+ 268 0158 40F20003 		movw	r3, #:lower16:rx_buff_ptr.7499
+ 269 015c C0F20003 		movt	r3, #:upper16:rx_buff_ptr.7499
+ 270 0160 1A70     		strb	r2, [r3, #0]
+ 271              	.L9:
+ 181:src/MAX-7W.c  **** 
+ 182:src/MAX-7W.c  **** 	if (cur_chr == 0x24){
+ 272              		.loc 1 182 0
+ 273 0162 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 274 0164 242B     		cmp	r3, #36
+ 275 0166 0DD1     		bne	.L10
+ 183:src/MAX-7W.c  **** 		// $ => start of new message => reset buffer index
+ 184:src/MAX-7W.c  **** 		rx_buff[0] = cur_chr;
+ 276              		.loc 1 184 0
+ 277 0168 FA79     		ldrb	r2, [r7, #7]	@ zero_extendqisi2
+ 278 016a 40F20003 		movw	r3, #:lower16:rx_buff.7500
+ 279 016e C0F20003 		movt	r3, #:upper16:rx_buff.7500
+ 280 0172 1A70     		strb	r2, [r3, #0]
+ 185:src/MAX-7W.c  **** 		rx_buff_ptr = 1; // reset buffer pointer
+ 281              		.loc 1 185 0
+ 282 0174 40F20003 		movw	r3, #:lower16:rx_buff_ptr.7499
+ 283 0178 C0F20003 		movt	r3, #:upper16:rx_buff_ptr.7499
+ 284 017c 4FF00102 		mov	r2, #1
+ 285 0180 1A70     		strb	r2, [r3, #0]
+ 286 0182 2AE0     		b	.L11
+ 287              	.L10:
+ 186:src/MAX-7W.c  **** 	} else if (cur_chr == 0x0A) {
+ 288              		.loc 1 186 0
+ 289 0184 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 290 0186 0A2B     		cmp	r3, #10
+ 291 0188 27D1     		bne	.L11
+ 187:src/MAX-7W.c  **** 		// at this point received message is complete !!!
+ 188:src/MAX-7W.c  **** 		rx_buff[rx_buff_ptr] = 0x00;
+ 292              		.loc 1 188 0
+ 293 018a 40F20003 		movw	r3, #:lower16:rx_buff_ptr.7499
+ 294 018e C0F20003 		movt	r3, #:upper16:rx_buff_ptr.7499
+ 295 0192 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 296 0194 1A46     		mov	r2, r3
+ 297 0196 40F20003 		movw	r3, #:lower16:rx_buff.7500
+ 298 019a C0F20003 		movt	r3, #:upper16:rx_buff.7500
+ 299 019e 4FF00001 		mov	r1, #0
+ 300 01a2 9954     		strb	r1, [r3, r2]
+ 189:src/MAX-7W.c  **** 
+ 190:src/MAX-7W.c  **** 		if (nmea_str_complete == 0) {
+ 301              		.loc 1 190 0
+ 302 01a4 40F20003 		movw	r3, #:lower16:nmea_str_complete
+ 303 01a8 C0F20003 		movt	r3, #:upper16:nmea_str_complete
+ 304 01ac 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 305 01ae 002B     		cmp	r3, #0
+ 306 01b0 0CD1     		bne	.L12
+ 191:src/MAX-7W.c  **** 			msg_len = rx_buff_ptr;
+ 307              		.loc 1 191 0
+ 308 01b2 40F20003 		movw	r3, #:lower16:rx_buff_ptr.7499
+ 309 01b6 C0F20003 		movt	r3, #:upper16:rx_buff_ptr.7499
+ 310 01ba 1B78     		ldrb	r3, [r3, #0]
+ 311 01bc FB73     		strb	r3, [r7, #15]
+ 192:src/MAX-7W.c  **** 			nmea_str_complete = 1;
+ 312              		.loc 1 192 0
+ 313 01be 40F20003 		movw	r3, #:lower16:nmea_str_complete
+ 314 01c2 C0F20003 		movt	r3, #:upper16:nmea_str_complete
+ 315 01c6 4FF00102 		mov	r2, #1
+ 316 01ca 1A70     		strb	r2, [r3, #0]
+ 317              	.L12:
+ 193:src/MAX-7W.c  **** 		}
+ 194:src/MAX-7W.c  **** 		rx_buff_ptr = 0; // reset buffer index
+ 318              		.loc 1 194 0
+ 319 01cc 40F20003 		movw	r3, #:lower16:rx_buff_ptr.7499
+ 320 01d0 C0F20003 		movt	r3, #:upper16:rx_buff_ptr.7499
+ 321 01d4 4FF00002 		mov	r2, #0
+ 322 01d8 1A70     		strb	r2, [r3, #0]
+ 323              	.L11:
+ 195:src/MAX-7W.c  **** 	}
+ 196:src/MAX-7W.c  **** 
+ 197:src/MAX-7W.c  **** 	if (nmea_str_complete != 1)
+ 324              		.loc 1 197 0
+ 325 01da 40F20003 		movw	r3, #:lower16:nmea_str_complete
+ 326 01de C0F20003 		movt	r3, #:upper16:nmea_str_complete
+ 327 01e2 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 328 01e4 012B     		cmp	r3, #1
+ 329 01e6 40F0A880 		bne	.L7
+ 198:src/MAX-7W.c  **** 		return;
+ 199:src/MAX-7W.c  **** 
+ 200:src/MAX-7W.c  **** 	nmea_str_complete = 0; // reset NMEA string complete flag
+ 330              		.loc 1 200 0
+ 331 01ea 40F20003 		movw	r3, #:lower16:nmea_str_complete
+ 332 01ee C0F20003 		movt	r3, #:upper16:nmea_str_complete
+ 333 01f2 4FF00002 		mov	r2, #0
+ 334 01f6 1A70     		strb	r2, [r3, #0]
+ 201:src/MAX-7W.c  **** 
+ 202:src/MAX-7W.c  **** 	if(!validate_csum((char *)&rx_buff[0], msg_len)){
+ 335              		.loc 1 202 0
+ 336 01f8 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 337 01fa 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 338 01fe C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 339 0202 1946     		mov	r1, r3
+ 340 0204 00F0C6FD 		bl	validate_csum
+ 341 0208 0346     		mov	r3, r0
+ 342 020a 002B     		cmp	r3, #0
+ 343 020c 00F09580 		beq	.L7
+ 203:src/MAX-7W.c  **** 		// checksum mismatch
+ 204:src/MAX-7W.c  **** 		// ToDo report error if needed
+ 205:src/MAX-7W.c  **** 		return;
+ 206:src/MAX-7W.c  **** 	}
+ 207:src/MAX-7W.c  **** 
+ 208:src/MAX-7W.c  **** 	if (strncmp((const char*) &rx_buff[0], "$GPRMC", 6) == 0) {
+ 344              		.loc 1 208 0
+ 345 0210 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 346 0214 C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 347 0218 40F20001 		movw	r1, #:lower16:.LC0
+ 348 021c C0F20001 		movt	r1, #:upper16:.LC0
+ 349 0220 4FF00602 		mov	r2, #6
+ 350 0224 FFF7FEFF 		bl	strncmp
+ 351 0228 0346     		mov	r3, r0
+ 352 022a 002B     		cmp	r3, #0
+ 353 022c 09D1     		bne	.L13
+ 209:src/MAX-7W.c  **** 		evaluate_$GPRMC(&rx_buff[0], msg_len);
+ 354              		.loc 1 209 0
+ 355 022e FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 356 0230 9BB2     		uxth	r3, r3
+ 357 0232 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 358 0236 C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 359 023a 1946     		mov	r1, r3
+ 360 023c 00F03CF9 		bl	evaluate_$GPRMC
+ 361 0240 7BE0     		b	.L7
+ 362              	.L13:
+ 210:src/MAX-7W.c  **** 	} else if (strncmp((const char*) &rx_buff[0], "$GPVTG", 6) == 0) {
+ 363              		.loc 1 210 0
+ 364 0242 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 365 0246 C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 366 024a 40F20001 		movw	r1, #:lower16:.LC1
+ 367 024e C0F20001 		movt	r1, #:upper16:.LC1
+ 368 0252 4FF00602 		mov	r2, #6
+ 369 0256 FFF7FEFF 		bl	strncmp
+ 370 025a 0346     		mov	r3, r0
+ 371 025c 002B     		cmp	r3, #0
+ 372 025e 09D1     		bne	.L14
+ 211:src/MAX-7W.c  **** 		evaluate_$GPVTG(&rx_buff[0], msg_len);
+ 373              		.loc 1 211 0
+ 374 0260 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 375 0262 9BB2     		uxth	r3, r3
+ 376 0264 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 377 0268 C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 378 026c 1946     		mov	r1, r3
+ 379 026e 00F03BFB 		bl	evaluate_$GPVTG
+ 380 0272 62E0     		b	.L7
+ 381              	.L14:
+ 212:src/MAX-7W.c  **** 	} else if (strncmp((const char*) &rx_buff[0], "$GPGGA", 6) == 0) {
+ 382              		.loc 1 212 0
+ 383 0274 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 384 0278 C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 385 027c 40F20001 		movw	r1, #:lower16:.LC2
+ 386 0280 C0F20001 		movt	r1, #:upper16:.LC2
+ 387 0284 4FF00602 		mov	r2, #6
+ 388 0288 FFF7FEFF 		bl	strncmp
+ 389 028c 0346     		mov	r3, r0
+ 390 028e 002B     		cmp	r3, #0
+ 391 0290 09D1     		bne	.L15
+ 213:src/MAX-7W.c  **** 		evaluate_$GPGGA(&rx_buff[0], msg_len);
+ 392              		.loc 1 213 0
+ 393 0292 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 394 0294 9BB2     		uxth	r3, r3
+ 395 0296 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 396 029a C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 397 029e 1946     		mov	r1, r3
+ 398 02a0 00F07EFB 		bl	evaluate_$GPGGA
+ 399 02a4 49E0     		b	.L7
+ 400              	.L15:
+ 214:src/MAX-7W.c  **** 	} else if (strncmp((const char*) &rx_buff[0], "$GPGSA", 6) == 0) {
+ 401              		.loc 1 214 0
+ 402 02a6 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 403 02aa C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 404 02ae 40F20001 		movw	r1, #:lower16:.LC3
+ 405 02b2 C0F20001 		movt	r1, #:upper16:.LC3
+ 406 02b6 4FF00602 		mov	r2, #6
+ 407 02ba FFF7FEFF 		bl	strncmp
+ 408 02be 0346     		mov	r3, r0
+ 409 02c0 002B     		cmp	r3, #0
+ 410 02c2 09D1     		bne	.L16
+ 215:src/MAX-7W.c  **** 		evaluate_$GPGSA(&rx_buff[0], msg_len);
+ 411              		.loc 1 215 0
+ 412 02c4 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 413 02c6 9BB2     		uxth	r3, r3
+ 414 02c8 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 415 02cc C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 416 02d0 1946     		mov	r1, r3
+ 417 02d2 00F0BDFB 		bl	evaluate_$GPGSA
+ 418 02d6 30E0     		b	.L7
+ 419              	.L16:
+ 216:src/MAX-7W.c  **** 	} else if (strncmp((const char*) &rx_buff[0], "$GPGLL", 6) == 0) {
+ 420              		.loc 1 216 0
+ 421 02d8 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 422 02dc C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 423 02e0 40F20001 		movw	r1, #:lower16:.LC4
+ 424 02e4 C0F20001 		movt	r1, #:upper16:.LC4
+ 425 02e8 4FF00602 		mov	r2, #6
+ 426 02ec FFF7FEFF 		bl	strncmp
+ 427 02f0 0346     		mov	r3, r0
+ 428 02f2 002B     		cmp	r3, #0
+ 429 02f4 09D1     		bne	.L17
+ 217:src/MAX-7W.c  **** 		evaluate_$GPGLL(&rx_buff[0], msg_len);
+ 430              		.loc 1 217 0
+ 431 02f6 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 432 02f8 9BB2     		uxth	r3, r3
+ 433 02fa 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 434 02fe C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 435 0302 1946     		mov	r1, r3
+ 436 0304 00F008FC 		bl	evaluate_$GPGLL
+ 437 0308 17E0     		b	.L7
+ 438              	.L17:
+ 218:src/MAX-7W.c  **** 	} else if (strncmp((const char*) &rx_buff[0], "$GPTXT", 6) == 0) {
+ 439              		.loc 1 218 0
+ 440 030a 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 441 030e C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 442 0312 40F20001 		movw	r1, #:lower16:.LC5
+ 443 0316 C0F20001 		movt	r1, #:upper16:.LC5
+ 444 031a 4FF00602 		mov	r2, #6
+ 445 031e FFF7FEFF 		bl	strncmp
+ 446 0322 0346     		mov	r3, r0
+ 447 0324 002B     		cmp	r3, #0
+ 448 0326 08D1     		bne	.L7
+ 219:src/MAX-7W.c  **** 		evaluate_$GPTXT(&rx_buff[0], msg_len);
+ 449              		.loc 1 219 0
+ 450 0328 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 451 032a 9BB2     		uxth	r3, r3
+ 452 032c 40F20000 		movw	r0, #:lower16:rx_buff.7500
+ 453 0330 C0F20000 		movt	r0, #:upper16:rx_buff.7500
+ 454 0334 1946     		mov	r1, r3
+ 455 0336 00F005F8 		bl	evaluate_$GPTXT
+ 456              	.L7:
+ 220:src/MAX-7W.c  **** 	} else {
+ 221:src/MAX-7W.c  **** 		; // any other NMEA string: do nothing
+ 222:src/MAX-7W.c  **** 	}
+ 223:src/MAX-7W.c  **** 
+ 224:src/MAX-7W.c  **** 	return;
+ 225:src/MAX-7W.c  **** } // UBLOX_MAX7W_task
+ 457              		.loc 1 225 0
+ 458 033a 07F11007 		add	r7, r7, #16
+ 459 033e BD46     		mov	sp, r7
+ 460 0340 80BD     		pop	{r7, pc}
+ 461              		.cfi_endproc
+ 462              	.LFE114:
+ 464              		.section	.rodata
+ 465 002f 00       		.align	2
+ 466              	.LC6:
+ 467 0030 414E5453 		.ascii	"ANTSTATUS=\000"
+ 467      54415455 
+ 467      533D00
+ 468 003b 00       		.align	2
+ 469              	.LC7:
+ 470 003c 494E4954 		.ascii	"INIT\000"
+ 470      00
+ 471 0041 000000   		.align	2
+ 472              	.LC8:
+ 473 0044 444F4E54 		.ascii	"DONTKNOW\000"
+ 473      4B4E4F57 
+ 473      00
+ 474 004d 000000   		.align	2
+ 475              	.LC9:
+ 476 0050 4F4B00   		.ascii	"OK\000"
+ 477 0053 00       		.align	2
+ 478              	.LC10:
+ 479 0054 53484F52 		.ascii	"SHORT\000"
+ 479      5400
+ 480 005a 0000     		.align	2
+ 481              	.LC11:
+ 482 005c 4F50454E 		.ascii	"OPEN\000"
+ 482      00
+ 483 0061 000000   		.text
+ 484 0342 00BF     		.align	2
+ 485              		.thumb
+ 486              		.thumb_func
+ 488              	evaluate_$GPTXT:
+ 489              	.LFB115:
+ 226:src/MAX-7W.c  **** 
+ 227:src/MAX-7W.c  **** 
+ 228:src/MAX-7W.c  **** 
+ 229:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 230:src/MAX-7W.c  **** //! static void evaluate_$GPTXT(char *p_msg, u16_t msg_le)
+ 231:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 232:src/MAX-7W.c  **** //! @brief	extracts date from GPTXT message
+ 233:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 234:src/MAX-7W.c  **** //! @param	p_msg		pointer to message buffer
+ 235:src/MAX-7W.c  **** //! @param	msg_len		length of message
+ 236:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 237:src/MAX-7W.c  **** static void evaluate_$GPTXT(char *p_msg, u16_t msg_len){
+ 490              		.loc 1 237 0
+ 491              		.cfi_startproc
+ 492              		@ args = 0, pretend = 0, frame = 32
+ 493              		@ frame_needed = 1, uses_anonymous_args = 0
+ 494 0344 80B5     		push	{r7, lr}
+ 495              	.LCFI9:
+ 496              		.cfi_def_cfa_offset 8
+ 497              		.cfi_offset 7, -8
+ 498              		.cfi_offset 14, -4
+ 499 0346 8AB0     		sub	sp, sp, #40
+ 500              	.LCFI10:
+ 501              		.cfi_def_cfa_offset 48
+ 502 0348 02AF     		add	r7, sp, #8
+ 503              	.LCFI11:
+ 504              		.cfi_def_cfa 7, 40
+ 505 034a 7860     		str	r0, [r7, #4]
+ 506 034c 0B46     		mov	r3, r1
+ 507 034e 7B80     		strh	r3, [r7, #2]	@ movhi
+ 238:src/MAX-7W.c  **** 	int res;
+ 239:src/MAX-7W.c  **** 	char *p_token[TXT_ELEM_CNT] = { 0, 0, 0, 0, 0 };
+ 508              		.loc 1 239 0
+ 509 0350 4FF00003 		mov	r3, #0
+ 510 0354 BB60     		str	r3, [r7, #8]
+ 511 0356 4FF00003 		mov	r3, #0
+ 512 035a FB60     		str	r3, [r7, #12]
+ 513 035c 4FF00003 		mov	r3, #0
+ 514 0360 3B61     		str	r3, [r7, #16]
+ 515 0362 4FF00003 		mov	r3, #0
+ 516 0366 7B61     		str	r3, [r7, #20]
+ 517 0368 4FF00003 		mov	r3, #0
+ 518 036c BB61     		str	r3, [r7, #24]
+ 240:src/MAX-7W.c  **** 
+ 241:src/MAX-7W.c  **** 	if(!p_msg)
+ 519              		.loc 1 241 0
+ 520 036e 7B68     		ldr	r3, [r7, #4]
+ 521 0370 002B     		cmp	r3, #0
+ 522 0372 00F09C80 		beq	.L19
+ 242:src/MAX-7W.c  **** 		return;
+ 243:src/MAX-7W.c  **** 
+ 244:src/MAX-7W.c  **** 	/***************************************************************************
+ 245:src/MAX-7W.c  **** 	 *	$GPTXT,numMsg,msgNum,msgType,text*cs<CR><LF>
+ 246:src/MAX-7W.c  **** 	 *  [0] -> "$GPTXT"
+ 247:src/MAX-7W.c  **** 	 *  [1] -> total number of messages in this transmission
+ 248:src/MAX-7W.c  **** 	 *  [2] -> number of this message in current transmission
+ 249:src/MAX-7W.c  **** 	 *  [3] -> type of this message 	'00' (error) | '01' (warning) |
+ 250:src/MAX-7W.c  **** 	 *  								'02' (notice) | '07' (user)
+ 251:src/MAX-7W.c  **** 	 *  [4] -> text + checksum
+ 252:src/MAX-7W.c  **** 	 **************************************************************************/
+ 253:src/MAX-7W.c  **** 	res = spltStr(p_msg, msg_len, ',', &p_token[0], TXT_ELEM_CNT);
+ 523              		.loc 1 253 0
+ 524 0376 7A88     		ldrh	r2, [r7, #2]
+ 525 0378 07F10803 		add	r3, r7, #8
+ 526 037c 4FF00501 		mov	r1, #5
+ 527 0380 0091     		str	r1, [sp, #0]
+ 528 0382 7868     		ldr	r0, [r7, #4]
+ 529 0384 1146     		mov	r1, r2
+ 530 0386 4FF02C02 		mov	r2, #44
+ 531 038a 00F059FD 		bl	spltStr
+ 532 038e F861     		str	r0, [r7, #28]
+ 254:src/MAX-7W.c  **** 
+ 255:src/MAX-7W.c  **** 	if (res < TXT_ELEM_CNT - 1)
+ 533              		.loc 1 255 0
+ 534 0390 FB69     		ldr	r3, [r7, #28]
+ 535 0392 032B     		cmp	r3, #3
+ 536 0394 40F38B80 		ble	.L19
+ 256:src/MAX-7W.c  **** 		return;
+ 257:src/MAX-7W.c  **** 
+ 258:src/MAX-7W.c  **** 	if (!p_token[4])
+ 537              		.loc 1 258 0
+ 538 0398 BB69     		ldr	r3, [r7, #24]
+ 539 039a 002B     		cmp	r3, #0
+ 540 039c 00F08780 		beq	.L19
+ 259:src/MAX-7W.c  **** 		return;
+ 260:src/MAX-7W.c  **** 
+ 261:src/MAX-7W.c  **** 	if (strncmp(p_token[4], "ANTSTATUS=", 10) == 0) {
+ 541              		.loc 1 261 0
+ 542 03a0 BB69     		ldr	r3, [r7, #24]
+ 543 03a2 1846     		mov	r0, r3
+ 544 03a4 40F20001 		movw	r1, #:lower16:.LC6
+ 545 03a8 C0F20001 		movt	r1, #:upper16:.LC6
+ 546 03ac 4FF00A02 		mov	r2, #10
+ 547 03b0 FFF7FEFF 		bl	strncmp
+ 548 03b4 0346     		mov	r3, r0
+ 549 03b6 002B     		cmp	r3, #0
+ 550 03b8 79D1     		bne	.L19
+ 262:src/MAX-7W.c  **** 		if (strncmp(p_token[4] + 10, "INIT", 4) == 0)
+ 551              		.loc 1 262 0
+ 552 03ba BB69     		ldr	r3, [r7, #24]
+ 553 03bc 03F10A03 		add	r3, r3, #10
+ 554 03c0 1846     		mov	r0, r3
+ 555 03c2 40F20001 		movw	r1, #:lower16:.LC7
+ 556 03c6 C0F20001 		movt	r1, #:upper16:.LC7
+ 557 03ca 4FF00402 		mov	r2, #4
+ 558 03ce FFF7FEFF 		bl	strncmp
+ 559 03d2 0346     		mov	r3, r0
+ 560 03d4 002B     		cmp	r3, #0
+ 561 03d6 07D1     		bne	.L22
+ 263:src/MAX-7W.c  **** 			MAX7W_Readings.Gps_AntennaStatus = 0;
+ 562              		.loc 1 263 0
+ 563 03d8 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 564 03dc C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 565 03e0 4FF00002 		mov	r2, #0
+ 566 03e4 1A70     		strb	r2, [r3, #0]
+ 567 03e6 62E0     		b	.L19
+ 568              	.L22:
+ 264:src/MAX-7W.c  **** 		else if (strncmp(p_token[4] + 10, "DONTKNOW", 8) == 0)
+ 569              		.loc 1 264 0
+ 570 03e8 BB69     		ldr	r3, [r7, #24]
+ 571 03ea 03F10A03 		add	r3, r3, #10
+ 572 03ee 1846     		mov	r0, r3
+ 573 03f0 40F20001 		movw	r1, #:lower16:.LC8
+ 574 03f4 C0F20001 		movt	r1, #:upper16:.LC8
+ 575 03f8 4FF00802 		mov	r2, #8
+ 576 03fc FFF7FEFF 		bl	strncmp
+ 577 0400 0346     		mov	r3, r0
+ 578 0402 002B     		cmp	r3, #0
+ 579 0404 07D1     		bne	.L23
+ 265:src/MAX-7W.c  **** 			MAX7W_Readings.Gps_AntennaStatus = 1;
+ 580              		.loc 1 265 0
+ 581 0406 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 582 040a C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 583 040e 4FF00102 		mov	r2, #1
+ 584 0412 1A70     		strb	r2, [r3, #0]
+ 585 0414 4BE0     		b	.L19
+ 586              	.L23:
+ 266:src/MAX-7W.c  **** 		else if (strncmp(p_token[4] + 10, "OK", 2) == 0)
+ 587              		.loc 1 266 0
+ 588 0416 BB69     		ldr	r3, [r7, #24]
+ 589 0418 03F10A03 		add	r3, r3, #10
+ 590 041c 1846     		mov	r0, r3
+ 591 041e 40F20001 		movw	r1, #:lower16:.LC9
+ 592 0422 C0F20001 		movt	r1, #:upper16:.LC9
+ 593 0426 4FF00202 		mov	r2, #2
+ 594 042a FFF7FEFF 		bl	strncmp
+ 595 042e 0346     		mov	r3, r0
+ 596 0430 002B     		cmp	r3, #0
+ 597 0432 07D1     		bne	.L24
+ 267:src/MAX-7W.c  **** 			MAX7W_Readings.Gps_AntennaStatus = 2;
+ 598              		.loc 1 267 0
+ 599 0434 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 600 0438 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 601 043c 4FF00202 		mov	r2, #2
+ 602 0440 1A70     		strb	r2, [r3, #0]
+ 603 0442 34E0     		b	.L19
+ 604              	.L24:
+ 268:src/MAX-7W.c  **** 		else if (strncmp(p_token[4] + 10, "SHORT", 5) == 0)
+ 605              		.loc 1 268 0
+ 606 0444 BB69     		ldr	r3, [r7, #24]
+ 607 0446 03F10A03 		add	r3, r3, #10
+ 608 044a 1846     		mov	r0, r3
+ 609 044c 40F20001 		movw	r1, #:lower16:.LC10
+ 610 0450 C0F20001 		movt	r1, #:upper16:.LC10
+ 611 0454 4FF00502 		mov	r2, #5
+ 612 0458 FFF7FEFF 		bl	strncmp
+ 613 045c 0346     		mov	r3, r0
+ 614 045e 002B     		cmp	r3, #0
+ 615 0460 07D1     		bne	.L25
+ 269:src/MAX-7W.c  **** 			MAX7W_Readings.Gps_AntennaStatus = 3;
+ 616              		.loc 1 269 0
+ 617 0462 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 618 0466 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 619 046a 4FF00302 		mov	r2, #3
+ 620 046e 1A70     		strb	r2, [r3, #0]
+ 621 0470 1DE0     		b	.L19
+ 622              	.L25:
+ 270:src/MAX-7W.c  **** 		else if (strncmp(p_token[4] + 10, "OPEN", 4) == 0)
+ 623              		.loc 1 270 0
+ 624 0472 BB69     		ldr	r3, [r7, #24]
+ 625 0474 03F10A03 		add	r3, r3, #10
+ 626 0478 1846     		mov	r0, r3
+ 627 047a 40F20001 		movw	r1, #:lower16:.LC11
+ 628 047e C0F20001 		movt	r1, #:upper16:.LC11
+ 629 0482 4FF00402 		mov	r2, #4
+ 630 0486 FFF7FEFF 		bl	strncmp
+ 631 048a 0346     		mov	r3, r0
+ 632 048c 002B     		cmp	r3, #0
+ 633 048e 07D1     		bne	.L26
+ 271:src/MAX-7W.c  **** 			MAX7W_Readings.Gps_AntennaStatus = 4;
+ 634              		.loc 1 271 0
+ 635 0490 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 636 0494 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 637 0498 4FF00402 		mov	r2, #4
+ 638 049c 1A70     		strb	r2, [r3, #0]
+ 639 049e 06E0     		b	.L19
+ 640              	.L26:
+ 272:src/MAX-7W.c  **** 		else
+ 273:src/MAX-7W.c  **** 			// any other string (undefined...)
+ 274:src/MAX-7W.c  **** 			MAX7W_Readings.Gps_AntennaStatus = 0;
+ 641              		.loc 1 274 0
+ 642 04a0 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 643 04a4 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 644 04a8 4FF00002 		mov	r2, #0
+ 645 04ac 1A70     		strb	r2, [r3, #0]
+ 646              	.L19:
+ 275:src/MAX-7W.c  **** 	}
+ 276:src/MAX-7W.c  **** }
+ 647              		.loc 1 276 0
+ 648 04ae 07F12007 		add	r7, r7, #32
+ 649 04b2 BD46     		mov	sp, r7
+ 650 04b4 80BD     		pop	{r7, pc}
+ 651              		.cfi_endproc
+ 652              	.LFE115:
+ 654 04b6 00BF     		.align	2
+ 655              		.thumb
+ 656              		.thumb_func
+ 658              	evaluate_$GPRMC:
+ 659              	.LFB116:
+ 277:src/MAX-7W.c  **** 
+ 278:src/MAX-7W.c  **** 
+ 279:src/MAX-7W.c  **** 
+ 280:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 281:src/MAX-7W.c  **** //! static void evaluate_$GPRMC(char *p_msg, u16_t msg_len)
+ 282:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 283:src/MAX-7W.c  **** //! @brief	extracts date from GPRMC message
+ 284:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 285:src/MAX-7W.c  **** //! @param	p_msg		pointer to message buffer
+ 286:src/MAX-7W.c  **** //! @param	msg_len		length of message
+ 287:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 288:src/MAX-7W.c  **** static void evaluate_$GPRMC(char *p_msg, u16_t msg_len)
+ 289:src/MAX-7W.c  **** {
+ 660              		.loc 1 289 0
+ 661              		.cfi_startproc
+ 662              		@ args = 0, pretend = 0, frame = 80
+ 663              		@ frame_needed = 1, uses_anonymous_args = 0
+ 664 04b8 90B5     		push	{r4, r7, lr}
+ 665              	.LCFI12:
+ 666              		.cfi_def_cfa_offset 12
+ 667              		.cfi_offset 4, -12
+ 668              		.cfi_offset 7, -8
+ 669              		.cfi_offset 14, -4
+ 670 04ba 97B0     		sub	sp, sp, #92
+ 671              	.LCFI13:
+ 672              		.cfi_def_cfa_offset 104
+ 673 04bc 02AF     		add	r7, sp, #8
+ 674              	.LCFI14:
+ 675              		.cfi_def_cfa 7, 96
+ 676 04be 7860     		str	r0, [r7, #4]
+ 677 04c0 0B46     		mov	r3, r1
+ 678 04c2 7B80     		strh	r3, [r7, #2]	@ movhi
+ 290:src/MAX-7W.c  **** 	int res;
+ 291:src/MAX-7W.c  **** 	char *p_token[RMC_ELEM_CNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ 679              		.loc 1 291 0
+ 680 04c4 4FF00003 		mov	r3, #0
+ 681 04c8 FB60     		str	r3, [r7, #12]
+ 682 04ca 4FF00003 		mov	r3, #0
+ 683 04ce 3B61     		str	r3, [r7, #16]
+ 684 04d0 4FF00003 		mov	r3, #0
+ 685 04d4 7B61     		str	r3, [r7, #20]
+ 686 04d6 4FF00003 		mov	r3, #0
+ 687 04da BB61     		str	r3, [r7, #24]
+ 688 04dc 4FF00003 		mov	r3, #0
+ 689 04e0 FB61     		str	r3, [r7, #28]
+ 690 04e2 4FF00003 		mov	r3, #0
+ 691 04e6 3B62     		str	r3, [r7, #32]
+ 692 04e8 4FF00003 		mov	r3, #0
+ 693 04ec 7B62     		str	r3, [r7, #36]
+ 694 04ee 4FF00003 		mov	r3, #0
+ 695 04f2 BB62     		str	r3, [r7, #40]
+ 696 04f4 4FF00003 		mov	r3, #0
+ 697 04f8 FB62     		str	r3, [r7, #44]
+ 698 04fa 4FF00003 		mov	r3, #0
+ 699 04fe 3B63     		str	r3, [r7, #48]
+ 700 0500 4FF00003 		mov	r3, #0
+ 701 0504 7B63     		str	r3, [r7, #52]
+ 702 0506 4FF00003 		mov	r3, #0
+ 703 050a BB63     		str	r3, [r7, #56]
+ 704 050c 4FF00003 		mov	r3, #0
+ 705 0510 FB63     		str	r3, [r7, #60]
+ 706 0512 4FF00003 		mov	r3, #0
+ 707 0516 3B64     		str	r3, [r7, #64]
+ 292:src/MAX-7W.c  **** 
+ 293:src/MAX-7W.c  **** 	if(!p_msg)
+ 708              		.loc 1 293 0
+ 709 0518 7B68     		ldr	r3, [r7, #4]
+ 710 051a 002B     		cmp	r3, #0
+ 711 051c 00F0E081 		beq	.L28
+ 294:src/MAX-7W.c  **** 		return;
+ 295:src/MAX-7W.c  **** 
+ 296:src/MAX-7W.c  **** 	/***************************************************************************
+ 297:src/MAX-7W.c  **** 	 *  should send NMEA-PGNs: 126992, 127258, 129025, 129026, 129029, 129033
+ 298:src/MAX-7W.c  **** 	 *  +	127250
+ 299:src/MAX-7W.c  **** 	 *	$GPRMC,time,status,lat,NS,long,EW,spd,cog,date,mv,mvEW,
+ 300:src/MAX-7W.c  **** 	 *	posMode*cs<CR><LF>
+ 301:src/MAX-7W.c  **** 	 *  [0] -> "$GPRMC"
+ 302:src/MAX-7W.c  **** 	 *  [1] -> UTC time hhmmss.ss
+ 303:src/MAX-7W.c  **** 	 *  [2] -> status 'V' (warning) | 'A' (valid data)
+ 304:src/MAX-7W.c  **** 	 *  [3] -> latitude ddmm.mmmmm
+ 305:src/MAX-7W.c  **** 	 *  [4] -> north / south indicator 'N'|'S'
+ 306:src/MAX-7W.c  **** 	 *  [5] -> longitude dddmm.mmmmm
+ 307:src/MAX-7W.c  **** 	 *  [6] -> east / west indicator 'E'|'W'
+ 308:src/MAX-7W.c  **** 	 *  [7] -> speed over ground [kn]
+ 309:src/MAX-7W.c  **** 	 *  [8] -> course over ground [degree]
+ 310:src/MAX-7W.c  **** 	 *  [9] -> date ddmmyy
+ 311:src/MAX-7W.c  **** 	 *  [10] -> magnetic variation (not used!)
+ 312:src/MAX-7W.c  **** 	 *  [11] -> magnetic variation E/W east / west indicator (not used!)
+ 313:src/MAX-7W.c  **** 	 *  [12] -> positioning mode	'N' (no fix) |
+ 314:src/MAX-7W.c  **** 	 *  							'E' (estimated / dead reckoning fix) |
+ 315:src/MAX-7W.c  **** 	 *  							'A' (autonomous GNSS fix) |
+ 316:src/MAX-7W.c  **** 	 *  							'D' (differential GNSS fix)
+ 317:src/MAX-7W.c  **** 	 *  [13] -> checksum
+ 318:src/MAX-7W.c  **** 	 **************************************************************************/
+ 319:src/MAX-7W.c  **** 	res = spltStr(p_msg, msg_len, ',', &p_token[0], RMC_ELEM_CNT);
+ 712              		.loc 1 319 0
+ 713 0520 7A88     		ldrh	r2, [r7, #2]
+ 714 0522 07F10C03 		add	r3, r7, #12
+ 715 0526 4FF00E01 		mov	r1, #14
+ 716 052a 0091     		str	r1, [sp, #0]
+ 717 052c 7868     		ldr	r0, [r7, #4]
+ 718 052e 1146     		mov	r1, r2
+ 719 0530 4FF02C02 		mov	r2, #44
+ 720 0534 00F084FC 		bl	spltStr
+ 721 0538 F864     		str	r0, [r7, #76]
+ 320:src/MAX-7W.c  **** 
+ 321:src/MAX-7W.c  **** 	if (res < RMC_ELEM_CNT - 1)
+ 722              		.loc 1 321 0
+ 723 053a FB6C     		ldr	r3, [r7, #76]
+ 724 053c 0C2B     		cmp	r3, #12
+ 725 053e 40F3CF81 		ble	.L28
+ 322:src/MAX-7W.c  **** 		return;
+ 323:src/MAX-7W.c  **** 
+ 324:src/MAX-7W.c  **** 	// make sure that length of token is okay
+ 325:src/MAX-7W.c  **** 	if (p_token[1] && (p_token[2] == p_token[1] + 10)) {
+ 726              		.loc 1 325 0
+ 727 0542 3B69     		ldr	r3, [r7, #16]
+ 728 0544 002B     		cmp	r3, #0
+ 729 0546 00F0A380 		beq	.L30
+ 730              		.loc 1 325 0 is_stmt 0 discriminator 1
+ 731 054a 7A69     		ldr	r2, [r7, #20]
+ 732 054c 3B69     		ldr	r3, [r7, #16]
+ 733 054e 03F10A03 		add	r3, r3, #10
+ 734 0552 9A42     		cmp	r2, r3
+ 735 0554 40F09C80 		bne	.L30
+ 736              	.LBB2:
+ 326:src/MAX-7W.c  **** 		char *p_chr;
+ 327:src/MAX-7W.c  **** 		p_chr = p_token[1];
+ 737              		.loc 1 327 0 is_stmt 1 discriminator 1
+ 738 0558 3B69     		ldr	r3, [r7, #16]
+ 739 055a BB64     		str	r3, [r7, #72]
+ 328:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Hrs = ascii2hex(*(p_chr++)) * 10;
+ 740              		.loc 1 328 0 discriminator 1
+ 741 055c BB6C     		ldr	r3, [r7, #72]
+ 742 055e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 743 0560 BA6C     		ldr	r2, [r7, #72]
+ 744 0562 02F10102 		add	r2, r2, #1
+ 745 0566 BA64     		str	r2, [r7, #72]
+ 746 0568 1846     		mov	r0, r3
+ 747 056a 00F0EDFC 		bl	ascii2hex
+ 748 056e 0346     		mov	r3, r0
+ 749 0570 1A46     		mov	r2, r3
+ 750 0572 4FEA8202 		lsl	r2, r2, #2
+ 751 0576 D318     		adds	r3, r2, r3
+ 752 0578 4FEA4303 		lsl	r3, r3, #1
+ 753 057c DAB2     		uxtb	r2, r3
+ 754 057e 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 755 0582 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 756 0586 83F82C20 		strb	r2, [r3, #44]
+ 329:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Hrs += ascii2hex(*(p_chr++));
+ 757              		.loc 1 329 0 discriminator 1
+ 758 058a 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 759 058e C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 760 0592 93F82C40 		ldrb	r4, [r3, #44]	@ zero_extendqisi2
+ 761 0596 BB6C     		ldr	r3, [r7, #72]
+ 762 0598 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 763 059a BA6C     		ldr	r2, [r7, #72]
+ 764 059c 02F10102 		add	r2, r2, #1
+ 765 05a0 BA64     		str	r2, [r7, #72]
+ 766 05a2 1846     		mov	r0, r3
+ 767 05a4 00F0D0FC 		bl	ascii2hex
+ 768 05a8 0346     		mov	r3, r0
+ 769 05aa E318     		adds	r3, r4, r3
+ 770 05ac DAB2     		uxtb	r2, r3
+ 771 05ae 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 772 05b2 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 773 05b6 83F82C20 		strb	r2, [r3, #44]
+ 330:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Min = ascii2hex(*(p_chr++)) * 10;
+ 774              		.loc 1 330 0 discriminator 1
+ 775 05ba BB6C     		ldr	r3, [r7, #72]
+ 776 05bc 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 777 05be BA6C     		ldr	r2, [r7, #72]
+ 778 05c0 02F10102 		add	r2, r2, #1
+ 779 05c4 BA64     		str	r2, [r7, #72]
+ 780 05c6 1846     		mov	r0, r3
+ 781 05c8 00F0BEFC 		bl	ascii2hex
+ 782 05cc 0346     		mov	r3, r0
+ 783 05ce 1A46     		mov	r2, r3
+ 784 05d0 4FEA8202 		lsl	r2, r2, #2
+ 785 05d4 D318     		adds	r3, r2, r3
+ 786 05d6 4FEA4303 		lsl	r3, r3, #1
+ 787 05da DAB2     		uxtb	r2, r3
+ 788 05dc 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 789 05e0 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 790 05e4 83F82D20 		strb	r2, [r3, #45]
+ 331:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Min += ascii2hex(*(p_chr++));
+ 791              		.loc 1 331 0 discriminator 1
+ 792 05e8 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 793 05ec C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 794 05f0 93F82D40 		ldrb	r4, [r3, #45]	@ zero_extendqisi2
+ 795 05f4 BB6C     		ldr	r3, [r7, #72]
+ 796 05f6 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 797 05f8 BA6C     		ldr	r2, [r7, #72]
+ 798 05fa 02F10102 		add	r2, r2, #1
+ 799 05fe BA64     		str	r2, [r7, #72]
+ 800 0600 1846     		mov	r0, r3
+ 801 0602 00F0A1FC 		bl	ascii2hex
+ 802 0606 0346     		mov	r3, r0
+ 803 0608 E318     		adds	r3, r4, r3
+ 804 060a DAB2     		uxtb	r2, r3
+ 805 060c 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 806 0610 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 807 0614 83F82D20 		strb	r2, [r3, #45]
+ 332:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Sec = ascii2hex(*(p_chr++)) * 10;
+ 808              		.loc 1 332 0 discriminator 1
+ 809 0618 BB6C     		ldr	r3, [r7, #72]
+ 810 061a 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 811 061c BA6C     		ldr	r2, [r7, #72]
+ 812 061e 02F10102 		add	r2, r2, #1
+ 813 0622 BA64     		str	r2, [r7, #72]
+ 814 0624 1846     		mov	r0, r3
+ 815 0626 00F08FFC 		bl	ascii2hex
+ 816 062a 0346     		mov	r3, r0
+ 817 062c 1A46     		mov	r2, r3
+ 818 062e 4FEA8202 		lsl	r2, r2, #2
+ 819 0632 D318     		adds	r3, r2, r3
+ 820 0634 4FEA4303 		lsl	r3, r3, #1
+ 821 0638 DAB2     		uxtb	r2, r3
+ 822 063a 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 823 063e C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 824 0642 83F82E20 		strb	r2, [r3, #46]
+ 333:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Sec += ascii2hex(*(p_chr++));
+ 825              		.loc 1 333 0 discriminator 1
+ 826 0646 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 827 064a C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 828 064e 93F82E40 		ldrb	r4, [r3, #46]	@ zero_extendqisi2
+ 829 0652 BB6C     		ldr	r3, [r7, #72]
+ 830 0654 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 831 0656 BA6C     		ldr	r2, [r7, #72]
+ 832 0658 02F10102 		add	r2, r2, #1
+ 833 065c BA64     		str	r2, [r7, #72]
+ 834 065e 1846     		mov	r0, r3
+ 835 0660 00F072FC 		bl	ascii2hex
+ 836 0664 0346     		mov	r3, r0
+ 837 0666 E318     		adds	r3, r4, r3
+ 838 0668 DAB2     		uxtb	r2, r3
+ 839 066a 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 840 066e C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 841 0672 83F82E20 		strb	r2, [r3, #46]
+ 334:src/MAX-7W.c  **** 		MAX7W_Readings.Validity |= GPS_TIME_VALID;
+ 842              		.loc 1 334 0 discriminator 1
+ 843 0676 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 844 067a C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 845 067e 5B6B     		ldr	r3, [r3, #52]
+ 846 0680 43F00102 		orr	r2, r3, #1
+ 847 0684 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 848 0688 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 849 068c 5A63     		str	r2, [r3, #52]
+ 850              	.LBE2:
+ 325:src/MAX-7W.c  **** 	if (p_token[1] && (p_token[2] == p_token[1] + 10)) {
+ 851              		.loc 1 325 0 discriminator 1
+ 852 068e 23E0     		b	.L31
+ 853              	.L30:
+ 335:src/MAX-7W.c  **** 	} else {
+ 336:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Hrs = 0;
+ 854              		.loc 1 336 0
+ 855 0690 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 856 0694 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 857 0698 4FF00002 		mov	r2, #0
+ 858 069c 83F82C20 		strb	r2, [r3, #44]
+ 337:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Min = 0;
+ 859              		.loc 1 337 0
+ 860 06a0 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 861 06a4 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 862 06a8 4FF00002 		mov	r2, #0
+ 863 06ac 83F82D20 		strb	r2, [r3, #45]
+ 338:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Sec = 0;
+ 864              		.loc 1 338 0
+ 865 06b0 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 866 06b4 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 867 06b8 4FF00002 		mov	r2, #0
+ 868 06bc 83F82E20 		strb	r2, [r3, #46]
+ 339:src/MAX-7W.c  **** 		MAX7W_Readings.Validity &= ~GPS_TIME_VALID;
+ 869              		.loc 1 339 0
+ 870 06c0 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 871 06c4 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 872 06c8 5B6B     		ldr	r3, [r3, #52]
+ 873 06ca 23F00102 		bic	r2, r3, #1
+ 874 06ce 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 875 06d2 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 876 06d6 5A63     		str	r2, [r3, #52]
+ 877              	.L31:
+ 340:src/MAX-7W.c  **** 	}
+ 341:src/MAX-7W.c  **** 
+ 342:src/MAX-7W.c  **** 	// make sure that length of token is okay
+ 343:src/MAX-7W.c  **** 	if (p_token[9] && (p_token[10] == p_token[9] + 7)) {
+ 878              		.loc 1 343 0
+ 879 06d8 3B6B     		ldr	r3, [r7, #48]
+ 880 06da 002B     		cmp	r3, #0
+ 881 06dc 00F0A380 		beq	.L32
+ 882              		.loc 1 343 0 is_stmt 0 discriminator 1
+ 883 06e0 7A6B     		ldr	r2, [r7, #52]
+ 884 06e2 3B6B     		ldr	r3, [r7, #48]
+ 885 06e4 03F10703 		add	r3, r3, #7
+ 886 06e8 9A42     		cmp	r2, r3
+ 887 06ea 40F09C80 		bne	.L32
+ 888              	.LBB3:
+ 344:src/MAX-7W.c  **** 		char *p_chr;
+ 345:src/MAX-7W.c  **** 		p_chr = p_token[9];
+ 889              		.loc 1 345 0 is_stmt 1 discriminator 1
+ 890 06ee 3B6B     		ldr	r3, [r7, #48]
+ 891 06f0 7B64     		str	r3, [r7, #68]
+ 346:src/MAX-7W.c  **** 		MAX7W_Readings.Date_DayOfMonth = ascii2hex(*(p_chr++)) * 10;
+ 892              		.loc 1 346 0 discriminator 1
+ 893 06f2 7B6C     		ldr	r3, [r7, #68]
+ 894 06f4 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 895 06f6 7A6C     		ldr	r2, [r7, #68]
+ 896 06f8 02F10102 		add	r2, r2, #1
+ 897 06fc 7A64     		str	r2, [r7, #68]
+ 898 06fe 1846     		mov	r0, r3
+ 899 0700 00F022FC 		bl	ascii2hex
+ 900 0704 0346     		mov	r3, r0
+ 901 0706 1A46     		mov	r2, r3
+ 902 0708 4FEA8202 		lsl	r2, r2, #2
+ 903 070c D318     		adds	r3, r2, r3
+ 904 070e 4FEA4303 		lsl	r3, r3, #1
+ 905 0712 DAB2     		uxtb	r2, r3
+ 906 0714 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 907 0718 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 908 071c 83F83120 		strb	r2, [r3, #49]
+ 347:src/MAX-7W.c  **** 		MAX7W_Readings.Date_DayOfMonth += ascii2hex(*(p_chr++));
+ 909              		.loc 1 347 0 discriminator 1
+ 910 0720 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 911 0724 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 912 0728 93F83140 		ldrb	r4, [r3, #49]	@ zero_extendqisi2
+ 913 072c 7B6C     		ldr	r3, [r7, #68]
+ 914 072e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 915 0730 7A6C     		ldr	r2, [r7, #68]
+ 916 0732 02F10102 		add	r2, r2, #1
+ 917 0736 7A64     		str	r2, [r7, #68]
+ 918 0738 1846     		mov	r0, r3
+ 919 073a 00F005FC 		bl	ascii2hex
+ 920 073e 0346     		mov	r3, r0
+ 921 0740 E318     		adds	r3, r4, r3
+ 922 0742 DAB2     		uxtb	r2, r3
+ 923 0744 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 924 0748 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 925 074c 83F83120 		strb	r2, [r3, #49]
+ 348:src/MAX-7W.c  **** 		MAX7W_Readings.Date_Month = ascii2hex(*(p_chr++)) * 10;
+ 926              		.loc 1 348 0 discriminator 1
+ 927 0750 7B6C     		ldr	r3, [r7, #68]
+ 928 0752 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 929 0754 7A6C     		ldr	r2, [r7, #68]
+ 930 0756 02F10102 		add	r2, r2, #1
+ 931 075a 7A64     		str	r2, [r7, #68]
+ 932 075c 1846     		mov	r0, r3
+ 933 075e 00F0F3FB 		bl	ascii2hex
+ 934 0762 0346     		mov	r3, r0
+ 935 0764 1A46     		mov	r2, r3
+ 936 0766 4FEA8202 		lsl	r2, r2, #2
+ 937 076a D318     		adds	r3, r2, r3
+ 938 076c 4FEA4303 		lsl	r3, r3, #1
+ 939 0770 DAB2     		uxtb	r2, r3
+ 940 0772 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 941 0776 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 942 077a 83F83020 		strb	r2, [r3, #48]
+ 349:src/MAX-7W.c  **** 		MAX7W_Readings.Date_Month += ascii2hex(*(p_chr++));
+ 943              		.loc 1 349 0 discriminator 1
+ 944 077e 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 945 0782 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 946 0786 93F83040 		ldrb	r4, [r3, #48]	@ zero_extendqisi2
+ 947 078a 7B6C     		ldr	r3, [r7, #68]
+ 948 078c 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 949 078e 7A6C     		ldr	r2, [r7, #68]
+ 950 0790 02F10102 		add	r2, r2, #1
+ 951 0794 7A64     		str	r2, [r7, #68]
+ 952 0796 1846     		mov	r0, r3
+ 953 0798 00F0D6FB 		bl	ascii2hex
+ 954 079c 0346     		mov	r3, r0
+ 955 079e E318     		adds	r3, r4, r3
+ 956 07a0 DAB2     		uxtb	r2, r3
+ 957 07a2 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 958 07a6 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 959 07aa 83F83020 		strb	r2, [r3, #48]
+ 350:src/MAX-7W.c  **** 		MAX7W_Readings.Date_Year = ascii2hex(*(p_chr++)) * 10;
+ 960              		.loc 1 350 0 discriminator 1
+ 961 07ae 7B6C     		ldr	r3, [r7, #68]
+ 962 07b0 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 963 07b2 7A6C     		ldr	r2, [r7, #68]
+ 964 07b4 02F10102 		add	r2, r2, #1
+ 965 07b8 7A64     		str	r2, [r7, #68]
+ 966 07ba 1846     		mov	r0, r3
+ 967 07bc 00F0C4FB 		bl	ascii2hex
+ 968 07c0 0346     		mov	r3, r0
+ 969 07c2 1A46     		mov	r2, r3
+ 970 07c4 4FEA8202 		lsl	r2, r2, #2
+ 971 07c8 D318     		adds	r3, r2, r3
+ 972 07ca 4FEA4303 		lsl	r3, r3, #1
+ 973 07ce DAB2     		uxtb	r2, r3
+ 974 07d0 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 975 07d4 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 976 07d8 83F82F20 		strb	r2, [r3, #47]
+ 351:src/MAX-7W.c  **** 		MAX7W_Readings.Date_Year += ascii2hex(*(p_chr++));
+ 977              		.loc 1 351 0 discriminator 1
+ 978 07dc 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 979 07e0 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 980 07e4 93F82F40 		ldrb	r4, [r3, #47]	@ zero_extendqisi2
+ 981 07e8 7B6C     		ldr	r3, [r7, #68]
+ 982 07ea 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 983 07ec 7A6C     		ldr	r2, [r7, #68]
+ 984 07ee 02F10102 		add	r2, r2, #1
+ 985 07f2 7A64     		str	r2, [r7, #68]
+ 986 07f4 1846     		mov	r0, r3
+ 987 07f6 00F0A7FB 		bl	ascii2hex
+ 988 07fa 0346     		mov	r3, r0
+ 989 07fc E318     		adds	r3, r4, r3
+ 990 07fe DAB2     		uxtb	r2, r3
+ 991 0800 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 992 0804 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 993 0808 83F82F20 		strb	r2, [r3, #47]
+ 352:src/MAX-7W.c  **** 		MAX7W_Readings.Validity |= GPS_DATE_VALID;
+ 994              		.loc 1 352 0 discriminator 1
+ 995 080c 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 996 0810 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 997 0814 5B6B     		ldr	r3, [r3, #52]
+ 998 0816 43F00202 		orr	r2, r3, #2
+ 999 081a 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1000 081e C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1001 0822 5A63     		str	r2, [r3, #52]
+ 1002              	.LBE3:
+ 343:src/MAX-7W.c  **** 	if (p_token[9] && (p_token[10] == p_token[9] + 7)) {
+ 1003              		.loc 1 343 0 discriminator 1
+ 1004 0824 23E0     		b	.L33
+ 1005              	.L32:
+ 353:src/MAX-7W.c  **** 	} else {
+ 354:src/MAX-7W.c  **** 		MAX7W_Readings.Date_Year = 0;
+ 1006              		.loc 1 354 0
+ 1007 0826 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1008 082a C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1009 082e 4FF00002 		mov	r2, #0
+ 1010 0832 83F82F20 		strb	r2, [r3, #47]
+ 355:src/MAX-7W.c  **** 		MAX7W_Readings.Date_Month = 0;
+ 1011              		.loc 1 355 0
+ 1012 0836 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1013 083a C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1014 083e 4FF00002 		mov	r2, #0
+ 1015 0842 83F83020 		strb	r2, [r3, #48]
+ 356:src/MAX-7W.c  **** 		MAX7W_Readings.Date_DayOfMonth = 0;
+ 1016              		.loc 1 356 0
+ 1017 0846 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1018 084a C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1019 084e 4FF00002 		mov	r2, #0
+ 1020 0852 83F83120 		strb	r2, [r3, #49]
+ 357:src/MAX-7W.c  **** 		MAX7W_Readings.Validity &= ~GPS_DATE_VALID;
+ 1021              		.loc 1 357 0
+ 1022 0856 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1023 085a C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1024 085e 5B6B     		ldr	r3, [r3, #52]
+ 1025 0860 23F00202 		bic	r2, r3, #2
+ 1026 0864 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1027 0868 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1028 086c 5A63     		str	r2, [r3, #52]
+ 1029              	.L33:
+ 358:src/MAX-7W.c  **** 	}
+ 359:src/MAX-7W.c  **** 
+ 360:src/MAX-7W.c  **** 	// first check status filed to know if position data is valid!
+ 361:src/MAX-7W.c  **** 	if (p_token[2] && *p_token[2] == 'V')
+ 1030              		.loc 1 361 0
+ 1031 086e 7B69     		ldr	r3, [r7, #20]
+ 1032 0870 002B     		cmp	r3, #0
+ 1033 0872 03D0     		beq	.L34
+ 1034              		.loc 1 361 0 is_stmt 0 discriminator 1
+ 1035 0874 7B69     		ldr	r3, [r7, #20]
+ 1036 0876 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1037 0878 562B     		cmp	r3, #86
+ 1038 087a 31D0     		beq	.L28
+ 1039              	.L34:
+ 362:src/MAX-7W.c  **** 		return;
+ 363:src/MAX-7W.c  **** 
+ 364:src/MAX-7W.c  **** 	if (p_token[3])
+ 1040              		.loc 1 364 0 is_stmt 1
+ 1041 087c BB69     		ldr	r3, [r7, #24]
+ 1042 087e 002B     		cmp	r3, #0
+ 1043 0880 0BD0     		beq	.L35
+ 365:src/MAX-7W.c  **** 		MAX7W_Readings.Pos_Latitude = strtof(p_token[3], NULL);
+ 1044              		.loc 1 365 0
+ 1045 0882 BB69     		ldr	r3, [r7, #24]
+ 1046 0884 1846     		mov	r0, r3
+ 1047 0886 4FF00001 		mov	r1, #0
+ 1048 088a FFF7FEFF 		bl	strtof
+ 1049 088e 0246     		mov	r2, r0
+ 1050 0890 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1051 0894 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1052 0898 5A61     		str	r2, [r3, #20]	@ float
+ 1053              	.L35:
+ 366:src/MAX-7W.c  **** 	if (p_token[4])
+ 1054              		.loc 1 366 0
+ 1055 089a FB69     		ldr	r3, [r7, #28]
+ 1056 089c 002B     		cmp	r3, #0
+ 1057 089e 06D0     		beq	.L36
+ 367:src/MAX-7W.c  **** 		MAX7W_Readings.Pos_LatitudeIndNS = *p_token[4];
+ 1058              		.loc 1 367 0
+ 1059 08a0 FB69     		ldr	r3, [r7, #28]
+ 1060 08a2 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 1061 08a4 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1062 08a8 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1063 08ac 1A76     		strb	r2, [r3, #24]
+ 1064              	.L36:
+ 368:src/MAX-7W.c  **** 	if (p_token[5])
+ 1065              		.loc 1 368 0
+ 1066 08ae 3B6A     		ldr	r3, [r7, #32]
+ 1067 08b0 002B     		cmp	r3, #0
+ 1068 08b2 0BD0     		beq	.L37
+ 369:src/MAX-7W.c  **** 		MAX7W_Readings.Pos_Longitude = strtof(p_token[5], NULL);
+ 1069              		.loc 1 369 0
+ 1070 08b4 3B6A     		ldr	r3, [r7, #32]
+ 1071 08b6 1846     		mov	r0, r3
+ 1072 08b8 4FF00001 		mov	r1, #0
+ 1073 08bc FFF7FEFF 		bl	strtof
+ 1074 08c0 0246     		mov	r2, r0
+ 1075 08c2 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1076 08c6 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1077 08ca DA60     		str	r2, [r3, #12]	@ float
+ 1078              	.L37:
+ 370:src/MAX-7W.c  **** 	if (p_token[6])
+ 1079              		.loc 1 370 0
+ 1080 08cc 7B6A     		ldr	r3, [r7, #36]
+ 1081 08ce 002B     		cmp	r3, #0
+ 1082 08d0 06D0     		beq	.L28
+ 371:src/MAX-7W.c  **** 		MAX7W_Readings.Pos_LongitudeIndEW = *p_token[6];
+ 1083              		.loc 1 371 0
+ 1084 08d2 7B6A     		ldr	r3, [r7, #36]
+ 1085 08d4 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 1086 08d6 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1087 08da C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1088 08de 1A74     		strb	r2, [r3, #16]
+ 1089              	.L28:
+ 372:src/MAX-7W.c  **** //	if (p_token[8])
+ 373:src/MAX-7W.c  **** //		MAX7W_Readings.Nav_CourseOverGround = strtof(p_token[8],NULL);
+ 374:src/MAX-7W.c  **** 
+ 375:src/MAX-7W.c  **** }
+ 1090              		.loc 1 375 0
+ 1091 08e0 07F15407 		add	r7, r7, #84
+ 1092 08e4 BD46     		mov	sp, r7
+ 1093 08e6 90BD     		pop	{r4, r7, pc}
+ 1094              		.cfi_endproc
+ 1095              	.LFE116:
+ 1097              		.align	2
+ 1098              		.thumb
+ 1099              		.thumb_func
+ 1101              	evaluate_$GPVTG:
+ 1102              	.LFB117:
+ 376:src/MAX-7W.c  **** 
+ 377:src/MAX-7W.c  **** 
+ 378:src/MAX-7W.c  **** 
+ 379:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 380:src/MAX-7W.c  **** //! static void evaluate_$GPVTG(char *p_msg, u16_t msg_len)
+ 381:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 382:src/MAX-7W.c  **** //! @brief	extracts date from GPVTG message
+ 383:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 384:src/MAX-7W.c  **** //! @param	p_msg		pointer to message buffer
+ 385:src/MAX-7W.c  **** //! @param	msg_len		length of message
+ 386:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 387:src/MAX-7W.c  **** static void evaluate_$GPVTG(char *p_msg, u16_t msg_len){
+ 1103              		.loc 1 387 0
+ 1104              		.cfi_startproc
+ 1105              		@ args = 0, pretend = 0, frame = 56
+ 1106              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1107 08e8 80B5     		push	{r7, lr}
+ 1108              	.LCFI15:
+ 1109              		.cfi_def_cfa_offset 8
+ 1110              		.cfi_offset 7, -8
+ 1111              		.cfi_offset 14, -4
+ 1112 08ea 90B0     		sub	sp, sp, #64
+ 1113              	.LCFI16:
+ 1114              		.cfi_def_cfa_offset 72
+ 1115 08ec 02AF     		add	r7, sp, #8
+ 1116              	.LCFI17:
+ 1117              		.cfi_def_cfa 7, 64
+ 1118 08ee 7860     		str	r0, [r7, #4]
+ 1119 08f0 0B46     		mov	r3, r1
+ 1120 08f2 7B80     		strh	r3, [r7, #2]	@ movhi
+ 388:src/MAX-7W.c  **** 	int res;
+ 389:src/MAX-7W.c  **** 	char *p_token[VTG_ELEM_CNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ 1121              		.loc 1 389 0
+ 1122 08f4 4FF00003 		mov	r3, #0
+ 1123 08f8 BB60     		str	r3, [r7, #8]
+ 1124 08fa 4FF00003 		mov	r3, #0
+ 1125 08fe FB60     		str	r3, [r7, #12]
+ 1126 0900 4FF00003 		mov	r3, #0
+ 1127 0904 3B61     		str	r3, [r7, #16]
+ 1128 0906 4FF00003 		mov	r3, #0
+ 1129 090a 7B61     		str	r3, [r7, #20]
+ 1130 090c 4FF00003 		mov	r3, #0
+ 1131 0910 BB61     		str	r3, [r7, #24]
+ 1132 0912 4FF00003 		mov	r3, #0
+ 1133 0916 FB61     		str	r3, [r7, #28]
+ 1134 0918 4FF00003 		mov	r3, #0
+ 1135 091c 3B62     		str	r3, [r7, #32]
+ 1136 091e 4FF00003 		mov	r3, #0
+ 1137 0922 7B62     		str	r3, [r7, #36]
+ 1138 0924 4FF00003 		mov	r3, #0
+ 1139 0928 BB62     		str	r3, [r7, #40]
+ 1140 092a 4FF00003 		mov	r3, #0
+ 1141 092e FB62     		str	r3, [r7, #44]
+ 1142 0930 4FF00003 		mov	r3, #0
+ 1143 0934 3B63     		str	r3, [r7, #48]
+ 390:src/MAX-7W.c  **** 
+ 391:src/MAX-7W.c  **** 	if(!p_msg)
+ 1144              		.loc 1 391 0
+ 1145 0936 7B68     		ldr	r3, [r7, #4]
+ 1146 0938 002B     		cmp	r3, #0
+ 1147 093a 2DD0     		beq	.L40
+ 392:src/MAX-7W.c  **** 		return;
+ 393:src/MAX-7W.c  **** 
+ 394:src/MAX-7W.c  **** 	/***************************************************************************
+ 395:src/MAX-7W.c  **** 	 *  should contain NMEA-PGNs: 129026
+ 396:src/MAX-7W.c  **** 	 *	$GPVTG,cogt,T,cogm,M,knots,N,kph,K,posMode*cs<CR><LF>
+ 397:src/MAX-7W.c  **** 	 *  [0] -> "$GPVTG"
+ 398:src/MAX-7W.c  **** 	 *  [1] -> course over ground (true) [degree]
+ 399:src/MAX-7W.c  **** 	 *  [2] -> fix 'T'
+ 400:src/MAX-7W.c  **** 	 *  [3] -> course over ground magnetic (not used!)
+ 401:src/MAX-7W.c  **** 	 *  [4] -> fix 'M'
+ 402:src/MAX-7W.c  **** 	 *  [5] -> speed over ground [kn]
+ 403:src/MAX-7W.c  **** 	 *  [6] -> fix 'N'
+ 404:src/MAX-7W.c  **** 	 *  [7] -> speed over ground [km/h]
+ 405:src/MAX-7W.c  **** 	 *  [8] -> fix 'K'
+ 406:src/MAX-7W.c  **** 	 *  [9] -> positioning mode	'N' (no fix) |
+ 407:src/MAX-7W.c  **** 	 *  						'E' (estimated / dead reckoning fix) |
+ 408:src/MAX-7W.c  **** 	 *  						'A' (autonomous GNSS fix) |
+ 409:src/MAX-7W.c  **** 	 *  						'D' (differential GNSS fix)
+ 410:src/MAX-7W.c  **** 	 *  [10] -> checksum
+ 411:src/MAX-7W.c  **** 	 **************************************************************************/
+ 412:src/MAX-7W.c  **** 	res = spltStr(p_msg, msg_len, ',', &p_token[0], VTG_ELEM_CNT);
+ 1148              		.loc 1 412 0
+ 1149 093c 7A88     		ldrh	r2, [r7, #2]
+ 1150 093e 07F10803 		add	r3, r7, #8
+ 1151 0942 4FF00B01 		mov	r1, #11
+ 1152 0946 0091     		str	r1, [sp, #0]
+ 1153 0948 7868     		ldr	r0, [r7, #4]
+ 1154 094a 1146     		mov	r1, r2
+ 1155 094c 4FF02C02 		mov	r2, #44
+ 1156 0950 00F076FA 		bl	spltStr
+ 1157 0954 7863     		str	r0, [r7, #52]
+ 413:src/MAX-7W.c  **** 
+ 414:src/MAX-7W.c  **** 	if (res < VTG_ELEM_CNT - 1)
+ 1158              		.loc 1 414 0
+ 1159 0956 7B6B     		ldr	r3, [r7, #52]
+ 1160 0958 092B     		cmp	r3, #9
+ 1161 095a 1DDD     		ble	.L40
+ 415:src/MAX-7W.c  **** 		return;
+ 416:src/MAX-7W.c  **** 
+ 417:src/MAX-7W.c  **** 	if (p_token[1])
+ 1162              		.loc 1 417 0
+ 1163 095c FB68     		ldr	r3, [r7, #12]
+ 1164 095e 002B     		cmp	r3, #0
+ 1165 0960 0BD0     		beq	.L42
+ 418:src/MAX-7W.c  **** 		MAX7W_Readings.Nav_CourseOverGround = strtof(p_token[1], NULL);
+ 1166              		.loc 1 418 0
+ 1167 0962 FB68     		ldr	r3, [r7, #12]
+ 1168 0964 1846     		mov	r0, r3
+ 1169 0966 4FF00001 		mov	r1, #0
+ 1170 096a FFF7FEFF 		bl	strtof
+ 1171 096e 0246     		mov	r2, r0
+ 1172 0970 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1173 0974 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1174 0978 9A60     		str	r2, [r3, #8]	@ float
+ 1175              	.L42:
+ 419:src/MAX-7W.c  **** 	if (p_token[7])
+ 1176              		.loc 1 419 0
+ 1177 097a 7B6A     		ldr	r3, [r7, #36]
+ 1178 097c 002B     		cmp	r3, #0
+ 1179 097e 0BD0     		beq	.L40
+ 420:src/MAX-7W.c  **** 		MAX7W_Readings.Nav_SpeedOverGroundKmh = strtof(p_token[7], NULL);
+ 1180              		.loc 1 420 0
+ 1181 0980 7B6A     		ldr	r3, [r7, #36]
+ 1182 0982 1846     		mov	r0, r3
+ 1183 0984 4FF00001 		mov	r1, #0
+ 1184 0988 FFF7FEFF 		bl	strtof
+ 1185 098c 0246     		mov	r2, r0
+ 1186 098e 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1187 0992 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1188 0996 5A60     		str	r2, [r3, #4]	@ float
+ 1189              	.L40:
+ 421:src/MAX-7W.c  **** }
+ 1190              		.loc 1 421 0
+ 1191 0998 07F13807 		add	r7, r7, #56
+ 1192 099c BD46     		mov	sp, r7
+ 1193 099e 80BD     		pop	{r7, pc}
+ 1194              		.cfi_endproc
+ 1195              	.LFE117:
+ 1197              		.align	2
+ 1198              		.thumb
+ 1199              		.thumb_func
+ 1201              	evaluate_$GPGGA:
+ 1202              	.LFB118:
+ 422:src/MAX-7W.c  **** 
+ 423:src/MAX-7W.c  **** 
+ 424:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 425:src/MAX-7W.c  **** //! static void evaluate_$GPGGA(char *p_msg, u16_t msg_len)
+ 426:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 427:src/MAX-7W.c  **** //! @brief	extracts date from GPGGA message
+ 428:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 429:src/MAX-7W.c  **** //! @param	p_msg		pointer to message buffer
+ 430:src/MAX-7W.c  **** //! @param	msg_len		length of message
+ 431:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 432:src/MAX-7W.c  **** static void evaluate_$GPGGA(char *p_msg, u16_t msg_len)
+ 433:src/MAX-7W.c  **** {
+ 1203              		.loc 1 433 0
+ 1204              		.cfi_startproc
+ 1205              		@ args = 0, pretend = 0, frame = 80
+ 1206              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1207 09a0 80B5     		push	{r7, lr}
+ 1208              	.LCFI18:
+ 1209              		.cfi_def_cfa_offset 8
+ 1210              		.cfi_offset 7, -8
+ 1211              		.cfi_offset 14, -4
+ 1212 09a2 96B0     		sub	sp, sp, #88
+ 1213              	.LCFI19:
+ 1214              		.cfi_def_cfa_offset 96
+ 1215 09a4 02AF     		add	r7, sp, #8
+ 1216              	.LCFI20:
+ 1217              		.cfi_def_cfa 7, 88
+ 1218 09a6 7860     		str	r0, [r7, #4]
+ 1219 09a8 0B46     		mov	r3, r1
+ 1220 09aa 7B80     		strh	r3, [r7, #2]	@ movhi
+ 434:src/MAX-7W.c  **** 	int res;
+ 435:src/MAX-7W.c  **** 	char *p_token[GGA_ELEM_CNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 1221              		.loc 1 435 0
+ 1222 09ac 07F10C02 		add	r2, r7, #12
+ 1223 09b0 4FF04003 		mov	r3, #64
+ 1224 09b4 1046     		mov	r0, r2
+ 1225 09b6 4FF00001 		mov	r1, #0
+ 1226 09ba 1A46     		mov	r2, r3
+ 1227 09bc FFF7FEFF 		bl	memset
+ 436:src/MAX-7W.c  **** 			0 };
+ 437:src/MAX-7W.c  **** 
+ 438:src/MAX-7W.c  **** 	if(!p_msg)
+ 1228              		.loc 1 438 0
+ 1229 09c0 7B68     		ldr	r3, [r7, #4]
+ 1230 09c2 002B     		cmp	r3, #0
+ 1231 09c4 3FD0     		beq	.L45
+ 439:src/MAX-7W.c  **** 		return;
+ 440:src/MAX-7W.c  **** 
+ 441:src/MAX-7W.c  **** 	/***************************************************************************
+ 442:src/MAX-7W.c  **** 	 *  should contain NMEA-PGNs: 126992, 129025, 129029, 129033, 129539
+ 443:src/MAX-7W.c  **** 	 *	$GPGGA,time,lat,NS,long,EW,quality,numSV,HDOP,alt,M,sep,M,diffAge,
+ 444:src/MAX-7W.c  **** 	 *	diffStation*cs<CR><LF>
+ 445:src/MAX-7W.c  **** 	 *  [0] -> "$GPGGA"
+ 446:src/MAX-7W.c  **** 	 *  [1] -> UTC time hhmmss.ss
+ 447:src/MAX-7W.c  **** 	 *  [2] -> latitude ddmm.mmmmm
+ 448:src/MAX-7W.c  **** 	 *  [3] -> north / south indicator 'N'|'S'
+ 449:src/MAX-7W.c  **** 	 *  [4] -> longitude dddmm.mmmmm
+ 450:src/MAX-7W.c  **** 	 *  [5] -> east / west indicator 'E'|'W'
+ 451:src/MAX-7W.c  **** 	 *  [6] -> quality of fix 	'0' (no fix) | '1' (standard GPS (2D/3D)) |
+ 452:src/MAX-7W.c  **** 	 *  						'2' Differential GPS | '6' (estimated DR fix)
+ 453:src/MAX-7W.c  **** 	 *  [7] -> number of used satellites
+ 454:src/MAX-7W.c  **** 	 *  [8] -> horizontal dilution of precision
+ 455:src/MAX-7W.c  **** 	 *  [9] -> altitude above mean see level
+ 456:src/MAX-7W.c  **** 	 *  [10] -> altitude unit (fix) 'M' (meters)
+ 457:src/MAX-7W.c  **** 	 *  [11] -> geoid separation
+ 458:src/MAX-7W.c  **** 	 *  [12] -> geoid separation unit (fix) 'M' (meters)
+ 459:src/MAX-7W.c  **** 	 *  [13] -> age of differential correction (DGPS only)
+ 460:src/MAX-7W.c  **** 	 *  [14] -> ID of differantial correction station (DGPS only)
+ 461:src/MAX-7W.c  **** 	 *  [15] -> checksum
+ 462:src/MAX-7W.c  **** 	 **************************************************************************/
+ 463:src/MAX-7W.c  **** 	res = spltStr(p_msg, msg_len, ',', &p_token[0], GGA_ELEM_CNT);
+ 1232              		.loc 1 463 0
+ 1233 09c6 7A88     		ldrh	r2, [r7, #2]
+ 1234 09c8 07F10C03 		add	r3, r7, #12
+ 1235 09cc 4FF01001 		mov	r1, #16
+ 1236 09d0 0091     		str	r1, [sp, #0]
+ 1237 09d2 7868     		ldr	r0, [r7, #4]
+ 1238 09d4 1146     		mov	r1, r2
+ 1239 09d6 4FF02C02 		mov	r2, #44
+ 1240 09da 00F031FA 		bl	spltStr
+ 1241 09de F864     		str	r0, [r7, #76]
+ 464:src/MAX-7W.c  **** 
+ 465:src/MAX-7W.c  **** 	if (res < GGA_ELEM_CNT - 1)
+ 1242              		.loc 1 465 0
+ 1243 09e0 FB6C     		ldr	r3, [r7, #76]
+ 1244 09e2 0E2B     		cmp	r3, #14
+ 1245 09e4 2FDD     		ble	.L45
+ 466:src/MAX-7W.c  **** 		return;
+ 467:src/MAX-7W.c  **** 
+ 468:src/MAX-7W.c  **** 	if (p_token[7])
+ 1246              		.loc 1 468 0
+ 1247 09e6 BB6A     		ldr	r3, [r7, #40]
+ 1248 09e8 002B     		cmp	r3, #0
+ 1249 09ea 0ED0     		beq	.L47
+ 469:src/MAX-7W.c  **** 		MAX7W_Readings.Nav_NumSatellites = (u8_t) strtoul(p_token[7], NULL, 10);
+ 1250              		.loc 1 469 0
+ 1251 09ec BB6A     		ldr	r3, [r7, #40]
+ 1252 09ee 1846     		mov	r0, r3
+ 1253 09f0 4FF00001 		mov	r1, #0
+ 1254 09f4 4FF00A02 		mov	r2, #10
+ 1255 09f8 FFF7FEFF 		bl	strtoul
+ 1256 09fc 0346     		mov	r3, r0
+ 1257 09fe DAB2     		uxtb	r2, r3
+ 1258 0a00 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1259 0a04 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1260 0a08 5A70     		strb	r2, [r3, #1]
+ 1261              	.L47:
+ 470:src/MAX-7W.c  **** 	if (p_token[8])
+ 1262              		.loc 1 470 0
+ 1263 0a0a FB6A     		ldr	r3, [r7, #44]
+ 1264 0a0c 002B     		cmp	r3, #0
+ 1265 0a0e 0BD0     		beq	.L48
+ 471:src/MAX-7W.c  **** 		MAX7W_Readings.HDOP = strtof(p_token[8], NULL);
+ 1266              		.loc 1 471 0
+ 1267 0a10 FB6A     		ldr	r3, [r7, #44]
+ 1268 0a12 1846     		mov	r0, r3
+ 1269 0a14 4FF00001 		mov	r1, #0
+ 1270 0a18 FFF7FEFF 		bl	strtof
+ 1271 0a1c 0246     		mov	r2, r0
+ 1272 0a1e 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1273 0a22 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1274 0a26 5A62     		str	r2, [r3, #36]	@ float
+ 1275              	.L48:
+ 472:src/MAX-7W.c  **** 	if (p_token[9])
+ 1276              		.loc 1 472 0
+ 1277 0a28 3B6B     		ldr	r3, [r7, #48]
+ 1278 0a2a 002B     		cmp	r3, #0
+ 1279 0a2c 0BD0     		beq	.L45
+ 473:src/MAX-7W.c  **** 		MAX7W_Readings.Pos_AltitudeOverSea = strtof(p_token[9], NULL);
+ 1280              		.loc 1 473 0
+ 1281 0a2e 3B6B     		ldr	r3, [r7, #48]
+ 1282 0a30 1846     		mov	r0, r3
+ 1283 0a32 4FF00001 		mov	r1, #0
+ 1284 0a36 FFF7FEFF 		bl	strtof
+ 1285 0a3a 0246     		mov	r2, r0
+ 1286 0a3c 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1287 0a40 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1288 0a44 DA61     		str	r2, [r3, #28]	@ float
+ 1289              	.L45:
+ 474:src/MAX-7W.c  **** 
+ 475:src/MAX-7W.c  **** 	return;
+ 476:src/MAX-7W.c  **** }
+ 1290              		.loc 1 476 0
+ 1291 0a46 07F15007 		add	r7, r7, #80
+ 1292 0a4a BD46     		mov	sp, r7
+ 1293 0a4c 80BD     		pop	{r7, pc}
+ 1294              		.cfi_endproc
+ 1295              	.LFE118:
+ 1297 0a4e 00BF     		.align	2
+ 1298              		.thumb
+ 1299              		.thumb_func
+ 1301              	evaluate_$GPGSA:
+ 1302              	.LFB119:
+ 477:src/MAX-7W.c  **** 
+ 478:src/MAX-7W.c  **** 
+ 479:src/MAX-7W.c  **** 
+ 480:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 481:src/MAX-7W.c  **** //! static void evaluate_$GPGSA(char *p_msg, u16_t msg_len)
+ 482:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 483:src/MAX-7W.c  **** //! @brief	extracts date from GPGSA message
+ 484:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 485:src/MAX-7W.c  **** //! @param	p_msg		pointer to message buffer
+ 486:src/MAX-7W.c  **** //! @param	msg_len		length of message
+ 487:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 488:src/MAX-7W.c  **** static void evaluate_$GPGSA(char *p_msg, u16_t msg_len){
+ 1303              		.loc 1 488 0
+ 1304              		.cfi_startproc
+ 1305              		@ args = 0, pretend = 0, frame = 88
+ 1306              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1307 0a50 80B5     		push	{r7, lr}
+ 1308              	.LCFI21:
+ 1309              		.cfi_def_cfa_offset 8
+ 1310              		.cfi_offset 7, -8
+ 1311              		.cfi_offset 14, -4
+ 1312 0a52 98B0     		sub	sp, sp, #96
+ 1313              	.LCFI22:
+ 1314              		.cfi_def_cfa_offset 104
+ 1315 0a54 02AF     		add	r7, sp, #8
+ 1316              	.LCFI23:
+ 1317              		.cfi_def_cfa 7, 96
+ 1318 0a56 7860     		str	r0, [r7, #4]
+ 1319 0a58 0B46     		mov	r3, r1
+ 1320 0a5a 7B80     		strh	r3, [r7, #2]	@ movhi
+ 489:src/MAX-7W.c  **** 	int res;
+ 490:src/MAX-7W.c  **** 	char *p_token[GSA_ELEM_CNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 1321              		.loc 1 490 0
+ 1322 0a5c 07F10802 		add	r2, r7, #8
+ 1323 0a60 4FF04C03 		mov	r3, #76
+ 1324 0a64 1046     		mov	r0, r2
+ 1325 0a66 4FF00001 		mov	r1, #0
+ 1326 0a6a 1A46     		mov	r2, r3
+ 1327 0a6c FFF7FEFF 		bl	memset
+ 491:src/MAX-7W.c  **** 			0, 0, 0, 0 };
+ 492:src/MAX-7W.c  **** 
+ 493:src/MAX-7W.c  **** 	if(!p_msg)
+ 1328              		.loc 1 493 0
+ 1329 0a70 7B68     		ldr	r3, [r7, #4]
+ 1330 0a72 002B     		cmp	r3, #0
+ 1331 0a74 4BD0     		beq	.L50
+ 494:src/MAX-7W.c  **** 		return;
+ 495:src/MAX-7W.c  **** 
+ 496:src/MAX-7W.c  **** 	/***************************************************************************
+ 497:src/MAX-7W.c  **** 	 *	$GPGSA,opMode,navMode{,sv},PDOP,HDOP,VDOP*cs<CR><LF>
+ 498:src/MAX-7W.c  **** 	 *  [0] -> "$GPGSA"
+ 499:src/MAX-7W.c  **** 	 *  [1] -> operation mode 'M' (manually set to 2D/3D mode)
+ 500:src/MAX-7W.c  **** 	 *						  'A' (automatically choosing 2D/3D mode)
+ 501:src/MAX-7W.c  **** 	 *  [2] -> navigation mode '1' (no fix) | '2' (2D fix) | '3' (3D fix)
+ 502:src/MAX-7W.c  **** 	 *  [3-14] -> satellite number
+ 503:src/MAX-7W.c  **** 	 *  [15] -> position dilution of precision
+ 504:src/MAX-7W.c  **** 	 *  [16] -> horizontal dilution of precision
+ 505:src/MAX-7W.c  **** 	 *  [17] -> vertical dilution of precision
+ 506:src/MAX-7W.c  **** 	 *  [18] -> checksum
+ 507:src/MAX-7W.c  **** 	 **************************************************************************/
+ 508:src/MAX-7W.c  **** 	res = spltStr(p_msg, msg_len, ',', &p_token[0], GSA_ELEM_CNT);
+ 1332              		.loc 1 508 0
+ 1333 0a76 7A88     		ldrh	r2, [r7, #2]
+ 1334 0a78 07F10803 		add	r3, r7, #8
+ 1335 0a7c 4FF01301 		mov	r1, #19
+ 1336 0a80 0091     		str	r1, [sp, #0]
+ 1337 0a82 7868     		ldr	r0, [r7, #4]
+ 1338 0a84 1146     		mov	r1, r2
+ 1339 0a86 4FF02C02 		mov	r2, #44
+ 1340 0a8a 00F0D9F9 		bl	spltStr
+ 1341 0a8e 7865     		str	r0, [r7, #84]
+ 509:src/MAX-7W.c  **** 
+ 510:src/MAX-7W.c  **** 	if (res < GSA_ELEM_CNT - 1)
+ 1342              		.loc 1 510 0
+ 1343 0a90 7B6D     		ldr	r3, [r7, #84]
+ 1344 0a92 112B     		cmp	r3, #17
+ 1345 0a94 3BDD     		ble	.L50
+ 511:src/MAX-7W.c  **** 		return;
+ 512:src/MAX-7W.c  **** 
+ 513:src/MAX-7W.c  **** 	if (p_token[2])
+ 1346              		.loc 1 513 0
+ 1347 0a96 3B69     		ldr	r3, [r7, #16]
+ 1348 0a98 002B     		cmp	r3, #0
+ 1349 0a9a 0BD0     		beq	.L52
+ 514:src/MAX-7W.c  **** 		MAX7W_Readings.Nav_Method = ascii2hex(*p_token[2]);
+ 1350              		.loc 1 514 0
+ 1351 0a9c 3B69     		ldr	r3, [r7, #16]
+ 1352 0a9e 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1353 0aa0 1846     		mov	r0, r3
+ 1354 0aa2 00F051FA 		bl	ascii2hex
+ 1355 0aa6 0346     		mov	r3, r0
+ 1356 0aa8 1A46     		mov	r2, r3
+ 1357 0aaa 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1358 0aae C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1359 0ab2 9A70     		strb	r2, [r3, #2]
+ 1360              	.L52:
+ 515:src/MAX-7W.c  **** 	if (p_token[15])
+ 1361              		.loc 1 515 0
+ 1362 0ab4 7B6C     		ldr	r3, [r7, #68]
+ 1363 0ab6 002B     		cmp	r3, #0
+ 1364 0ab8 0BD0     		beq	.L53
+ 516:src/MAX-7W.c  **** 		MAX7W_Readings.PDOP = strtof((const char*) p_token[15], NULL);
+ 1365              		.loc 1 516 0
+ 1366 0aba 7B6C     		ldr	r3, [r7, #68]
+ 1367 0abc 1846     		mov	r0, r3
+ 1368 0abe 4FF00001 		mov	r1, #0
+ 1369 0ac2 FFF7FEFF 		bl	strtof
+ 1370 0ac6 0246     		mov	r2, r0
+ 1371 0ac8 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1372 0acc C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1373 0ad0 1A62     		str	r2, [r3, #32]	@ float
+ 1374              	.L53:
+ 517:src/MAX-7W.c  **** 	if (p_token[16])
+ 1375              		.loc 1 517 0
+ 1376 0ad2 BB6C     		ldr	r3, [r7, #72]
+ 1377 0ad4 002B     		cmp	r3, #0
+ 1378 0ad6 0BD0     		beq	.L54
+ 518:src/MAX-7W.c  **** 		MAX7W_Readings.HDOP = strtof((const char*) p_token[16], NULL);
+ 1379              		.loc 1 518 0
+ 1380 0ad8 BB6C     		ldr	r3, [r7, #72]
+ 1381 0ada 1846     		mov	r0, r3
+ 1382 0adc 4FF00001 		mov	r1, #0
+ 1383 0ae0 FFF7FEFF 		bl	strtof
+ 1384 0ae4 0246     		mov	r2, r0
+ 1385 0ae6 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1386 0aea C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1387 0aee 5A62     		str	r2, [r3, #36]	@ float
+ 1388              	.L54:
+ 519:src/MAX-7W.c  **** 	if (p_token[17])
+ 1389              		.loc 1 519 0
+ 1390 0af0 FB6C     		ldr	r3, [r7, #76]
+ 1391 0af2 002B     		cmp	r3, #0
+ 1392 0af4 0BD0     		beq	.L50
+ 520:src/MAX-7W.c  **** 		MAX7W_Readings.VDOP = strtof((const char*) p_token[17], NULL);
+ 1393              		.loc 1 520 0
+ 1394 0af6 FB6C     		ldr	r3, [r7, #76]
+ 1395 0af8 1846     		mov	r0, r3
+ 1396 0afa 4FF00001 		mov	r1, #0
+ 1397 0afe FFF7FEFF 		bl	strtof
+ 1398 0b02 0246     		mov	r2, r0
+ 1399 0b04 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1400 0b08 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1401 0b0c 9A62     		str	r2, [r3, #40]	@ float
+ 1402              	.L50:
+ 521:src/MAX-7W.c  **** 
+ 522:src/MAX-7W.c  **** 	return;
+ 523:src/MAX-7W.c  **** }
+ 1403              		.loc 1 523 0
+ 1404 0b0e 07F15807 		add	r7, r7, #88
+ 1405 0b12 BD46     		mov	sp, r7
+ 1406 0b14 80BD     		pop	{r7, pc}
+ 1407              		.cfi_endproc
+ 1408              	.LFE119:
+ 1410 0b16 00BF     		.align	2
+ 1411              		.thumb
+ 1412              		.thumb_func
+ 1414              	evaluate_$GPGLL:
+ 1415              	.LFB120:
+ 524:src/MAX-7W.c  **** 
+ 525:src/MAX-7W.c  **** 
+ 526:src/MAX-7W.c  **** 
+ 527:src/MAX-7W.c  **** 
+ 528:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 529:src/MAX-7W.c  **** //! static void evaluate_$GPGLL(void)
+ 530:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 531:src/MAX-7W.c  **** //! @brief	extracts date from GPGLL message
+ 532:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 533:src/MAX-7W.c  **** //! @param	p_msg		pointer to message buffer
+ 534:src/MAX-7W.c  **** //! @param	msg_len		length of message
+ 535:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 536:src/MAX-7W.c  **** static void evaluate_$GPGLL(char *p_msg, u16_t msg_len){
+ 1416              		.loc 1 536 0
+ 1417              		.cfi_startproc
+ 1418              		@ args = 0, pretend = 0, frame = 56
+ 1419              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1420 0b18 90B5     		push	{r4, r7, lr}
+ 1421              	.LCFI24:
+ 1422              		.cfi_def_cfa_offset 12
+ 1423              		.cfi_offset 4, -12
+ 1424              		.cfi_offset 7, -8
+ 1425              		.cfi_offset 14, -4
+ 1426 0b1a 91B0     		sub	sp, sp, #68
+ 1427              	.LCFI25:
+ 1428              		.cfi_def_cfa_offset 80
+ 1429 0b1c 02AF     		add	r7, sp, #8
+ 1430              	.LCFI26:
+ 1431              		.cfi_def_cfa 7, 72
+ 1432 0b1e 7860     		str	r0, [r7, #4]
+ 1433 0b20 0B46     		mov	r3, r1
+ 1434 0b22 7B80     		strh	r3, [r7, #2]	@ movhi
+ 537:src/MAX-7W.c  **** 	int res;
+ 538:src/MAX-7W.c  **** 	char *p_token[GLL_ELEM_CNT] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+ 1435              		.loc 1 538 0
+ 1436 0b24 4FF00003 		mov	r3, #0
+ 1437 0b28 FB60     		str	r3, [r7, #12]
+ 1438 0b2a 4FF00003 		mov	r3, #0
+ 1439 0b2e 3B61     		str	r3, [r7, #16]
+ 1440 0b30 4FF00003 		mov	r3, #0
+ 1441 0b34 7B61     		str	r3, [r7, #20]
+ 1442 0b36 4FF00003 		mov	r3, #0
+ 1443 0b3a BB61     		str	r3, [r7, #24]
+ 1444 0b3c 4FF00003 		mov	r3, #0
+ 1445 0b40 FB61     		str	r3, [r7, #28]
+ 1446 0b42 4FF00003 		mov	r3, #0
+ 1447 0b46 3B62     		str	r3, [r7, #32]
+ 1448 0b48 4FF00003 		mov	r3, #0
+ 1449 0b4c 7B62     		str	r3, [r7, #36]
+ 1450 0b4e 4FF00003 		mov	r3, #0
+ 1451 0b52 BB62     		str	r3, [r7, #40]
+ 1452 0b54 4FF00003 		mov	r3, #0
+ 1453 0b58 FB62     		str	r3, [r7, #44]
+ 539:src/MAX-7W.c  **** 
+ 540:src/MAX-7W.c  **** 	if(!p_msg)
+ 1454              		.loc 1 540 0
+ 1455 0b5a 7B68     		ldr	r3, [r7, #4]
+ 1456 0b5c 002B     		cmp	r3, #0
+ 1457 0b5e 00F01581 		beq	.L56
+ 541:src/MAX-7W.c  **** 		return;
+ 542:src/MAX-7W.c  **** 
+ 543:src/MAX-7W.c  **** 	/***************************************************************************
+ 544:src/MAX-7W.c  **** 	 *  should contain NMEA-PGNs: 126992, 129025, 129029, 129033
+ 545:src/MAX-7W.c  **** 	 *  $GPGLL,lat,NS,long,EW,time,status,posMode*cs<CR><LF>
+ 546:src/MAX-7W.c  **** 	 *  [0] -> "$GPGLL"
+ 547:src/MAX-7W.c  **** 	 *  [1] -> latitude ddmm.mmmmm
+ 548:src/MAX-7W.c  **** 	 *  [2] -> north / south indicator 'N'|'S'
+ 549:src/MAX-7W.c  **** 	 *  [3] -> longitude dddmm.mmmmm
+ 550:src/MAX-7W.c  **** 	 *  [4] -> east / west indicator 'E'|'W'
+ 551:src/MAX-7W.c  **** 	 *  [5] -> UTC time hhmmss.ss
+ 552:src/MAX-7W.c  **** 	 *  [6] -> status 'A' (data valid) | 'V' (data invalid)
+ 553:src/MAX-7W.c  **** 	 *  [7] -> positioning mode (optional)
+ 554:src/MAX-7W.c  **** 	 *  [7|8] -> checksum
+ 555:src/MAX-7W.c  **** 	 **************************************************************************/
+ 556:src/MAX-7W.c  **** 	res = spltStr(p_msg, msg_len, ',', &p_token[0], GLL_ELEM_CNT);
+ 1458              		.loc 1 556 0
+ 1459 0b62 7A88     		ldrh	r2, [r7, #2]
+ 1460 0b64 07F10C03 		add	r3, r7, #12
+ 1461 0b68 4FF00901 		mov	r1, #9
+ 1462 0b6c 0091     		str	r1, [sp, #0]
+ 1463 0b6e 7868     		ldr	r0, [r7, #4]
+ 1464 0b70 1146     		mov	r1, r2
+ 1465 0b72 4FF02C02 		mov	r2, #44
+ 1466 0b76 00F063F9 		bl	spltStr
+ 1467 0b7a 7863     		str	r0, [r7, #52]
+ 557:src/MAX-7W.c  **** 
+ 558:src/MAX-7W.c  **** 	if (res < GLL_ELEM_CNT - 2) // one optional element
+ 1468              		.loc 1 558 0
+ 1469 0b7c 7B6B     		ldr	r3, [r7, #52]
+ 1470 0b7e 062B     		cmp	r3, #6
+ 1471 0b80 40F30481 		ble	.L56
+ 559:src/MAX-7W.c  **** 		return;
+ 560:src/MAX-7W.c  **** 
+ 561:src/MAX-7W.c  **** 	// make sure that length of token is okay
+ 562:src/MAX-7W.c  **** 	if (p_token[5] && (p_token[6] == p_token[5] + 10)) {
+ 1472              		.loc 1 562 0
+ 1473 0b84 3B6A     		ldr	r3, [r7, #32]
+ 1474 0b86 002B     		cmp	r3, #0
+ 1475 0b88 00F0A380 		beq	.L58
+ 1476              		.loc 1 562 0 is_stmt 0 discriminator 1
+ 1477 0b8c 7A6A     		ldr	r2, [r7, #36]
+ 1478 0b8e 3B6A     		ldr	r3, [r7, #32]
+ 1479 0b90 03F10A03 		add	r3, r3, #10
+ 1480 0b94 9A42     		cmp	r2, r3
+ 1481 0b96 40F09C80 		bne	.L58
+ 1482              	.LBB4:
+ 563:src/MAX-7W.c  **** 		char *p_chr;
+ 564:src/MAX-7W.c  **** 		p_chr = p_token[5];
+ 1483              		.loc 1 564 0 is_stmt 1 discriminator 1
+ 1484 0b9a 3B6A     		ldr	r3, [r7, #32]
+ 1485 0b9c 3B63     		str	r3, [r7, #48]
+ 565:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Hrs = ascii2hex(*(p_chr++)) * 10;
+ 1486              		.loc 1 565 0 discriminator 1
+ 1487 0b9e 3B6B     		ldr	r3, [r7, #48]
+ 1488 0ba0 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1489 0ba2 3A6B     		ldr	r2, [r7, #48]
+ 1490 0ba4 02F10102 		add	r2, r2, #1
+ 1491 0ba8 3A63     		str	r2, [r7, #48]
+ 1492 0baa 1846     		mov	r0, r3
+ 1493 0bac 00F0CCF9 		bl	ascii2hex
+ 1494 0bb0 0346     		mov	r3, r0
+ 1495 0bb2 1A46     		mov	r2, r3
+ 1496 0bb4 4FEA8202 		lsl	r2, r2, #2
+ 1497 0bb8 D318     		adds	r3, r2, r3
+ 1498 0bba 4FEA4303 		lsl	r3, r3, #1
+ 1499 0bbe DAB2     		uxtb	r2, r3
+ 1500 0bc0 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1501 0bc4 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1502 0bc8 83F82C20 		strb	r2, [r3, #44]
+ 566:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Hrs += ascii2hex(*(p_chr++));
+ 1503              		.loc 1 566 0 discriminator 1
+ 1504 0bcc 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1505 0bd0 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1506 0bd4 93F82C40 		ldrb	r4, [r3, #44]	@ zero_extendqisi2
+ 1507 0bd8 3B6B     		ldr	r3, [r7, #48]
+ 1508 0bda 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1509 0bdc 3A6B     		ldr	r2, [r7, #48]
+ 1510 0bde 02F10102 		add	r2, r2, #1
+ 1511 0be2 3A63     		str	r2, [r7, #48]
+ 1512 0be4 1846     		mov	r0, r3
+ 1513 0be6 00F0AFF9 		bl	ascii2hex
+ 1514 0bea 0346     		mov	r3, r0
+ 1515 0bec E318     		adds	r3, r4, r3
+ 1516 0bee DAB2     		uxtb	r2, r3
+ 1517 0bf0 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1518 0bf4 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1519 0bf8 83F82C20 		strb	r2, [r3, #44]
+ 567:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Min = ascii2hex(*(p_chr++)) * 10;
+ 1520              		.loc 1 567 0 discriminator 1
+ 1521 0bfc 3B6B     		ldr	r3, [r7, #48]
+ 1522 0bfe 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1523 0c00 3A6B     		ldr	r2, [r7, #48]
+ 1524 0c02 02F10102 		add	r2, r2, #1
+ 1525 0c06 3A63     		str	r2, [r7, #48]
+ 1526 0c08 1846     		mov	r0, r3
+ 1527 0c0a 00F09DF9 		bl	ascii2hex
+ 1528 0c0e 0346     		mov	r3, r0
+ 1529 0c10 1A46     		mov	r2, r3
+ 1530 0c12 4FEA8202 		lsl	r2, r2, #2
+ 1531 0c16 D318     		adds	r3, r2, r3
+ 1532 0c18 4FEA4303 		lsl	r3, r3, #1
+ 1533 0c1c DAB2     		uxtb	r2, r3
+ 1534 0c1e 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1535 0c22 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1536 0c26 83F82D20 		strb	r2, [r3, #45]
+ 568:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Min += ascii2hex(*(p_chr++));
+ 1537              		.loc 1 568 0 discriminator 1
+ 1538 0c2a 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1539 0c2e C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1540 0c32 93F82D40 		ldrb	r4, [r3, #45]	@ zero_extendqisi2
+ 1541 0c36 3B6B     		ldr	r3, [r7, #48]
+ 1542 0c38 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1543 0c3a 3A6B     		ldr	r2, [r7, #48]
+ 1544 0c3c 02F10102 		add	r2, r2, #1
+ 1545 0c40 3A63     		str	r2, [r7, #48]
+ 1546 0c42 1846     		mov	r0, r3
+ 1547 0c44 00F080F9 		bl	ascii2hex
+ 1548 0c48 0346     		mov	r3, r0
+ 1549 0c4a E318     		adds	r3, r4, r3
+ 1550 0c4c DAB2     		uxtb	r2, r3
+ 1551 0c4e 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1552 0c52 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1553 0c56 83F82D20 		strb	r2, [r3, #45]
+ 569:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Sec = ascii2hex(*(p_chr++)) * 10;
+ 1554              		.loc 1 569 0 discriminator 1
+ 1555 0c5a 3B6B     		ldr	r3, [r7, #48]
+ 1556 0c5c 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1557 0c5e 3A6B     		ldr	r2, [r7, #48]
+ 1558 0c60 02F10102 		add	r2, r2, #1
+ 1559 0c64 3A63     		str	r2, [r7, #48]
+ 1560 0c66 1846     		mov	r0, r3
+ 1561 0c68 00F06EF9 		bl	ascii2hex
+ 1562 0c6c 0346     		mov	r3, r0
+ 1563 0c6e 1A46     		mov	r2, r3
+ 1564 0c70 4FEA8202 		lsl	r2, r2, #2
+ 1565 0c74 D318     		adds	r3, r2, r3
+ 1566 0c76 4FEA4303 		lsl	r3, r3, #1
+ 1567 0c7a DAB2     		uxtb	r2, r3
+ 1568 0c7c 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1569 0c80 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1570 0c84 83F82E20 		strb	r2, [r3, #46]
+ 570:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Sec += ascii2hex(*(p_chr++));
+ 1571              		.loc 1 570 0 discriminator 1
+ 1572 0c88 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1573 0c8c C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1574 0c90 93F82E40 		ldrb	r4, [r3, #46]	@ zero_extendqisi2
+ 1575 0c94 3B6B     		ldr	r3, [r7, #48]
+ 1576 0c96 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1577 0c98 3A6B     		ldr	r2, [r7, #48]
+ 1578 0c9a 02F10102 		add	r2, r2, #1
+ 1579 0c9e 3A63     		str	r2, [r7, #48]
+ 1580 0ca0 1846     		mov	r0, r3
+ 1581 0ca2 00F051F9 		bl	ascii2hex
+ 1582 0ca6 0346     		mov	r3, r0
+ 1583 0ca8 E318     		adds	r3, r4, r3
+ 1584 0caa DAB2     		uxtb	r2, r3
+ 1585 0cac 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1586 0cb0 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1587 0cb4 83F82E20 		strb	r2, [r3, #46]
+ 571:src/MAX-7W.c  **** 		MAX7W_Readings.Validity |= GPS_TIME_VALID;
+ 1588              		.loc 1 571 0 discriminator 1
+ 1589 0cb8 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1590 0cbc C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1591 0cc0 5B6B     		ldr	r3, [r3, #52]
+ 1592 0cc2 43F00102 		orr	r2, r3, #1
+ 1593 0cc6 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1594 0cca C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1595 0cce 5A63     		str	r2, [r3, #52]
+ 1596              	.LBE4:
+ 562:src/MAX-7W.c  **** 	if (p_token[5] && (p_token[6] == p_token[5] + 10)) {
+ 1597              		.loc 1 562 0 discriminator 1
+ 1598 0cd0 23E0     		b	.L59
+ 1599              	.L58:
+ 572:src/MAX-7W.c  **** 	} else {
+ 573:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Hrs = 0;
+ 1600              		.loc 1 573 0
+ 1601 0cd2 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1602 0cd6 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1603 0cda 4FF00002 		mov	r2, #0
+ 1604 0cde 83F82C20 		strb	r2, [r3, #44]
+ 574:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Min = 0;
+ 1605              		.loc 1 574 0
+ 1606 0ce2 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1607 0ce6 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1608 0cea 4FF00002 		mov	r2, #0
+ 1609 0cee 83F82D20 		strb	r2, [r3, #45]
+ 575:src/MAX-7W.c  **** 		MAX7W_Readings.Time_Sec = 0;
+ 1610              		.loc 1 575 0
+ 1611 0cf2 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1612 0cf6 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1613 0cfa 4FF00002 		mov	r2, #0
+ 1614 0cfe 83F82E20 		strb	r2, [r3, #46]
+ 576:src/MAX-7W.c  **** 		MAX7W_Readings.Validity &= ~GPS_TIME_VALID;
+ 1615              		.loc 1 576 0
+ 1616 0d02 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1617 0d06 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1618 0d0a 5B6B     		ldr	r3, [r3, #52]
+ 1619 0d0c 23F00102 		bic	r2, r3, #1
+ 1620 0d10 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1621 0d14 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1622 0d18 5A63     		str	r2, [r3, #52]
+ 1623              	.L59:
+ 577:src/MAX-7W.c  **** 	}
+ 578:src/MAX-7W.c  **** 
+ 579:src/MAX-7W.c  **** 	// first check status filed to know if position data is valid!
+ 580:src/MAX-7W.c  **** 	if (p_token[6] && *p_token[6] == 'V')
+ 1624              		.loc 1 580 0
+ 1625 0d1a 7B6A     		ldr	r3, [r7, #36]
+ 1626 0d1c 002B     		cmp	r3, #0
+ 1627 0d1e 03D0     		beq	.L60
+ 1628              		.loc 1 580 0 is_stmt 0 discriminator 1
+ 1629 0d20 7B6A     		ldr	r3, [r7, #36]
+ 1630 0d22 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1631 0d24 562B     		cmp	r3, #86
+ 1632 0d26 31D0     		beq	.L56
+ 1633              	.L60:
+ 581:src/MAX-7W.c  **** 		return;
+ 582:src/MAX-7W.c  **** 
+ 583:src/MAX-7W.c  **** 	if (p_token[1])
+ 1634              		.loc 1 583 0 is_stmt 1
+ 1635 0d28 3B69     		ldr	r3, [r7, #16]
+ 1636 0d2a 002B     		cmp	r3, #0
+ 1637 0d2c 0BD0     		beq	.L61
+ 584:src/MAX-7W.c  **** 		MAX7W_Readings.Pos_Latitude = strtof((const char*) p_token[1], NULL);
+ 1638              		.loc 1 584 0
+ 1639 0d2e 3B69     		ldr	r3, [r7, #16]
+ 1640 0d30 1846     		mov	r0, r3
+ 1641 0d32 4FF00001 		mov	r1, #0
+ 1642 0d36 FFF7FEFF 		bl	strtof
+ 1643 0d3a 0246     		mov	r2, r0
+ 1644 0d3c 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1645 0d40 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1646 0d44 5A61     		str	r2, [r3, #20]	@ float
+ 1647              	.L61:
+ 585:src/MAX-7W.c  **** 	if (p_token[2])
+ 1648              		.loc 1 585 0
+ 1649 0d46 7B69     		ldr	r3, [r7, #20]
+ 1650 0d48 002B     		cmp	r3, #0
+ 1651 0d4a 06D0     		beq	.L62
+ 586:src/MAX-7W.c  **** 		MAX7W_Readings.Pos_LatitudeIndNS = *p_token[2]; // character 'N' or 'S'
+ 1652              		.loc 1 586 0
+ 1653 0d4c 7B69     		ldr	r3, [r7, #20]
+ 1654 0d4e 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 1655 0d50 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1656 0d54 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1657 0d58 1A76     		strb	r2, [r3, #24]
+ 1658              	.L62:
+ 587:src/MAX-7W.c  **** 	if (p_token[3])
+ 1659              		.loc 1 587 0
+ 1660 0d5a BB69     		ldr	r3, [r7, #24]
+ 1661 0d5c 002B     		cmp	r3, #0
+ 1662 0d5e 0BD0     		beq	.L63
+ 588:src/MAX-7W.c  **** 		MAX7W_Readings.Pos_Longitude = strtof((const char*) p_token[3], NULL);
+ 1663              		.loc 1 588 0
+ 1664 0d60 BB69     		ldr	r3, [r7, #24]
+ 1665 0d62 1846     		mov	r0, r3
+ 1666 0d64 4FF00001 		mov	r1, #0
+ 1667 0d68 FFF7FEFF 		bl	strtof
+ 1668 0d6c 0246     		mov	r2, r0
+ 1669 0d6e 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1670 0d72 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1671 0d76 DA60     		str	r2, [r3, #12]	@ float
+ 1672              	.L63:
+ 589:src/MAX-7W.c  **** 	if (p_token[4])
+ 1673              		.loc 1 589 0
+ 1674 0d78 FB69     		ldr	r3, [r7, #28]
+ 1675 0d7a 002B     		cmp	r3, #0
+ 1676 0d7c 06D0     		beq	.L56
+ 590:src/MAX-7W.c  **** 		MAX7W_Readings.Pos_LongitudeIndEW = *p_token[4]; // character 'E' or 'W'
+ 1677              		.loc 1 590 0
+ 1678 0d7e FB69     		ldr	r3, [r7, #28]
+ 1679 0d80 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 1680 0d82 40F20003 		movw	r3, #:lower16:MAX7W_Readings
+ 1681 0d86 C0F20003 		movt	r3, #:upper16:MAX7W_Readings
+ 1682 0d8a 1A74     		strb	r2, [r3, #16]
+ 1683              	.L56:
+ 591:src/MAX-7W.c  **** 
+ 592:src/MAX-7W.c  **** 	return;
+ 593:src/MAX-7W.c  **** }
+ 1684              		.loc 1 593 0
+ 1685 0d8c 07F13C07 		add	r7, r7, #60
+ 1686 0d90 BD46     		mov	sp, r7
+ 1687 0d92 90BD     		pop	{r4, r7, pc}
+ 1688              		.cfi_endproc
+ 1689              	.LFE120:
+ 1691              		.align	2
+ 1692              		.thumb
+ 1693              		.thumb_func
+ 1695              	validate_csum:
+ 1696              	.LFB121:
+ 594:src/MAX-7W.c  **** 
+ 595:src/MAX-7W.c  **** 
+ 596:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 597:src/MAX-7W.c  **** //! static int validate_csum(char *p_msg, unsigned int msg_len)
+ 598:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 599:src/MAX-7W.c  **** //! @brief	calculates checksum of nmea string and compares it to the on that
+ 600:src/MAX-7W.c  **** //!			was contained in the message
+ 601:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 602:src/MAX-7W.c  **** //! @param	p_msg		pointer to message buffer
+ 603:src/MAX-7W.c  **** //! @param	msg_len		length of message
+ 604:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 605:src/MAX-7W.c  **** //! @return 0 if checksums is false
+ 606:src/MAX-7W.c  **** //! @return 1 if checksum is okay
+ 607:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 608:src/MAX-7W.c  **** static int validate_csum(char *p_msg, unsigned int msg_len){
+ 1697              		.loc 1 608 0
+ 1698              		.cfi_startproc
+ 1699              		@ args = 0, pretend = 0, frame = 16
+ 1700              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1701 0d94 80B5     		push	{r7, lr}
+ 1702              	.LCFI27:
+ 1703              		.cfi_def_cfa_offset 8
+ 1704              		.cfi_offset 7, -8
+ 1705              		.cfi_offset 14, -4
+ 1706 0d96 84B0     		sub	sp, sp, #16
+ 1707              	.LCFI28:
+ 1708              		.cfi_def_cfa_offset 24
+ 1709 0d98 00AF     		add	r7, sp, #0
+ 1710              	.LCFI29:
+ 1711              		.cfi_def_cfa_register 7
+ 1712 0d9a 7860     		str	r0, [r7, #4]
+ 1713 0d9c 3960     		str	r1, [r7, #0]
+ 609:src/MAX-7W.c  **** 	u8_t cs_calc;		//!< self-calculated checksum of the incoming message
+ 610:src/MAX-7W.c  **** 	u8_t cs_rcv;  		//!< received checksum of the incoming message
+ 611:src/MAX-7W.c  **** 	u8_t i_csum;
+ 612:src/MAX-7W.c  **** 
+ 613:src/MAX-7W.c  **** 	// if message length was is not valid
+ 614:src/MAX-7W.c  **** 	if(msg_len > GPS_BUF_SZ || msg_len < 4)
+ 1714              		.loc 1 614 0
+ 1715 0d9e 3B68     		ldr	r3, [r7, #0]
+ 1716 0da0 802B     		cmp	r3, #128
+ 1717 0da2 02D8     		bhi	.L66
+ 1718              		.loc 1 614 0 is_stmt 0 discriminator 1
+ 1719 0da4 3B68     		ldr	r3, [r7, #0]
+ 1720 0da6 032B     		cmp	r3, #3
+ 1721 0da8 02D8     		bhi	.L67
+ 1722              	.L66:
+ 615:src/MAX-7W.c  **** 		return 0;		
+ 1723              		.loc 1 615 0 is_stmt 1
+ 1724 0daa 4FF00003 		mov	r3, #0
+ 1725 0dae 41E0     		b	.L68
+ 1726              	.L67:
+ 616:src/MAX-7W.c  **** 	
+ 617:src/MAX-7W.c  **** 	// msg_len is incl. leading $ but without trailing <0D><0A><00>
+ 618:src/MAX-7W.c  **** 	msg_len-=3;
+ 1727              		.loc 1 618 0
+ 1728 0db0 3B68     		ldr	r3, [r7, #0]
+ 1729 0db2 A3F10303 		sub	r3, r3, #3
+ 1730 0db6 3B60     		str	r3, [r7, #0]
+ 619:src/MAX-7W.c  **** 
+ 620:src/MAX-7W.c  **** 	// see if checksum of received NmeaCmdString is ok
+ 621:src/MAX-7W.c  **** 	cs_rcv = (ascii2hex(p_msg[msg_len - 1]) << 4) & 0x0F0;
+ 1731              		.loc 1 621 0
+ 1732 0db8 3B68     		ldr	r3, [r7, #0]
+ 1733 0dba 03F1FF33 		add	r3, r3, #-1
+ 1734 0dbe 7A68     		ldr	r2, [r7, #4]
+ 1735 0dc0 D318     		adds	r3, r2, r3
+ 1736 0dc2 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1737 0dc4 1846     		mov	r0, r3
+ 1738 0dc6 00F0BFF8 		bl	ascii2hex
+ 1739 0dca 0346     		mov	r3, r0
+ 1740 0dcc 4FEA0313 		lsl	r3, r3, #4
+ 1741 0dd0 7B73     		strb	r3, [r7, #13]
+ 622:src/MAX-7W.c  **** 	cs_rcv = (cs_rcv | ((ascii2hex(p_msg[msg_len])) & 0x00F));
+ 1742              		.loc 1 622 0
+ 1743 0dd2 7A68     		ldr	r2, [r7, #4]
+ 1744 0dd4 3B68     		ldr	r3, [r7, #0]
+ 1745 0dd6 D318     		adds	r3, r2, r3
+ 1746 0dd8 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1747 0dda 1846     		mov	r0, r3
+ 1748 0ddc 00F0B4F8 		bl	ascii2hex
+ 1749 0de0 0346     		mov	r3, r0
+ 1750 0de2 DBB2     		uxtb	r3, r3
+ 1751 0de4 03F00F03 		and	r3, r3, #15
+ 1752 0de8 DAB2     		uxtb	r2, r3
+ 1753 0dea 7B7B     		ldrb	r3, [r7, #13]	@ zero_extendqisi2
+ 1754 0dec 1343     		orrs	r3, r3, r2
+ 1755 0dee DBB2     		uxtb	r3, r3
+ 1756 0df0 7B73     		strb	r3, [r7, #13]
+ 623:src/MAX-7W.c  **** 
+ 624:src/MAX-7W.c  **** 	// calculate checksum of anything between $ and *
+ 625:src/MAX-7W.c  **** 	cs_calc = 0;
+ 1757              		.loc 1 625 0
+ 1758 0df2 4FF00003 		mov	r3, #0
+ 1759 0df6 FB73     		strb	r3, [r7, #15]
+ 626:src/MAX-7W.c  **** 	for (i_csum = 1; i_csum <= msg_len-3; i_csum++) {
+ 1760              		.loc 1 626 0
+ 1761 0df8 4FF00103 		mov	r3, #1
+ 1762 0dfc BB73     		strb	r3, [r7, #14]
+ 1763 0dfe 0AE0     		b	.L69
+ 1764              	.L70:
+ 627:src/MAX-7W.c  **** 		cs_calc = cs_calc ^ (p_msg[i_csum]);
+ 1765              		.loc 1 627 0 discriminator 2
+ 1766 0e00 BB7B     		ldrb	r3, [r7, #14]	@ zero_extendqisi2
+ 1767 0e02 7A68     		ldr	r2, [r7, #4]
+ 1768 0e04 D318     		adds	r3, r2, r3
+ 1769 0e06 1A78     		ldrb	r2, [r3, #0]	@ zero_extendqisi2
+ 1770 0e08 FB7B     		ldrb	r3, [r7, #15]
+ 1771 0e0a 5340     		eors	r3, r3, r2
+ 1772 0e0c FB73     		strb	r3, [r7, #15]
+ 626:src/MAX-7W.c  **** 	for (i_csum = 1; i_csum <= msg_len-3; i_csum++) {
+ 1773              		.loc 1 626 0 discriminator 2
+ 1774 0e0e BB7B     		ldrb	r3, [r7, #14]
+ 1775 0e10 03F10103 		add	r3, r3, #1
+ 1776 0e14 BB73     		strb	r3, [r7, #14]
+ 1777              	.L69:
+ 626:src/MAX-7W.c  **** 	for (i_csum = 1; i_csum <= msg_len-3; i_csum++) {
+ 1778              		.loc 1 626 0 is_stmt 0 discriminator 1
+ 1779 0e16 BA7B     		ldrb	r2, [r7, #14]	@ zero_extendqisi2
+ 1780 0e18 3B68     		ldr	r3, [r7, #0]
+ 1781 0e1a A3F10303 		sub	r3, r3, #3
+ 1782 0e1e 9A42     		cmp	r2, r3
+ 1783 0e20 EED9     		bls	.L70
+ 628:src/MAX-7W.c  **** 	}
+ 629:src/MAX-7W.c  **** 
+ 630:src/MAX-7W.c  **** 	if (cs_calc != cs_rcv)
+ 1784              		.loc 1 630 0 is_stmt 1
+ 1785 0e22 FA7B     		ldrb	r2, [r7, #15]	@ zero_extendqisi2
+ 1786 0e24 7B7B     		ldrb	r3, [r7, #13]	@ zero_extendqisi2
+ 1787 0e26 9A42     		cmp	r2, r3
+ 1788 0e28 02D0     		beq	.L71
+ 631:src/MAX-7W.c  **** 		return 0;
+ 1789              		.loc 1 631 0
+ 1790 0e2a 4FF00003 		mov	r3, #0
+ 1791 0e2e 01E0     		b	.L68
+ 1792              	.L71:
+ 632:src/MAX-7W.c  **** 
+ 633:src/MAX-7W.c  **** 	return 1;
+ 1793              		.loc 1 633 0
+ 1794 0e30 4FF00103 		mov	r3, #1
+ 1795              	.L68:
+ 634:src/MAX-7W.c  **** }
+ 1796              		.loc 1 634 0
+ 1797 0e34 1846     		mov	r0, r3
+ 1798 0e36 07F11007 		add	r7, r7, #16
+ 1799 0e3a BD46     		mov	sp, r7
+ 1800 0e3c 80BD     		pop	{r7, pc}
+ 1801              		.cfi_endproc
+ 1802              	.LFE121:
+ 1804 0e3e 00BF     		.align	2
+ 1805              		.thumb
+ 1806              		.thumb_func
+ 1808              	spltStr:
+ 1809              	.LFB122:
+ 635:src/MAX-7W.c  **** 
+ 636:src/MAX-7W.c  **** 
+ 637:src/MAX-7W.c  **** 
+ 638:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 639:src/MAX-7W.c  **** //! static int spltStr(char *p_str, u16_t sz, char delim, char **pp_res, u8_t cnt)
+ 640:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 641:src/MAX-7W.c  **** //! @brief	splits an separated string into n strings.
+ 642:src/MAX-7W.c  **** //!			Attention: String gets changed! every delimiter is replaced by '\0'
+ 643:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 644:src/MAX-7W.c  **** //! @param	p_str	pointer to string
+ 645:src/MAX-7W.c  **** //! @param	sz		string size
+ 646:src/MAX-7W.c  **** //! @param	delim	delimiter that separates string parts
+ 647:src/MAX-7W.c  **** //! @param	pp_res	pointer to result array
+ 648:src/MAX-7W.c  **** //! @param	cnt		size of array
+ 649:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 650:src/MAX-7W.c  **** //! @return <0 in case of errors
+ 651:src/MAX-7W.c  **** //! @return >=0 number of elements the string is spit in
+ 652:src/MAX-7W.c  **** //!				(never > cnt -> further elements are ignored).
+ 653:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 654:src/MAX-7W.c  **** static int spltStr(char *p_str, u16_t sz, char delim, char **pp_res, u8_t cnt) {
+ 1810              		.loc 1 654 0
+ 1811              		.cfi_startproc
+ 1812              		@ args = 4, pretend = 0, frame = 24
+ 1813              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1814              		@ link register save eliminated.
+ 1815 0e40 80B4     		push	{r7}
+ 1816              	.LCFI30:
+ 1817              		.cfi_def_cfa_offset 4
+ 1818              		.cfi_offset 7, -4
+ 1819 0e42 87B0     		sub	sp, sp, #28
+ 1820              	.LCFI31:
+ 1821              		.cfi_def_cfa_offset 32
+ 1822 0e44 00AF     		add	r7, sp, #0
+ 1823              	.LCFI32:
+ 1824              		.cfi_def_cfa_register 7
+ 1825 0e46 F860     		str	r0, [r7, #12]
+ 1826 0e48 7B60     		str	r3, [r7, #4]
+ 1827 0e4a 0B46     		mov	r3, r1	@ movhi
+ 1828 0e4c 7B81     		strh	r3, [r7, #10]	@ movhi
+ 1829 0e4e 1346     		mov	r3, r2
+ 1830 0e50 7B72     		strb	r3, [r7, #9]
+ 655:src/MAX-7W.c  **** 	u8_t i; //!< position in string
+ 656:src/MAX-7W.c  **** 	u8_t k; //!< number of current element
+ 657:src/MAX-7W.c  **** 
+ 658:src/MAX-7W.c  **** 	if (!p_str)
+ 1831              		.loc 1 658 0
+ 1832 0e52 FB68     		ldr	r3, [r7, #12]
+ 1833 0e54 002B     		cmp	r3, #0
+ 1834 0e56 02D1     		bne	.L73
+ 659:src/MAX-7W.c  **** 		return -1;
+ 1835              		.loc 1 659 0
+ 1836 0e58 4FF0FF33 		mov	r3, #-1
+ 1837 0e5c 52E0     		b	.L74
+ 1838              	.L73:
+ 660:src/MAX-7W.c  **** 	if (!pp_res)
+ 1839              		.loc 1 660 0
+ 1840 0e5e 7B68     		ldr	r3, [r7, #4]
+ 1841 0e60 002B     		cmp	r3, #0
+ 1842 0e62 02D1     		bne	.L75
+ 661:src/MAX-7W.c  **** 		return -1;
+ 1843              		.loc 1 661 0
+ 1844 0e64 4FF0FF33 		mov	r3, #-1
+ 1845 0e68 4CE0     		b	.L74
+ 1846              	.L75:
+ 662:src/MAX-7W.c  **** 	if (sz < 1)
+ 1847              		.loc 1 662 0
+ 1848 0e6a 7B89     		ldrh	r3, [r7, #10]
+ 1849 0e6c 002B     		cmp	r3, #0
+ 1850 0e6e 02D1     		bne	.L76
+ 663:src/MAX-7W.c  **** 		return -1;
+ 1851              		.loc 1 663 0
+ 1852 0e70 4FF0FF33 		mov	r3, #-1
+ 1853 0e74 46E0     		b	.L74
+ 1854              	.L76:
+ 664:src/MAX-7W.c  **** 
+ 665:src/MAX-7W.c  **** 	k = 0;
+ 1855              		.loc 1 665 0
+ 1856 0e76 4FF00003 		mov	r3, #0
+ 1857 0e7a BB75     		strb	r3, [r7, #22]
+ 666:src/MAX-7W.c  **** 
+ 667:src/MAX-7W.c  **** 	pp_res[k++] = &p_str[0];
+ 1858              		.loc 1 667 0
+ 1859 0e7c BB7D     		ldrb	r3, [r7, #22]	@ zero_extendqisi2
+ 1860 0e7e 4FEA8303 		lsl	r3, r3, #2
+ 1861 0e82 7A68     		ldr	r2, [r7, #4]
+ 1862 0e84 D318     		adds	r3, r2, r3
+ 1863 0e86 FA68     		ldr	r2, [r7, #12]
+ 1864 0e88 1A60     		str	r2, [r3, #0]
+ 1865 0e8a BB7D     		ldrb	r3, [r7, #22]
+ 1866 0e8c 03F10103 		add	r3, r3, #1
+ 1867 0e90 BB75     		strb	r3, [r7, #22]
+ 668:src/MAX-7W.c  **** 
+ 669:src/MAX-7W.c  **** 	// search max cnt elements in first sz chars
+ 670:src/MAX-7W.c  **** 	for (i = 0; i < sz; i++) {
+ 1868              		.loc 1 670 0
+ 1869 0e92 4FF00003 		mov	r3, #0
+ 1870 0e96 FB75     		strb	r3, [r7, #23]
+ 1871 0e98 2EE0     		b	.L77
+ 1872              	.L81:
+ 671:src/MAX-7W.c  **** 		if (p_str[i] == '\0') {
+ 1873              		.loc 1 671 0
+ 1874 0e9a FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 1875 0e9c FA68     		ldr	r2, [r7, #12]
+ 1876 0e9e D318     		adds	r3, r2, r3
+ 1877 0ea0 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1878 0ea2 002B     		cmp	r3, #0
+ 1879 0ea4 01D1     		bne	.L78
+ 672:src/MAX-7W.c  **** 			return k;
+ 1880              		.loc 1 672 0
+ 1881 0ea6 BB7D     		ldrb	r3, [r7, #22]	@ zero_extendqisi2
+ 1882 0ea8 2CE0     		b	.L74
+ 1883              	.L78:
+ 673:src/MAX-7W.c  **** 		} else if (p_str[i] == delim) {
+ 1884              		.loc 1 673 0
+ 1885 0eaa FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 1886 0eac FA68     		ldr	r2, [r7, #12]
+ 1887 0eae D318     		adds	r3, r2, r3
+ 1888 0eb0 1B78     		ldrb	r3, [r3, #0]	@ zero_extendqisi2
+ 1889 0eb2 7A7A     		ldrb	r2, [r7, #9]	@ zero_extendqisi2
+ 1890 0eb4 9A42     		cmp	r2, r3
+ 1891 0eb6 14D1     		bne	.L79
+ 674:src/MAX-7W.c  **** 			p_str[i] = '\0';
+ 1892              		.loc 1 674 0
+ 1893 0eb8 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 1894 0eba FA68     		ldr	r2, [r7, #12]
+ 1895 0ebc D318     		adds	r3, r2, r3
+ 1896 0ebe 4FF00002 		mov	r2, #0
+ 1897 0ec2 1A70     		strb	r2, [r3, #0]
+ 675:src/MAX-7W.c  **** 			pp_res[k++] = &p_str[i + 1];
+ 1898              		.loc 1 675 0
+ 1899 0ec4 BB7D     		ldrb	r3, [r7, #22]	@ zero_extendqisi2
+ 1900 0ec6 4FEA8303 		lsl	r3, r3, #2
+ 1901 0eca 7A68     		ldr	r2, [r7, #4]
+ 1902 0ecc D318     		adds	r3, r2, r3
+ 1903 0ece FA7D     		ldrb	r2, [r7, #23]	@ zero_extendqisi2
+ 1904 0ed0 02F10102 		add	r2, r2, #1
+ 1905 0ed4 F968     		ldr	r1, [r7, #12]
+ 1906 0ed6 8A18     		adds	r2, r1, r2
+ 1907 0ed8 1A60     		str	r2, [r3, #0]
+ 1908 0eda BB7D     		ldrb	r3, [r7, #22]
+ 1909 0edc 03F10103 		add	r3, r3, #1
+ 1910 0ee0 BB75     		strb	r3, [r7, #22]
+ 1911              	.L79:
+ 676:src/MAX-7W.c  **** 		}
+ 677:src/MAX-7W.c  **** 
+ 678:src/MAX-7W.c  **** 		if (k >= cnt)
+ 1912              		.loc 1 678 0
+ 1913 0ee2 BA7D     		ldrb	r2, [r7, #22]	@ zero_extendqisi2
+ 1914 0ee4 97F82030 		ldrb	r3, [r7, #32]	@ zero_extendqisi2
+ 1915 0ee8 9A42     		cmp	r2, r3
+ 1916 0eea 01D3     		bcc	.L80
+ 679:src/MAX-7W.c  **** 			return k;
+ 1917              		.loc 1 679 0
+ 1918 0eec BB7D     		ldrb	r3, [r7, #22]	@ zero_extendqisi2
+ 1919 0eee 09E0     		b	.L74
+ 1920              	.L80:
+ 670:src/MAX-7W.c  **** 	for (i = 0; i < sz; i++) {
+ 1921              		.loc 1 670 0
+ 1922 0ef0 FB7D     		ldrb	r3, [r7, #23]
+ 1923 0ef2 03F10103 		add	r3, r3, #1
+ 1924 0ef6 FB75     		strb	r3, [r7, #23]
+ 1925              	.L77:
+ 670:src/MAX-7W.c  **** 	for (i = 0; i < sz; i++) {
+ 1926              		.loc 1 670 0 is_stmt 0 discriminator 1
+ 1927 0ef8 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 1928 0efa 9BB2     		uxth	r3, r3
+ 1929 0efc 7A89     		ldrh	r2, [r7, #10]
+ 1930 0efe 9A42     		cmp	r2, r3
+ 1931 0f00 CBD8     		bhi	.L81
+ 680:src/MAX-7W.c  **** 	}
+ 681:src/MAX-7W.c  **** 
+ 682:src/MAX-7W.c  **** 	return k;
+ 1932              		.loc 1 682 0 is_stmt 1
+ 1933 0f02 BB7D     		ldrb	r3, [r7, #22]	@ zero_extendqisi2
+ 1934              	.L74:
+ 683:src/MAX-7W.c  **** }
+ 1935              		.loc 1 683 0
+ 1936 0f04 1846     		mov	r0, r3
+ 1937 0f06 07F11C07 		add	r7, r7, #28
+ 1938 0f0a BD46     		mov	sp, r7
+ 1939 0f0c 80BC     		pop	{r7}
+ 1940 0f0e 7047     		bx	lr
+ 1941              		.cfi_endproc
+ 1942              	.LFE122:
+ 1944              		.align	2
+ 1945              		.thumb
+ 1946              		.thumb_func
+ 1948              	hex2ascii:
+ 1949              	.LFB123:
+ 684:src/MAX-7W.c  **** 
+ 685:src/MAX-7W.c  **** 
+ 686:src/MAX-7W.c  **** 
+ 687:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 688:src/MAX-7W.c  **** //! static u8_t hex2ascii(u8_t chr)
+ 689:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 690:src/MAX-7W.c  **** //! @brief	translates hex number to character
+ 691:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 692:src/MAX-7W.c  **** //! @param	chr	value to convert
+ 693:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 694:src/MAX-7W.c  **** //! @return converted char
+ 695:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 696:src/MAX-7W.c  **** static u8_t hex2ascii(u8_t chr){
+ 1950              		.loc 1 696 0
+ 1951              		.cfi_startproc
+ 1952              		@ args = 0, pretend = 0, frame = 8
+ 1953              		@ frame_needed = 1, uses_anonymous_args = 0
+ 1954              		@ link register save eliminated.
+ 1955 0f10 80B4     		push	{r7}
+ 1956              	.LCFI33:
+ 1957              		.cfi_def_cfa_offset 4
+ 1958              		.cfi_offset 7, -4
+ 1959 0f12 83B0     		sub	sp, sp, #12
+ 1960              	.LCFI34:
+ 1961              		.cfi_def_cfa_offset 16
+ 1962 0f14 00AF     		add	r7, sp, #0
+ 1963              	.LCFI35:
+ 1964              		.cfi_def_cfa_register 7
+ 1965 0f16 0346     		mov	r3, r0
+ 1966 0f18 FB71     		strb	r3, [r7, #7]
+ 697:src/MAX-7W.c  **** 	chr = chr & 0xF;
+ 1967              		.loc 1 697 0
+ 1968 0f1a FB79     		ldrb	r3, [r7, #7]
+ 1969 0f1c 03F00F03 		and	r3, r3, #15
+ 1970 0f20 FB71     		strb	r3, [r7, #7]
+ 698:src/MAX-7W.c  **** 	if (chr > 9) {
+ 1971              		.loc 1 698 0
+ 1972 0f22 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 1973 0f24 092B     		cmp	r3, #9
+ 1974 0f26 04D9     		bls	.L83
+ 699:src/MAX-7W.c  **** 		chr += ('A' - 10); //characters
+ 1975              		.loc 1 699 0
+ 1976 0f28 FB79     		ldrb	r3, [r7, #7]
+ 1977 0f2a 03F13703 		add	r3, r3, #55
+ 1978 0f2e FB71     		strb	r3, [r7, #7]
+ 1979 0f30 03E0     		b	.L84
+ 1980              	.L83:
+ 700:src/MAX-7W.c  **** 	} else {
+ 701:src/MAX-7W.c  **** 		chr += '0'; // numbers
+ 1981              		.loc 1 701 0
+ 1982 0f32 FB79     		ldrb	r3, [r7, #7]
+ 1983 0f34 03F13003 		add	r3, r3, #48
+ 1984 0f38 FB71     		strb	r3, [r7, #7]
+ 1985              	.L84:
+ 702:src/MAX-7W.c  **** 	}
+ 703:src/MAX-7W.c  **** 	return chr;
+ 1986              		.loc 1 703 0
+ 1987 0f3a FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 704:src/MAX-7W.c  **** }
+ 1988              		.loc 1 704 0
+ 1989 0f3c 1846     		mov	r0, r3
+ 1990 0f3e 07F10C07 		add	r7, r7, #12
+ 1991 0f42 BD46     		mov	sp, r7
+ 1992 0f44 80BC     		pop	{r7}
+ 1993 0f46 7047     		bx	lr
+ 1994              		.cfi_endproc
+ 1995              	.LFE123:
+ 1997              		.align	2
+ 1998              		.thumb
+ 1999              		.thumb_func
+ 2001              	ascii2hex:
+ 2002              	.LFB124:
+ 705:src/MAX-7W.c  **** 
+ 706:src/MAX-7W.c  **** 
+ 707:src/MAX-7W.c  **** 
+ 708:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 709:src/MAX-7W.c  **** //! static u8_t hex2ascii(u8_t chr)
+ 710:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 711:src/MAX-7W.c  **** //! @brief	translates character to hex number
+ 712:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 713:src/MAX-7W.c  **** //! @param	chr	char to convert
+ 714:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 715:src/MAX-7W.c  **** //! @return converted number
+ 716:src/MAX-7W.c  **** //------------------------------------------------------------------------------
+ 717:src/MAX-7W.c  **** static u8_t ascii2hex(u8_t chr){
+ 2003              		.loc 1 717 0
+ 2004              		.cfi_startproc
+ 2005              		@ args = 0, pretend = 0, frame = 8
+ 2006              		@ frame_needed = 1, uses_anonymous_args = 0
+ 2007              		@ link register save eliminated.
+ 2008 0f48 80B4     		push	{r7}
+ 2009              	.LCFI36:
+ 2010              		.cfi_def_cfa_offset 4
+ 2011              		.cfi_offset 7, -4
+ 2012 0f4a 83B0     		sub	sp, sp, #12
+ 2013              	.LCFI37:
+ 2014              		.cfi_def_cfa_offset 16
+ 2015 0f4c 00AF     		add	r7, sp, #0
+ 2016              	.LCFI38:
+ 2017              		.cfi_def_cfa_register 7
+ 2018 0f4e 0346     		mov	r3, r0
+ 2019 0f50 FB71     		strb	r3, [r7, #7]
+ 718:src/MAX-7W.c  **** 	if ((chr <= 'F') && (chr >= 'A')) // upper case characters
+ 2020              		.loc 1 718 0
+ 2021 0f52 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 2022 0f54 462B     		cmp	r3, #70
+ 2023 0f56 0BD8     		bhi	.L87
+ 2024              		.loc 1 718 0 is_stmt 0 discriminator 1
+ 2025 0f58 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 2026 0f5a 402B     		cmp	r3, #64
+ 2027 0f5c 08D9     		bls	.L87
+ 719:src/MAX-7W.c  **** 			{
+ 720:src/MAX-7W.c  **** 		chr -= ('A' - 10);
+ 2028              		.loc 1 720 0 is_stmt 1
+ 2029 0f5e FB79     		ldrb	r3, [r7, #7]
+ 2030 0f60 A3F13703 		sub	r3, r3, #55
+ 2031 0f64 FB71     		strb	r3, [r7, #7]
+ 721:src/MAX-7W.c  **** 		return chr & 0xF;
+ 2032              		.loc 1 721 0
+ 2033 0f66 FB79     		ldrb	r3, [r7, #7]
+ 2034 0f68 03F00F03 		and	r3, r3, #15
+ 2035 0f6c DBB2     		uxtb	r3, r3
+ 2036 0f6e 20E0     		b	.L88
+ 2037              	.L87:
+ 722:src/MAX-7W.c  **** 	} else if ((chr <= 'f') && (chr >= 'a')) // lower case characters
+ 2038              		.loc 1 722 0
+ 2039 0f70 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 2040 0f72 662B     		cmp	r3, #102
+ 2041 0f74 0BD8     		bhi	.L89
+ 2042              		.loc 1 722 0 is_stmt 0 discriminator 1
+ 2043 0f76 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 2044 0f78 602B     		cmp	r3, #96
+ 2045 0f7a 08D9     		bls	.L89
+ 723:src/MAX-7W.c  **** 			{
+ 724:src/MAX-7W.c  **** 		chr -= ('a' - 10);
+ 2046              		.loc 1 724 0 is_stmt 1
+ 2047 0f7c FB79     		ldrb	r3, [r7, #7]
+ 2048 0f7e A3F15703 		sub	r3, r3, #87
+ 2049 0f82 FB71     		strb	r3, [r7, #7]
+ 725:src/MAX-7W.c  **** 		return chr & 0xF;
+ 2050              		.loc 1 725 0
+ 2051 0f84 FB79     		ldrb	r3, [r7, #7]
+ 2052 0f86 03F00F03 		and	r3, r3, #15
+ 2053 0f8a DBB2     		uxtb	r3, r3
+ 2054 0f8c 11E0     		b	.L88
+ 2055              	.L89:
+ 726:src/MAX-7W.c  **** 	}
+ 727:src/MAX-7W.c  **** 
+ 728:src/MAX-7W.c  **** 	else if ((chr <= '9') && (chr >= '0')) // numbers
+ 2056              		.loc 1 728 0
+ 2057 0f8e FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 2058 0f90 392B     		cmp	r3, #57
+ 2059 0f92 07D8     		bhi	.L90
+ 2060              		.loc 1 728 0 is_stmt 0 discriminator 1
+ 2061 0f94 FB79     		ldrb	r3, [r7, #7]	@ zero_extendqisi2
+ 2062 0f96 2F2B     		cmp	r3, #47
+ 2063 0f98 04D9     		bls	.L90
+ 729:src/MAX-7W.c  **** 			{
+ 730:src/MAX-7W.c  **** 		chr -= '0';
+ 2064              		.loc 1 730 0 is_stmt 1
+ 2065 0f9a FB79     		ldrb	r3, [r7, #7]
+ 2066 0f9c A3F13003 		sub	r3, r3, #48
+ 2067 0fa0 FB71     		strb	r3, [r7, #7]
+ 2068 0fa2 02E0     		b	.L91
+ 2069              	.L90:
+ 731:src/MAX-7W.c  **** 	} else {
+ 732:src/MAX-7W.c  **** 		chr = 0;
+ 2070              		.loc 1 732 0
+ 2071 0fa4 4FF00003 		mov	r3, #0
+ 2072 0fa8 FB71     		strb	r3, [r7, #7]
+ 2073              	.L91:
+ 733:src/MAX-7W.c  **** 	}
+ 734:src/MAX-7W.c  **** 	return chr & 0xF;
+ 2074              		.loc 1 734 0
+ 2075 0faa FB79     		ldrb	r3, [r7, #7]
+ 2076 0fac 03F00F03 		and	r3, r3, #15
+ 2077 0fb0 DBB2     		uxtb	r3, r3
+ 2078              	.L88:
+ 735:src/MAX-7W.c  **** }
+ 2079              		.loc 1 735 0
+ 2080 0fb2 1846     		mov	r0, r3
+ 2081 0fb4 07F10C07 		add	r7, r7, #12
+ 2082 0fb8 BD46     		mov	sp, r7
+ 2083 0fba 80BC     		pop	{r7}
+ 2084 0fbc 7047     		bx	lr
+ 2085              		.cfi_endproc
+ 2086              	.LFE124:
+ 2088              		.bss
+ 2089              	rx_buff_ptr.7499:
+ 2090 00c4 00       		.space	1
+ 2091 00c5 000000   		.align	2
+ 2092              	rx_buff.7500:
+ 2093 00c8 00000000 		.space	128
+ 2093      00000000 
+ 2093      00000000 
+ 2093      00000000 
+ 2093      00000000 
+ 2094              		.text
+ 2095              	.Letext0:
+ 2096              		.file 2 "c:/tools/pcan-router/yagarto-20121222/lib/gcc/../../arm-none-eabi/sys-include/stdint.h"
+ 2097              		.file 3 "./inc/typedefs.h"
+ 2098              		.file 4 "./inc/lib/serial.h"
+ 2099              		.file 5 "./inc/MAX-7W.h"
+ 2100              		.file 6 "./inc/core_cm4.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 MAX-7W.c
+                            *COM*:00000038 MAX7W_Readings
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:20     .bss:00000000 nmea_str_complete
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:21     .bss:00000000 $d
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:23     .bss:00000004 TxFifo
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:26     .bss:00000044 RxFifo
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:33     .text:00000000 $t
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:38     .text:00000000 Init_UART2
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:134    .text:000000b0 $d
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:139    .text:000000b8 $t
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:144    .text:000000b8 UBLOX_MAX7W_init
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:184    .rodata:00000000 $d
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:185    .rodata:00000000 .LC0
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:188    .rodata:00000008 .LC1
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:191    .rodata:00000010 .LC2
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:194    .rodata:00000018 .LC3
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:197    .rodata:00000020 .LC4
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:200    .rodata:00000028 .LC5
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:208    .text:000000e8 UBLOX_MAX7W_task
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:2089   .bss:000000c4 rx_buff_ptr.7499
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:2092   .bss:000000c8 rx_buff.7500
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1695   .text:00000d94 validate_csum
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:658    .text:000004b8 evaluate_$GPRMC
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1101   .text:000008e8 evaluate_$GPVTG
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1201   .text:000009a0 evaluate_$GPGGA
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1301   .text:00000a50 evaluate_$GPGSA
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1414   .text:00000b18 evaluate_$GPGLL
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:488    .text:00000344 evaluate_$GPTXT
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:466    .rodata:00000030 .LC6
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:469    .rodata:0000003c .LC7
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:472    .rodata:00000044 .LC8
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:475    .rodata:00000050 .LC9
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:478    .rodata:00000054 .LC10
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:481    .rodata:0000005c .LC11
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1808   .text:00000e40 spltStr
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:2001   .text:00000f48 ascii2hex
+C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1948   .text:00000f10 hex2ascii
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_ui2d
+__aeabi_ddiv
+__aeabi_dadd
+__aeabi_d2uiz
+SER_Initialize
+HW_GPS_PowerOn
+SER_Read
+strncmp
+strtof
+memset
+strtoul
