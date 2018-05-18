@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PCANExplorerProject Version="5.0" Name="PCAN-GPS">
+    <Connections AutoReset="0" IgnoreRTRLength="0" ProcessRTR="1">
+        <Connection Bus="1" Enabled="1" Protocol="0" ErrorFrames="1" CalcBusLoad="1" SymbolsFileName="PCAN-GPS_Symbols.sym" BitRate="28" Connection="500k@pcan_usb" Name="Verbindung1"/>
+    </Connections>
+    <MessageFilters/>
+    <Files>
+        <File RelativePath="PCAN-GPS_Symbols.sym"/>
+        <File RelativePath="PCAN-GPS_Panel.ipf"/>
+        <File RelativePath="PCAN-GPS_Plot_Accelerations.plt"/>
+        <File RelativePath="PCAN-GPS_Plot_Rotations.plt"/>
+        <File RelativePath="PCAN-GPS_SetDateTime.xmt"/>
+    </Files>
+</PCANExplorerProject>
