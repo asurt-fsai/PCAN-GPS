@@ -1,0 +1,177 @@
+FormatVersion=5.0 // Do not edit!
+// Last editet by MG (2014-11-11)
+
+Title="PCAN-GPS Example"
+
+{ENUMS}
+
+enum AccCalibTargets(0="0 G", 1="+1 G", 2="-1 G")
+enum AccScales(1="±2 G", 2="±4 G", 3="±8 G", 4="±16 G")
+enum AntStats(0="INIT", 1="DONTKNOW", 2="OK", 3="SHORT", 4="OPEN")
+enum Axes(0="undefined", 1="X Axis", 2="Y Axis", 3="Z Axis")
+enum DaysOfWeek(0="Monday", 1="Tuesday", 2="Wednesday", 3="Thursday", 4="Friday", 5="Saturday", 6="Sunday")
+enum GyroScales(0="±250 °/s", 1="±500 °/s", 2="±2000 °/s", 3="±2000 °/s")
+enum LogiStates(0="False", 1="True")
+enum Months(1="January", 2="February", 3="March", 4="April", 5="May", 6="June", 7="July", 8="August", 9="September", 10="October", 11="November", 12="December")
+enum NavMeths(0="INIT", 1="NONE", 2="2D", 3="3D")
+enum Orientations(0="flat", 1="flat upside down", 2="landscape left", 3="landscape right", 4="portrait", 5="portrait upside down")
+enum Quadrants(0="INIT", 69="East", 78="North", 83="South", 87="West")
+enum SwitchStates(0="Off", 1="On")
+
+
+{RECEIVE}
+
+[BMC_Acceleration]
+ID=600h
+DLC=8
+Var=Acceleration_X signed 0,16 /u:mG /f:3.91 /min:-20000 /max:20000
+Var=Acceleration_Y signed 16,16 /u:mG /f:3.91 /min:-20000 /max:20000
+Var=Acceleration_Z signed 32,16 /u:mG /f:3.91 /min:-20000 /max:20000
+Var=Temperature signed 48,8 /u:°C /f:0.5 /o:24
+Var=VerticalAxis unsigned 56,2 /e:Axes
+Var=Orientation unsigned 58,3 /e:Orientations
+
+[BMC_MagneticField]
+ID=601h
+DLC=6
+Var=MagneticField_X signed 0,16 /u:µT /f:0.3
+Var=MagneticField_Y signed 16,16 /u:µT /f:0.3
+Var=MagneticField_Z signed 32,16 /u:µT /f:0.3
+
+[L3GD20_Rotation_A]
+ID=610h
+DLC=8
+Var=Rotation_X float 0,32 /u:°/s /min:-4000 /max:4000
+Var=Rotation_Y float 32,32 /u:°/s /min:-4000 /max:4000
+
+[L3GD20_Rotation_B]
+ID=611h
+DLC=4
+Var=Rotation_Z float 0,32 /u:°/s /min:-4000 /max:4000
+
+[GPS_Status]
+ID=620h
+DLC=3
+Var=GPS_AntennaStatus AntStats 0,8
+Var=GPS_NumSatellites unsigned 8,8
+Var=GPS_NavigationMethod NavMeths 16,8
+
+[GPS_CourseSpeed]
+ID=621h
+DLC=8
+Var=GPS_Course float 0,32 /u:°
+Var=GPS_Speed float 32,32 /u:km/h
+
+[GPS_PositionLongitude]
+ID=622h
+DLC=7
+Var=GPS_Longitude_Degree unsigned 32,16 /max:359 /u:°
+Var=GPS_Longitude_Minutes float 0,32 /p:5 /u:'
+Var=GPS_IndicatorEW Quadrants 48,8
+
+[GPS_PositionLatitude]
+ID=623h
+DLC=7
+Var=GPS_Latitude_Degree unsigned 32,16 /max:359 /u:°
+Var=GPS_Latitude_Minutes float 0,32 /p:5 /u:'
+Var=GPS_IndicatorNS Quadrants 48,8
+
+[GPS_PositionAltitude]
+ID=624h
+DLC=4
+Var=GPS_Altitude float 0,32 /u:m
+
+[GPS_Delusions_A]
+ID=625h
+DLC=8
+Var=GPS_PDOP float 0,32
+Var=GPS_HDOP float 32,32
+
+[GPS_Delusions_B]
+ID=626h
+DLC=4
+Var=GPS_VDOP float 0,32
+
+[GPS_DateTime]
+ID=627h
+DLC=6
+Var=UTC_Year unsigned 0,8
+Var=UTC_Month unsigned 8,8
+Var=UTC_DayOfMonth unsigned 16,8
+Var=UTC_Hour unsigned 24,8
+Var=UTC_Minute unsigned 32,8
+Var=UTC_Second unsigned 40,8
+
+[IO]
+ID=630h
+DLC=1
+Var=Din1_Status SwitchStates 0,1
+Var=Din2_Status SwitchStates 1,1
+Var=Dout_Status SwitchStates 2,1
+Var=SD_Present LogiStates 3,1
+Var=GPS_PowerStatus SwitchStates 4,1
+Var=Device_ID unsigned 5,3
+
+[RTC_DateTime]
+ID=640h
+DLC=8
+Var=RTC_Sec unsigned 0,8
+Var=RTC_Min unsigned 8,8
+Var=RTC_Hour unsigned 16,8
+Var=RTC_DayOfWeek unsigned 24,8 /e:DaysOfWeek
+Var=RTC_DayOfMonth unsigned 32,8
+Var=RTC_Month unsigned 40,8
+Var=RTC_Year unsigned 48,16
+
+
+{SENDRECEIVE}
+
+[Out_IO]
+ID=650h
+DLC=1
+Var=Dout_Set SwitchStates 0,1
+Var=GPS_SetPower SwitchStates 1,1 /d:1
+
+[Out_PowerOff]
+ID=651h
+DLC=1
+Var=Device_PowerOff LogiStates 0,1
+
+[Out_Gyro]
+ID=652h
+DLC=1
+Var=Gyro_SetScale unsigned 0,2 /u:°/s /e:GyroScales
+
+[Out_BMC_AccScale]
+ID=653h
+DLC=1
+Var=Acc_SetScale unsigned 0,3 /d:1 /e:AccScales
+
+[Out_SaveConfig]
+ID=654h
+DLC=1
+Var=Config_SaveToEEPROM LogiStates 0,1  // Saves sensor ranges and calibration targets to EERPOM to restore them after startup
+
+[Out_RTC_SetTime]
+ID=655h
+DLC=8
+Var=RTC_SetSec unsigned 0,8 /max:59
+Var=RTC_SetMin unsigned 8,8 /max:59
+Var=RTC_SetHour unsigned 16,8 /max:23
+Var=RTC_SetDayOfWeek unsigned 24,8 /e:DaysOfWeek /max:6
+Var=RTC_SetDayOfMonth unsigned 32,8 /min:1 /max:31
+Var=RTC_SetMonth unsigned 40,8 /e:Months /min:1 /max:12
+Var=RTC_SetYear unsigned 48,16 /min:1900 /max:2099
+
+[Out_RTC_TimeFromGPS]
+ID=656h
+DLC=1
+Var=RTC_SetTimeFromGPS LogiStates 0,1  // Note: GPS time does not know the day of week!
+
+[Out_Acc_FastCalibration]
+ID=657h
+DLC=4
+Var=Acc_SetCalibTarget_X AccCalibTargets 0,2
+Var=Acc_SetCalibTarget_Y AccCalibTargets 8,2
+Var=Acc_SetCalibTarget_Z AccCalibTargets 16,2
+Var=Acc_StartFastCalib LogiStates 24,1

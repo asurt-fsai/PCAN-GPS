@@ -1,0 +1,3 @@
+PCAN-GPS.peproj ist ein Beispielprojekt für die Verwendung mit dem
+PCAN-Explorer 5. Es funktioniert im Zusammenhang mit der Auslieferungsfirmware
+(Delivery Firmware) für das PCAN-GPS.

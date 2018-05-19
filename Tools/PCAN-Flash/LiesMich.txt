@@ -1,0 +1,18 @@
+===============================================================================
+LiesMich.txt
+
+PCAN-Flash
+Copyright (c) 2015 PEAK-System Technik GmbH Darmstadt
+Alle Rechte vorbehalten.
+===============================================================================
+
+PCAN-Flash muss von einem Datenträger gestartet werden, der auch beschreibbar
+ist, da ansonsten die Konfiguration des Programms (Datei PcanFlash.ini) nicht
+gespeichert werden kann. Das Programm funktioniert nicht korrekt, wenn es von
+einer DVD ausgeführt wird. Dies äußert sich zum Beispiel durch eine Fehler-
+meldung bei der Auswahl einer CAN-Verbindung.
+
+Stellen Sie sicher, dass das Verzeichnis PCAN-Flash zum Beispiel auf einer
+lokalen Festplatte liegt (gegebenenfalls Kopie von der DVD) sowie Schreibrechte
+in dem Verzeichnis bestehen, und führen Sie PCAN-Flash (PcanFlash.exe) von dort
+aus.

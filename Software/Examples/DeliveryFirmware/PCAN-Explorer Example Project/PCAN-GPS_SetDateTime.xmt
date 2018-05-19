@@ -1,0 +1,12 @@
+; D:\Projekte\GPS\PCAN-GPS Example Project PE5\Arbeit_MG\PCAN-GPS_SetDateTime.xmt
+; CAN messages saved by PCAN-Explorer 5.3.5
+;
+; Columns descriptions:
+; ~~~~~~~~~~~~~~~~~~~~~
+; +Message ID
+; |            +Cycle time in ms (0=manual)
+; |            |  +Length of message
+; |            |  |  +Frame type: D)ata or R)emote request
+; |            |  |  |  +Message data
+; |            |  |  |  |
+655h           0  8  D 00h 00h 0Ch 01h 0Bh 0Bh DEh 07h
