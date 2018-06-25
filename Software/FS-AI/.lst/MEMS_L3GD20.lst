@@ -1410,30 +1410,30 @@
 DEFINED SYMBOLS
                             *ABS*:00000000 MEMS_L3GD20.c
                             *COM*:00000014 L3GD20_Readings
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:20     .bss:00000000 L3GD20State
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:21     .bss:00000000 $d
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:23     .bss:00000004 ConfRegs
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:26     .bss:0000000c DataRegs
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:29     .rodata:00000000 $d
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:32     .rodata:00000000 sens
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:39     .bss:00000018 wBuff_GyroData
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:41     .bss:00000028 ssp_init
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:43     .bss:00000029 data_init
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:46     .text:00000000 $t
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:51     .text:00000000 MEMS_L3GD20_init
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:511    .text:00000384 initSSP
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:592    .text:000003fc initData
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:817    .text:000005cc rwL3GD20
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:879    .text:00000618 wL3GD20Reg
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:292    .text:0000023c MEMS_L3GD20_task
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:926    .text:00000650 rL3GD20Reg
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:679    .text:000004b0 prcRawValues
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:374    .text:000002d0 MEMS_L3GD20_SetRange
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:435    .text:0000032c $d
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:439    .text:00000330 $t
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:444    .text:00000330 MEMS_L3GD20_GetRange
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:503    .text:00000380 $d
-C:\Users\Ian\AppData\Local\Temp\cc5EUObo.s:507    .text:00000384 $t
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:20     .bss:00000000 L3GD20State
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:21     .bss:00000000 $d
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:23     .bss:00000004 ConfRegs
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:26     .bss:0000000c DataRegs
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:29     .rodata:00000000 $d
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:32     .rodata:00000000 sens
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:39     .bss:00000018 wBuff_GyroData
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:41     .bss:00000028 ssp_init
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:43     .bss:00000029 data_init
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:46     .text:00000000 $t
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:51     .text:00000000 MEMS_L3GD20_init
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:511    .text:00000384 initSSP
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:592    .text:000003fc initData
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:817    .text:000005cc rwL3GD20
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:879    .text:00000618 wL3GD20Reg
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:292    .text:0000023c MEMS_L3GD20_task
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:926    .text:00000650 rL3GD20Reg
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:679    .text:000004b0 prcRawValues
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:374    .text:000002d0 MEMS_L3GD20_SetRange
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:435    .text:0000032c $d
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:439    .text:00000330 $t
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:444    .text:00000330 MEMS_L3GD20_GetRange
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:503    .text:00000380 $d
+C:\Users\Ian\AppData\Local\Temp\ccVXvajV.s:507    .text:00000384 $t
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS

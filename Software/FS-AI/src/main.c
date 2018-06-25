@@ -203,7 +203,7 @@ int main(void)
 		}
 		//-------------------------
 
-		CAN_UserProcessMsg();
+//		CAN_UserProcessMsg();
 	} // end while (1)
 }
 

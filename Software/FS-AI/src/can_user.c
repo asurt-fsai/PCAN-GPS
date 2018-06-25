@@ -51,26 +51,22 @@ extern S_CONFIG_DATA_t cfg_data;
  local definitions
  ******************************************************************************/
 
-#define SYM_BMC_ACCELERATION	0x500
-#define SYM_BMC_MAGNETIC_FIELD	0x501
+#define SYM_BMC_ACCELERATION	0x620
+#define SYM_BMC_MAGNETIC_FIELD	0x621
+#define SYM_L3GD_ROTATION_01	0x622
+#define SYM_L3GD_ROTATION_02	0x623
+#define SYM_GPS_STATUS			0x624
+#define SYM_GPS_COURSE_SPEED	0x625
+#define SYM_GPS_POS_LONGITUDE	0x626
+#define SYM_GPS_POS_LATITUDE	0x627
+#define SYM_GPS_POS_ALTITUDE	0x628
+#define SYM_GPS_DATE_TIME		0x629
 
-#define SYM_L3GD_ROTATION_01	0x510
-#define SYM_L3GD_ROTATION_02	0x511
 
-#define SYM_GPS_STATUS			0x520
-#define SYM_GPS_COURSE_SPEED	0x521
-#define SYM_GPS_POS_LONGITUDE	0x522
-#define SYM_GPS_POS_LATITUDE	0x523
-#define SYM_GPS_POS_ALTITUDE	0x524
 #define SYM_GPS_DELUSIONS_01	0x525
 #define SYM_GPS_DELUSIONS_02	0x526
-#define SYM_GPS_DATE_TIME		0x527
-
 #define SYM_IO					0x530
-
 #define SYM_RTC_TIME			0x540
-
-
 #define SYM_OUT_IO				0x550
 #define SYM_OUT_POWEROFF		0x551
 #define SYM_OUT_GYRO			0x552
@@ -79,7 +75,6 @@ extern S_CONFIG_DATA_t cfg_data;
 #define SYM_OUT_RTC_SET_TIME		0x555
 #define SYM_OUT_RTC_ADOPT_GPS_TIME	0x556
 #define SYM_OUT_ACC_FAST_CALIBRATION	0x557
-
 #define INCOMING_CAN_ID_MIN	0x550
 #define INCOMING_CAN_ID_MAX	0x557
 
@@ -318,13 +313,13 @@ void CAN_UserSendGPSData(void){
 	TxMsg.Type = CAN_MSG_STANDARD;
 	TxMsg.Data.DataFlt[0] = MAX7W_Readings.PDOP;
 	TxMsg.Data.DataFlt[1] = MAX7W_Readings.HDOP;
-	CAN_UserWrite(&TxMsg);
+//	CAN_UserWrite(&TxMsg);
 
 	TxMsg.Id = SYM_GPS_DELUSIONS_02;
 	TxMsg.Len = 4;
 	TxMsg.Type = CAN_MSG_STANDARD;
 	TxMsg.Data.DataFlt[0] = MAX7W_Readings.VDOP;
-	CAN_UserWrite(&TxMsg);
+//	CAN_UserWrite(&TxMsg);
 
 	TxMsg.Id = SYM_GPS_DATE_TIME;
 	TxMsg.Len = 6;
@@ -371,7 +366,7 @@ void CAN_UserSendDioData(void){
 	HW_GetModuleID(&tmp8);
 	TxMsg.Data.Data8[0] |= (tmp8&0x7)<<5;
 
-	CAN_UserWrite(&TxMsg);
+//	CAN_UserWrite(&TxMsg);
 
 	return;
 }
@@ -399,7 +394,7 @@ void CAN_UserSendRTCTime(void){
 	TxMsg.Data.Data8[5] = rtc.month;
 	TxMsg.Data.Data16[3] = rtc.year;
 
-	CAN_UserWrite(&TxMsg);
+//	CAN_UserWrite(&TxMsg);
 
 	return;
 }
@@ -560,17 +555,17 @@ void CAN_UserResetPanelValues(void){
 	TxMsg.Len = 1;
 	TxMsg.Type = CAN_MSG_STANDARD;
 	TxMsg.Data.Data8[0] =  (HW_GPS_GetPowerState()<<1) | ((u8_t)tmp_u32) ;
-	CAN_UserWrite(&TxMsg);
+//	CAN_UserWrite(&TxMsg);
 
 	TxMsg.Id = SYM_OUT_GYRO;
 	TxMsg.Len = 1;
 	MEMS_L3GD20_GetRange(&TxMsg.Data.Data8[0]);
-	CAN_UserWrite(&TxMsg);
+//	CAN_UserWrite(&TxMsg);
 	
 	TxMsg.Id = SYM_OUT_ACC_SCALE;
 	TxMsg.Len = 1;
 	MEMS_BMC050_GetAccRange(&TxMsg.Data.Data8[0]);
-	CAN_UserWrite(&TxMsg);
+//	CAN_UserWrite(&TxMsg);
 
 	TxMsg.Id = SYM_OUT_ACC_FAST_CALIBRATION;
 	TxMsg.Len = 4;
@@ -578,7 +573,7 @@ void CAN_UserResetPanelValues(void){
 			&TxMsg.Data.Data8[1],
 			&TxMsg.Data.Data8[2]);
 	TxMsg.Data.Data8[3] = 0;
-	CAN_UserWrite(&TxMsg);
+//	CAN_UserWrite(&TxMsg);
 
 	rtc_gettime(&rtc);
 	TxMsg.Id = SYM_OUT_RTC_SET_TIME;
@@ -590,7 +585,7 @@ void CAN_UserResetPanelValues(void){
 	TxMsg.Data.Data8[4] = rtc.mday;
 	TxMsg.Data.Data8[5] = rtc.month;
 	TxMsg.Data.Data16[3] = rtc.year;
-	CAN_UserWrite(&TxMsg);
+//	CAN_UserWrite(&TxMsg);
 	
 	return;
 }

@@ -2843,41 +2843,41 @@
 DEFINED SYMBOLS
                             *ABS*:00000000 MAX-7W.c
                             *COM*:00000038 MAX7W_Readings
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:20     .bss:00000000 nmea_str_complete
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:21     .bss:00000000 $d
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:23     .bss:00000004 TxFifo
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:26     .bss:00000044 RxFifo
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:33     .text:00000000 $t
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:38     .text:00000000 Init_UART2
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:134    .text:000000b0 $d
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:139    .text:000000b8 $t
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:144    .text:000000b8 UBLOX_MAX7W_init
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:184    .rodata:00000000 $d
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:185    .rodata:00000000 .LC0
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:188    .rodata:00000008 .LC1
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:191    .rodata:00000010 .LC2
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:194    .rodata:00000018 .LC3
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:197    .rodata:00000020 .LC4
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:200    .rodata:00000028 .LC5
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:208    .text:000000e8 UBLOX_MAX7W_task
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:2089   .bss:000000c4 rx_buff_ptr.7499
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:2092   .bss:000000c8 rx_buff.7500
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1695   .text:00000d94 validate_csum
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:658    .text:000004b8 evaluate_$GPRMC
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1101   .text:000008e8 evaluate_$GPVTG
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1201   .text:000009a0 evaluate_$GPGGA
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1301   .text:00000a50 evaluate_$GPGSA
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1414   .text:00000b18 evaluate_$GPGLL
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:488    .text:00000344 evaluate_$GPTXT
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:466    .rodata:00000030 .LC6
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:469    .rodata:0000003c .LC7
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:472    .rodata:00000044 .LC8
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:475    .rodata:00000050 .LC9
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:478    .rodata:00000054 .LC10
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:481    .rodata:0000005c .LC11
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1808   .text:00000e40 spltStr
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:2001   .text:00000f48 ascii2hex
-C:\Users\Ian\AppData\Local\Temp\cc1tnaT9.s:1948   .text:00000f10 hex2ascii
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:20     .bss:00000000 nmea_str_complete
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:21     .bss:00000000 $d
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:23     .bss:00000004 TxFifo
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:26     .bss:00000044 RxFifo
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:33     .text:00000000 $t
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:38     .text:00000000 Init_UART2
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:134    .text:000000b0 $d
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:139    .text:000000b8 $t
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:144    .text:000000b8 UBLOX_MAX7W_init
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:184    .rodata:00000000 $d
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:185    .rodata:00000000 .LC0
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:188    .rodata:00000008 .LC1
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:191    .rodata:00000010 .LC2
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:194    .rodata:00000018 .LC3
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:197    .rodata:00000020 .LC4
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:200    .rodata:00000028 .LC5
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:208    .text:000000e8 UBLOX_MAX7W_task
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:2089   .bss:000000c4 rx_buff_ptr.7499
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:2092   .bss:000000c8 rx_buff.7500
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:1695   .text:00000d94 validate_csum
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:658    .text:000004b8 evaluate_$GPRMC
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:1101   .text:000008e8 evaluate_$GPVTG
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:1201   .text:000009a0 evaluate_$GPGGA
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:1301   .text:00000a50 evaluate_$GPGSA
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:1414   .text:00000b18 evaluate_$GPGLL
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:488    .text:00000344 evaluate_$GPTXT
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:466    .rodata:00000030 .LC6
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:469    .rodata:0000003c .LC7
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:472    .rodata:00000044 .LC8
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:475    .rodata:00000050 .LC9
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:478    .rodata:00000054 .LC10
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:481    .rodata:0000005c .LC11
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:1808   .text:00000e40 spltStr
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:2001   .text:00000f48 ascii2hex
+C:\Users\Ian\AppData\Local\Temp\ccWoOcLN.s:1948   .text:00000f10 hex2ascii
                      .debug_frame:00000010 $d
 
 UNDEFINED SYMBOLS
