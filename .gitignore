@@ -54,3 +54,4 @@ dkms.conf
 # Special stuff
 !HEX2BIN.EXE
 !*libPCAN-GPS-GNU0.1.3.a
+*.lst

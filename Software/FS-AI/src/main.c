@@ -149,7 +149,7 @@ int main(void)
 		static u32_t  		TIME_counter=0;
 
 		// read new compass/accelerometer/temperature data
-		if (SYSTIME_DIFF(BMC050task_counter, SYSTIME_NOW) >= 25000)
+		if (SYSTIME_DIFF(BMC050task_counter, SYSTIME_NOW) >= 5000)
 		{
 			// update time interval
 			BMC050task_counter = SYSTIME_NOW;
@@ -166,7 +166,7 @@ int main(void)
 		//-------------------------
 		
 		// read new gyro/temperature data
-		if (SYSTIME_DIFF (L3GD20task_counter, SYSTIME_NOW) >= 50000)
+		if (SYSTIME_DIFF (L3GD20task_counter, SYSTIME_NOW) >= 5000)
 		{
 			// update time interval
 			L3GD20task_counter = SYSTIME_NOW;
@@ -178,29 +178,29 @@ int main(void)
 		}
 		//-------------------------
 
-		// evaluate new gps data as fast as possible
-		UBLOX_MAX7W_task();
-		if (SYSTIME_DIFF (MAX7Wtask_counter, SYSTIME_NOW) >= 100000)
-		{
-			// update time interval
-			MAX7Wtask_counter = SYSTIME_NOW;
-			CAN_UserSendGPSData();
-		}
-		//-------------------------
-		if (SYSTIME_DIFF (DIO_counter, SYSTIME_NOW) >= 25000)
-		{
-			// update time interval
-			DIO_counter = SYSTIME_NOW;
-			CAN_UserSendDioData();
-		}
-		//-------------------------
-
-		if (SYSTIME_DIFF (TIME_counter, SYSTIME_NOW) >= 500000)
-		{
-			// update time interval
-			TIME_counter = SYSTIME_NOW;
-			CAN_UserSendRTCTime();
-		}
+//		// evaluate new gps data as fast as possible
+//		UBLOX_MAX7W_task();
+//		if (SYSTIME_DIFF (MAX7Wtask_counter, SYSTIME_NOW) >= 100000)
+//		{
+//			// update time interval
+//			MAX7Wtask_counter = SYSTIME_NOW;
+//			CAN_UserSendGPSData();
+//		}
+//		//-------------------------
+//		if (SYSTIME_DIFF (DIO_counter, SYSTIME_NOW) >= 25000)
+//		{
+//			// update time interval
+//			DIO_counter = SYSTIME_NOW;
+//			CAN_UserSendDioData();
+//		}
+//		//-------------------------
+//
+//		if (SYSTIME_DIFF (TIME_counter, SYSTIME_NOW) >= 500000)
+//		{
+//			// update time interval
+//			TIME_counter = SYSTIME_NOW;
+//			CAN_UserSendRTCTime();
+//		}
 		//-------------------------
 
 //		CAN_UserProcessMsg();

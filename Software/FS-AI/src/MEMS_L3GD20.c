@@ -337,13 +337,13 @@ static void prcRawValues(MEMS_L3GD20_Data_Register_Type *pData,
 	L3GD20_Readings.Temperature = pData->temp;
 
 	tmp = (s16_t) (pData->x_l | (u16_t) pData->x_h << 8);
-	L3GD20_Readings.Gyro_X = sens[pConf->Reg_0x23.fs] * tmp;
+	L3GD20_Readings.Gyro_X = tmp;//sens[pConf->Reg_0x23.fs] * tmp;
 
 	tmp = (s16_t) (pData->y_l | (u16_t) pData->y_h << 8);
-	L3GD20_Readings.Gyro_Y = sens[pConf->Reg_0x23.fs] * tmp;
+	L3GD20_Readings.Gyro_Y = tmp;//sens[pConf->Reg_0x23.fs] * tmp;
 
 	tmp = (s16_t) (pData->z_l | (u16_t) pData->z_h << 8);
-	L3GD20_Readings.Gyro_Z = sens[pConf->Reg_0x23.fs] * tmp;
+	L3GD20_Readings.Gyro_Z = tmp;//sens[pConf->Reg_0x23.fs] * tmp;
 
 	L3GD20_Readings.data_valid = TRUE;
 			

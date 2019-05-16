@@ -218,17 +218,17 @@ void CAN_UserSendBMCData(void){
 	TxMsg.Data.Data16[1] = BMC050_Readings.Acceleration_Y;
 	TxMsg.Data.Data16[2] = BMC050_Readings.Acceleration_Z;
 	TxMsg.Data.Data8[6] = BMC050_Readings.Temperature;
-	MEMS_BMC050_GetVertialAxis(&tmp8u);
+//	MEMS_BMC050_GetVertialAxis(&tmp8u);
 	TxMsg.Data.Data8[7] = (tmp8u&0x3) | (BMC050_Readings.orientation&0x7)<<2;
 	CAN_UserWrite(&TxMsg);
 
-	TxMsg.Id  = SYM_BMC_MAGNETIC_FIELD;
-	TxMsg.Len = 6;
-	TxMsg.Type = CAN_MSG_STANDARD;
-	TxMsg.Data.Data16[0] = BMC050_Readings.MagField_X;
-	TxMsg.Data.Data16[1] = BMC050_Readings.MagField_Y;
-	TxMsg.Data.Data16[2] = BMC050_Readings.MagField_Z;
-	CAN_UserWrite(&TxMsg);
+//	TxMsg.Id  = SYM_BMC_MAGNETIC_FIELD;
+//	TxMsg.Len = 6;
+//	TxMsg.Type = CAN_MSG_STANDARD;
+//	TxMsg.Data.Data16[0] = BMC050_Readings.MagField_X;
+//	TxMsg.Data.Data16[1] = BMC050_Readings.MagField_Y;
+//	TxMsg.Data.Data16[2] = BMC050_Readings.MagField_Z;
+//	CAN_UserWrite(&TxMsg);
 
 	// allow task for reading new values
 	BMC050_Readings.data_valid = FALSE;
@@ -247,15 +247,16 @@ void CAN_UserSendL3GDData(void){
 	TxMsg.Id = SYM_L3GD_ROTATION_01;
 	TxMsg.Len = 8;
 	TxMsg.Type = CAN_MSG_STANDARD;
-	TxMsg.Data.DataFlt[0] = L3GD20_Readings.Gyro_X;
-	TxMsg.Data.DataFlt[1] = L3GD20_Readings.Gyro_Y;
+	TxMsg.Data.Data16s[0] = L3GD20_Readings.Gyro_X;
+	TxMsg.Data.Data16s[1] = L3GD20_Readings.Gyro_Y;
+	TxMsg.Data.Data16s[2] = L3GD20_Readings.Gyro_Z;
 	CAN_UserWrite(&TxMsg);
 
-	TxMsg.Id = SYM_L3GD_ROTATION_02;
-	TxMsg.Len = 4;
-	TxMsg.Type = CAN_MSG_STANDARD;
-	TxMsg.Data.DataFlt[0] = L3GD20_Readings.Gyro_Z;
-	CAN_UserWrite(&TxMsg);
+//	TxMsg.Id = SYM_L3GD_ROTATION_02;
+//	TxMsg.Len = 4;
+//	TxMsg.Type = CAN_MSG_STANDARD;
+//	TxMsg.Data.DataFlt[0] = L3GD20_Readings.Gyro_Z;
+//	CAN_UserWrite(&TxMsg);
 
 	return;
 }

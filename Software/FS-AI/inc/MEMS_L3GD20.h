@@ -26,9 +26,9 @@
 typedef struct {
 	u8_t GyroDevID;
 	u8_t Temperature;
-	float Gyro_X;
-	float Gyro_Y;
-	float Gyro_Z;
+	s16_t Gyro_X;
+	s16_t Gyro_Y;
+	s16_t Gyro_Z;
 	u8_t data_valid;
 } MEMS_L3GD20_Result_Type;
 
