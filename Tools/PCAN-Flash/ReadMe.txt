@@ -2,7 +2,7 @@
 ReadMe.txt
 
 PCAN-Flash
-Copyright (c) 2015 PEAK-System Technik GmbH Darmstadt, Germany
+Copyright (c) 2018 PEAK-System Technik GmbH Darmstadt, Germany
 All rights reserved.
 ===============================================================================
 

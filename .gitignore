@@ -55,3 +55,6 @@ dkms.conf
 !HEX2BIN.EXE
 !*libPCAN-GPS-GNU0.1.3.a
 *.lst
+!/Tools/PCAN-Flash/*.exe
+!/Tools/PCAN-Flash/*.dll
+!/Software/FS-AI/.out/*.*

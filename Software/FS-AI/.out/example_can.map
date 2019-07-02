@@ -1,0 +1,1729 @@
+Archive member included because of file (symbol)
+
+./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+                              ./src/MEMS_BMC050.o (SSP_Init)
+./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+                              ./src/gcc/syscalls.o (SER_Write)
+./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                              ./src/can_user.o (HW_GPS_PowerOn)
+./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+                              ./src/main.o (EEPROM_Read)
+./lib/libPCAN-GPS-GNU0.1.3.a(crc.o)
+                              ./src/can_user.o (CRC_Init)
+./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                              ./src/can_user.o (CAN_ReferenceTxQueue)
+./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+                              (ResetISR)
+./lib/libPCAN-GPS-GNU0.1.3.a(interrupt.o)
+                              ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o) (Init_Interrupts)
+./lib/libPCAN-GPS-GNU0.1.3.a(i2c.o)
+                              ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o) (I2C_Start)
+./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+                              ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o) (SystemInit)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+                              ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o) (memcmp)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+                              ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o) (memcpy)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+                              ./src/MAX-7W.o (memset)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+                              ./src/can_user.o (modf)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+                              ./src/MAX-7W.o (strncmp)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                              ./src/MAX-7W.o (strtof)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+                              ./src/MAX-7W.o (strtoul)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o) (__ctype_ptr__)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o) (__gethex)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o) (__hexnan)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o) (_impure_ptr)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o) (_localeconv_r)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o) (_Balloc)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o) (__fpclassifyd)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o) (nanf)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o) (strcmp)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o) (strlen)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o) (_calloc_r)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o) (_malloc_r)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o) (__malloc_lock)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o) (_free_r)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o) (__aeabi_uidiv)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_dvmd_tls.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o) (__aeabi_idiv0)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o) (__aeabi_dsub)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o) (__aeabi_dmul)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o) (__aeabi_dcmpeq)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixdfsi.o)
+                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o) (__aeabi_d2iz)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixunsdfsi.o)
+                              ./src/can_user.o (__aeabi_d2uiz)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_truncdfsf2.o)
+                              ./src/can_user.o (__aeabi_d2f)
+c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+                              ./src/can_user.o (__aeabi_fmul)
+
+Allocating common symbols
+Common symbol       size              file
+
+L3GD20_Readings     0xa               ./src/MEMS_L3GD20.o
+E_EEPROM_Int_cmd    0x1               ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+MAX7W_Readings      0x38              ./src/MAX-7W.o
+cfg_data            0x24              ./src/main.o
+BMC050_Readings     0x12              ./src/MEMS_BMC050.o
+serPort             0x3c              ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+BMC050_dbg_data_acc
+                    0xa               ./src/MEMS_BMC050.o
+__hexdig            0x100             c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+BMC050_dbg_data_cmp
+                    0xb               ./src/MEMS_BMC050.o
+BMC050_AccCompensate
+                    0xa               ./src/MEMS_BMC050.o
+TxQueueCAN1         0x100             ./src/can_user.o
+RxQueueCAN1         0x80              ./src/can_user.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+RAM_32k          0x10000000         0x00008000         xrw
+RAM_8k           0x20000000         0x00002000         xrw
+RO_FLASH         0x00000000         0x00020000         xr
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD ./src/main.o
+LOAD ./src/gcc/syscalls.o
+LOAD ./src/timer.o
+LOAD ./src/can_user.o
+LOAD ./src/MAX-7W.o
+LOAD ./src/MEMS_BMC050.o
+LOAD ./src/MEMS_L3GD20.o
+LOAD ./src/ff/rtc.o
+LOAD ./lib/libPCAN-GPS-GNU0.1.3.a
+LOAD c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a
+LOAD c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libm.a
+LOAD c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a
+LOAD c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a
+LOAD c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libstdc++.a
+START GROUP
+LOAD c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a
+LOAD c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libg.a
+LOAD c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a
+END GROUP
+                0x10008000                __TOP_RAM_32k = 0x10008000
+                0x20002000                __TOP_RAM_8k = 0x20002000
+                0x00020000                __TOP_RO_FLASH = 0x20000
+                0xeffeb206                __code_checksum = (0x0 - ((((((((((((_vStackTop + ResetISR) + 0x1) + NMI_Handler) + 0x1) + HardFault_Handler) + 0x1) + MemManage_Handler) + 0x1) + BusFault_Handler) + 0x1) + UsageFault_Handler) + 0x1))
+
+.ident          0x00000080        0xc
+ *(.ident)
+ .ident         0x00000080        0xc ./src/main.o
+                0x00000080                Ident
+
+.C2F_Info       0x00000100       0x2e
+ *(.C2F_Info)
+ .C2F_Info      0x00000100       0x20 ./src/main.o
+                0x00000100                C2F_Array
+                0x00000120        0x2 SHORT 0x1
+                0x00000122        0x2 SHORT 0x1
+                0x00000124        0x4 LONG 0x2000
+                0x00000128        0x4 LONG 0xfa00 ((((_etext + SIZEOF (.data)) - 0x2000) + 0x1ff) & 0xfffffe00)
+                0x0000012c        0x2 SHORT 0x0
+
+.text           0x00002000     0xf008
+ FILL mask 0xff
+ *(.isr_vector)
+ .isr_vector    0x00002000       0xe4 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+                0x00002000                g_pfnVectors
+                0x000020e4                . = ALIGN (0x4)
+                0x000020e4                __section_table_start = .
+                0x000020e4                __data_section_table = .
+                0x000020e4        0x4 LONG 0x11008 LOADADDR (.data)
+                0x000020e8        0x4 LONG 0x10000000 ADDR (.data)
+                0x000020ec        0x4 LONG 0x90c SIZEOF (.data)
+                0x000020f0        0x4 LONG 0x1000090c LOADADDR (.data_RAM2)
+                0x000020f4        0x4 LONG 0x20000000 ADDR (.data_RAM2)
+                0x000020f8        0x4 LONG 0x0 SIZEOF (.data_RAM2)
+                0x000020fc                __data_section_table_end = .
+                0x000020fc                __bss_section_table = .
+                0x000020fc        0x4 LONG 0x10000910 ADDR (.bss)
+                0x00002100        0x4 LONG 0x6bc SIZEOF (.bss)
+                0x00002104        0x4 LONG 0x20000000 ADDR (.bss_RAM2)
+                0x00002108        0x4 LONG 0x0 SIZEOF (.bss_RAM2)
+                0x0000210c                __bss_section_table_end = .
+                0x0000210c                __section_table_end = .
+ *(.after_vectors*)
+ .after_vectors
+                0x0000210c      0x1ac ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+                0x0000210c                data_init
+                0x0000215c                bss_init
+                0x0000219c                ResetISR
+                0x000021c0                PostResetISR
+                0x00002268                NMI_Handler
+                0x00002270                HardFault_Handler
+                0x00002278                MemManage_Handler
+                0x00002280                BusFault_Handler
+                0x00002288                UsageFault_Handler
+                0x00002290                SVC_Handler
+                0x00002298                DebugMon_Handler
+                0x000022a0                PendSV_Handler
+                0x000022a8                SysTick_Handler
+                0x000022b0                EINT3_IRQHandler
+                0x000022b0                CANActivity_IRQHandler
+                0x000022b0                TIMER3_IRQHandler
+                0x000022b0                EINT2_IRQHandler
+                0x000022b0                USBActivity_IRQHandler
+                0x000022b0                IntDefaultHandler
+                0x000022b0                PLL0_IRQHandler
+                0x000022b0                PLL1_IRQHandler
+                0x000022b0                I2C1_IRQHandler
+                0x000022b0                I2C2_IRQHandler
+                0x000022b0                RTC_IRQHandler
+                0x000022b0                SPI_IRQHandler
+                0x000022b0                LCD_IRQHandler
+                0x000022b0                RIT_IRQHandler
+                0x000022b0                EINT1_IRQHandler
+                0x000022b0                TIMER1_IRQHandler
+                0x000022b0                UART4_IRQHandler
+                0x000022b0                ADC_IRQHandler
+                0x000022b0                MCI_IRQHandler
+                0x000022b0                USB_IRQHandler
+                0x000022b0                I2C0_IRQHandler
+                0x000022b0                WDT_IRQHandler
+                0x000022b0                PWM1_IRQHandler
+                0x000022b0                QEI_IRQHandler
+                0x000022b0                TIMER2_IRQHandler
+                0x000022b0                EINT0_IRQHandler
+                0x000022b0                PWM0_IRQHandler
+                0x000022b0                EEPROM_IRQHandler
+                0x000022b0                I2S_IRQHandler
+                0x000022b0                DMA_IRQHandler
+                0x000022b0                GPIO_IRQHandler
+                0x000022b0                UART3_IRQHandler
+                0x000022b0                MCPWM_IRQHandler
+                0x000022b0                ENET_IRQHandler
+ *(.text*)
+ .text          0x000022b8      0x3b0 ./src/main.o
+                0x000022b8                Timer_1000usec
+                0x0000234c                main
+ .text          0x00002668      0x20c ./src/gcc/syscalls.o
+                0x00002668                _read_r
+                0x000026f4                _write_r
+                0x00002768                _close_r
+                0x00002784                _lseek_r
+                0x000027a4                _fstat_r
+                0x000027c8                isatty
+                0x000027e0                _exit
+                0x000027ec                _sbrk_r
+                0x00002848                _getpid
+                0x00002858                _kill
+ .text          0x00002874      0x1d8 ./src/timer.o
+                0x00002944                Init_Timer0
+                0x000029c4                TIMER0_IRQHandler
+                0x00002a04                Wait_Usec
+ .text          0x00002a4c      0xab0 ./src/can_user.o
+                0x00002ae0                CAN_UserWrite
+                0x00002b44                CAN_UserRead
+                0x00002ba4                CAN_UserInit
+                0x00002c64                CAN_UserSendBMCData
+                0x00002cfc                CAN_UserSendL3GDData
+                0x00002d48                CAN_UserSendGPSData
+                0x00002fac                CAN_UserSendDioData
+                0x00003078                CAN_UserSendRTCTime
+                0x000030c0                CAN_UserProcessMsg
+                0x00003420                CAN_UserResetPanelValues
+ *fill*         0x000034fc        0x4 
+ .text          0x00003500      0xfc0 ./src/MAX-7W.o
+                0x00003500                Init_UART2
+                0x000035b8                UBLOX_MAX7W_init
+                0x000035e8                UBLOX_MAX7W_task
+ .text          0x000044c0     0x14d0 ./src/MEMS_BMC050.o
+                0x000044c0                MEMS_BMC050_init_Accelerometer
+                0x000047e4                MEMS_BMC050_init_Magnetometer
+                0x00004918                MEMS_BMC050_readAccCompValues
+                0x00004930                MEMS_BMC050_StartFastAccCompensation
+                0x00004948                MEMS_BMC050_ResetAccCompensation
+                0x00004960                MEMS_BMC050_SetVertialAxis
+                0x000049a0                MEMS_BMC050_GetVertialAxis
+                0x000049d4                AccCalRdy
+                0x00004a20                MEMS_BMC050_SetAccCalTargets
+                0x00004ad8                MEMS_BMC050_GetAccCalTargets
+                0x00004b48                MEMS_BMC050_GetAccCalRawValues
+                0x00004ba4                MEMS_BMC050_GetAccCalFiltValues
+                0x00004c00                MEMS_BMC050_GetAccRange
+                0x00004c74                MEMS_BMC050_SetAccRange
+                0x00004cf8                MEMS_BMC050_task
+ .text          0x00005990      0x620 ./src/MEMS_L3GD20.o
+                0x00005990                MEMS_L3GD20_init
+                0x00005bcc                MEMS_L3GD20_task
+                0x00005c60                MEMS_L3GD20_SetRange
+                0x00005cc0                MEMS_L3GD20_GetRange
+ .text          0x00005fb0      0x220 ./src/ff/rtc.o
+                0x00005fb0                rtc_initialize
+                0x00005ffc                rtc_gettime
+                0x0000611c                rtc_settime
+ .text          0x000061d0      0xa58 ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+                0x000061d0                SSP_Init
+                0x000062f8                SSP_SingleRead
+                0x00006350                SSP_SingleWrite
+                0x0000639c                SSP_ReadWrite
+                0x000066f4                SSP0_IRQHandler
+                0x000068b0                SSP1_IRQHandler
+                0x00006a6c                SSP2_IRQHandler
+ .text          0x00006c28     0x1160 ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+                0x00006d7c                SER_Write
+                0x00006fd0                SER_Read
+                0x000072a4                UART0_IRQHandler
+                0x000073f4                UART1_IRQHandler
+                0x00007540                UART2_IRQHandler
+                0x0000768c                SER_ResetTX
+                0x00007764                SER_ResetRX
+                0x000078bc                SER_Initialize
+ .text          0x00007d88      0xed0 ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                0x00007df4                Init_CAN2
+                0x00007e1c                Init_I2C
+                0x00007ea0                Init_EEPROM
+                0x00007ed0                HW_GPS_PowerOn
+                0x00007ef4                HW_GPS_PowerOff
+                0x00007f18                HW_GPS_GetPowerState
+                0x00007f3c                HW_BMC_CsAccelerationOn
+                0x00007f60                HW_BMC_CsAccelerationOff
+                0x00007f84                HW_BMC_CsMagnetometerOn
+                0x00007fa8                HW_BMC_CsMagnetometerOff
+                0x00007fcc                HW_L3GD20_CsOn
+                0x00007ff0                HW_L3GD20_CsOff
+                0x00008014                HW_SD_PowerOn
+                0x00008038                HW_SD_PowerOff
+                0x0000805c                RTC_Init
+                0x000080a4                GoToSleep
+                0x00008104                GoToDeepSleep
+                0x00008164                HW_SwitchOFF
+                0x000082e8                HW_SDCardPresent
+                0x00008334                HW_GetModuleID
+                0x000083b4                HW_SetLED
+                0x000085bc                HW_GetDINn
+                0x00008624                HW_GetDIN
+                0x00008688                HW_SetDOUTn
+                0x000086f4                HW_SetDOUT
+                0x00008758                HW_GetDOUT
+                0x00008794                HW_JumpToBootloader
+                0x00008804                HW_Init
+                0x00008c4c                BOD_IRQHandler
+ .text          0x00008c58      0x784 ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+                0x000090c8                EEPROM_Read
+                0x00009210                EEPROM_Write
+                0x00009374                EEPROM_FlushCache
+ .text          0x000093dc      0x1ec ./lib/libPCAN-GPS-GNU0.1.3.a(crc.o)
+                0x000093dc                CRC_Init
+                0x000094ac                CRC_CalcCRC
+                0x00009558                CRC_Valid
+ .text          0x000095c8     0x29ec ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                0x000096c0                CAN_ReferenceTxQueue
+                0x00009750                CAN_ReferenceRxQueue
+                0x000097e0                CAN_GetIsrVector
+                0x00009800                CAN_SetUnatomicHandler
+                0x00009848                CAN_SetTimestampHandler
+                0x000098a4                CAN_SetErrorLimit
+                0x00009904                CAN_SetRxCallback
+                0x00009960                CAN_SetChannelInfo
+                0x000099bc                CAN_GetChannelInfo
+                0x00009a10                CAN_SetTxErrorCallback
+                0x00009a6c                CAN_SetBusMode
+                0x00009b08                CAN_TxQueueGetNext
+                0x00009b90                CAN_RxQueueGetNext
+                0x00009c1c                CAN_TxQueueWriteNext
+                0x00009de0                CAN_RxQueueReadNext
+                0x00009eec                CAN_GetTransceiverType
+                0x00009f3c                CAN_SetTransceiverMode
+                0x0000a03c                CAN_FilterAddId
+                0x0000a680                CAN_SetFilterMode
+                0x0000a6b4                CAN_InitFilters
+                0x0000a738                CAN_InitChannel
+                0x0000a8dc                CAN_ReInitChannel
+                0x0000ac30                CAN_IRQHandler
+                0x0000ae64                Ahxoh1ai
+                0x0000b070                fohSh5th
+                0x0000b338                ahRaTahk6k
+ .text          0x0000bfb4        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+ .text          0x0000bfb4      0x16c ./lib/libPCAN-GPS-GNU0.1.3.a(interrupt.o)
+                0x0000c098                Init_Interrupts
+ .text          0x0000c120      0x26c ./lib/libPCAN-GPS-GNU0.1.3.a(i2c.o)
+                0x0000c120                I2C_Start
+                0x0000c184                I2C_Write
+                0x0000c2dc                I2C_Read
+                0x0000c338                I2C_Stop
+ .text          0x0000c38c      0x788 ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+                0x0000c38c                SystemCoreClockUpdate
+                0x0000c8f0                fpu_init
+                0x0000c974                SystemInit
+ .text          0x0000cb14       0x64 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+                0x0000cb14                memcmp
+ .text          0x0000cb78       0x94 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+                0x0000cb78                memcpy
+ .text          0x0000cc0c       0x98 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+                0x0000cc0c                memset
+ .text          0x0000cca4       0xb4 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+                0x0000cca4                modf
+ .text          0x0000cd58       0xac c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+                0x0000cd58                strncmp
+ *fill*         0x0000ce04        0x4 
+ .text          0x0000ce08      0xef0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                0x0000ce08                _strtod_r
+                0x0000dcb4                strtod
+                0x0000dcc8                strtof
+ .text          0x0000dcf8      0x168 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+                0x0000dcf8                _strtoul_r
+                0x0000de44                strtoul
+ .text          0x0000de60        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+ .text          0x0000de60      0x654 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                0x0000df10                __hexdig_init
+                0x0000df60                __gethex
+ .text          0x0000e4b4      0x1bc c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+                0x0000e4b4                __hexnan
+ .text          0x0000e670        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+ .text          0x0000e670       0x88 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+                0x0000e670                _setlocale_r
+                0x0000e6b0                __locale_charset
+                0x0000e6bc                __locale_mb_cur_max
+                0x0000e6c8                __locale_msgcharset
+                0x0000e6d0                __locale_cjk_lang
+                0x0000e6d4                _localeconv_r
+                0x0000e6dc                setlocale
+                0x0000e6f0                localeconv
+ .text          0x0000e6f8      0x8e0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                0x0000e6f8                _Balloc
+                0x0000e748                _Bfree
+                0x0000e75c                __multadd
+                0x0000e7f4                __s2b
+                0x0000e890                __hi0bits
+                0x0000e8cc                __lo0bits
+                0x0000e928                __i2b
+                0x0000e93c                __multiply
+                0x0000ea78                __pow5mult
+                0x0000eb0c                __lshift
+                0x0000ebcc                __mcmp
+                0x0000ec08                __mdiff
+                0x0000ecf4                __ulp
+                0x0000ed38                __b2d
+                0x0000ede8                __d2b
+                0x0000eea4                __ratio
+                0x0000ef04                _mprec_log10
+                0x0000ef38                __copybits
+                0x0000ef80                __any_on
+ .text          0x0000efd8       0x50 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+                0x0000efd8                __fpclassifyd
+ .text          0x0000f028        0x8 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+                0x0000f028                nanf
+ .text          0x0000f030      0x1dc c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+                0x0000f030                strcmp
+ .text          0x0000f20c       0x60 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+                0x0000f20c                strlen
+ .text          0x0000f26c       0x60 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+                0x0000f26c                _calloc_r
+ .text          0x0000f2cc      0x570 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+                0x0000f2cc                _malloc_r
+ .text          0x0000f83c        0x8 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+                0x0000f83c                __malloc_lock
+                0x0000f840                __malloc_unlock
+ .text          0x0000f844      0x224 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+                0x0000f844                _malloc_trim_r
+                0x0000f8dc                _free_r
+ .text          0x0000fa68      0x278 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+                0x0000fa68                __aeabi_uidiv
+                0x0000fa68                __udivsi3
+                0x0000fcc4                __aeabi_uidivmod
+ .text          0x0000fce0        0x4 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_dvmd_tls.o)
+                0x0000fce0                __aeabi_idiv0
+                0x0000fce0                __aeabi_ldiv0
+ .text          0x0000fce4      0x370 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+                0x0000fce4                __aeabi_drsub
+                0x0000fcec                __aeabi_dsub
+                0x0000fcec                __subdf3
+                0x0000fcf0                __aeabi_dadd
+                0x0000fcf0                __adddf3
+                0x0000ff68                __floatunsidf
+                0x0000ff68                __aeabi_ui2d
+                0x0000ff88                __floatsidf
+                0x0000ff88                __aeabi_i2d
+                0x0000ffac                __aeabi_f2d
+                0x0000ffac                __extendsfdf2
+                0x0000ffe8                __floatundidf
+                0x0000ffe8                __aeabi_ul2d
+                0x0000fff8                __floatdidf
+                0x0000fff8                __aeabi_l2d
+ .text          0x00010054      0x424 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+                0x00010054                __aeabi_dmul
+                0x00010054                __muldf3
+                0x000102a8                __divdf3
+                0x000102a8                __aeabi_ddiv
+ .text          0x00010478      0x110 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+                0x00010478                __gtdf2
+                0x00010478                __gedf2
+                0x00010480                __ltdf2
+                0x00010480                __ledf2
+                0x00010488                __nedf2
+                0x00010488                __eqdf2
+                0x00010488                __cmpdf2
+                0x00010504                __aeabi_cdrcmple
+                0x00010514                __aeabi_cdcmpeq
+                0x00010514                __aeabi_cdcmple
+                0x00010524                __aeabi_dcmpeq
+                0x00010538                __aeabi_dcmplt
+                0x0001054c                __aeabi_dcmple
+                0x00010560                __aeabi_dcmpge
+                0x00010574                __aeabi_dcmpgt
+ .text          0x00010588       0x50 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixdfsi.o)
+                0x00010588                __aeabi_d2iz
+                0x00010588                __fixdfsi
+ .text          0x000105d8       0x40 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixunsdfsi.o)
+                0x000105d8                __aeabi_d2uiz
+                0x000105d8                __fixunsdfsi
+ .text          0x00010618       0xa0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_truncdfsf2.o)
+                0x00010618                __truncdfsf2
+                0x00010618                __aeabi_d2f
+ .text          0x000106b8      0x2a0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+                0x000106b8                __mulsf3
+                0x000106b8                __aeabi_fmul
+                0x00010820                __aeabi_fdiv
+                0x00010820                __divsf3
+ *(.rodata .rodata.*)
+ .rodata        0x00010958        0xc ./src/main.o
+ .rodata        0x00010964        0x4 ./src/gcc/syscalls.o
+ .rodata        0x00010968        0xc ./src/can_user.o
+ .rodata        0x00010974       0x64 ./src/MAX-7W.o
+ .rodata        0x000109d8       0x10 ./src/MEMS_L3GD20.o
+ .rodata        0x000109e8        0xc ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+ .rodata        0x000109f4        0x4 ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+ .rodata        0x000109f8       0x14 ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+ .rodata        0x00010a0c        0x8 ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+ .rodata        0x00010a14      0x35c ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+ .rodata        0x00010d70       0x28 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .rodata.str1.4
+                0x00010d98        0xf c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                                 0x10 (size before relaxing)
+ *fill*         0x00010da7        0x1 
+ .rodata        0x00010da8      0x104 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+                0x00010da8                _ctype_
+ .rodata.str1.4
+                0x00010eac       0x1b c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                                 0x1c (size before relaxing)
+ *fill*         0x00010ec7        0x1 
+ .rodata        0x00010ec8        0x4 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+                0x00010ec8                _global_impure_ptr
+ .rodata.str1.4
+                0x00010ecc        0x2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+                                  0x4 (size before relaxing)
+ *fill*         0x00010ece        0x2 
+ .rodata.str1.4
+                0x00010ed0       0x10 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+                                 0x14 (size before relaxing)
+ .rodata        0x00010ee0      0x128 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                0x00010ef0                __mprec_tens
+                0x00010fb8                __mprec_tinytens
+                0x00010fe0                __mprec_bigtens
+                0x00011008                . = ALIGN (0x4)
+                0x00011008                _etext = .
+
+.glue_7         0x00011008        0x0
+ .glue_7        0x00000000        0x0 linker stubs
+
+.glue_7t        0x00011008        0x0
+ .glue_7t       0x00000000        0x0 linker stubs
+
+.vfp11_veneer   0x00011008        0x0
+ .vfp11_veneer  0x00000000        0x0 linker stubs
+
+.v4_bx          0x00011008        0x0
+ .v4_bx         0x00000000        0x0 linker stubs
+
+.iplt           0x00011008        0x0
+ .iplt          0x00000000        0x0 ./src/main.o
+
+.rel.dyn        0x00011008        0x0
+ .rel.iplt      0x00000000        0x0 ./src/main.o
+
+.ARM.extab
+ *(.ARM.extab* .gnu.linkonce.armextab.*)
+                0x00011008                __exidx_start = .
+
+.ARM.exidx
+ *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+                0x00011008                __exidx_end = .
+
+.data           0x10000000      0x90c load address 0x00011008
+ FILL mask 0xff
+                0x10000000                _data = .
+ *(vtable)
+ *(.data*)
+ .data          0x10000000        0x0 ./src/main.o
+ .data          0x10000000        0x0 ./src/gcc/syscalls.o
+ .data          0x10000000        0x0 ./src/timer.o
+ .data          0x10000000        0x0 ./src/can_user.o
+ .data          0x10000000        0x0 ./src/MAX-7W.o
+ .data          0x10000000        0x2 ./src/MEMS_BMC050.o
+ .data          0x10000002        0x0 ./src/MEMS_L3GD20.o
+ .data          0x10000002        0x0 ./src/ff/rtc.o
+ *fill*         0x10000002        0x2 
+ .data          0x10000004        0x8 ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+ .data          0x1000000c        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+ .data          0x1000000c        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+ .data          0x1000000c        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+ .data          0x1000000c        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(crc.o)
+ .data          0x1000000c        0x8 ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+ .data          0x10000014        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+ .data          0x10000014        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(interrupt.o)
+ .data          0x10000014        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(i2c.o)
+ .data          0x10000014       0x10 ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+                0x10000014                SystemCoreClock
+                0x10000018                PeripheralClock
+                0x1000001c                EMCClock
+                0x10000020                USBClock
+ .data          0x10000024        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+ .data          0x10000024        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+ .data          0x10000024        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+ .data          0x10000024        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+ .data          0x10000024        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+ .data          0x10000024       0x28 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .data          0x1000004c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+ .data          0x1000004c        0x4 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+                0x1000004c                __ctype_ptr__
+ .data          0x10000050        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+ .data          0x10000050        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+ .data          0x10000050      0x430 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+                0x10000050                _impure_ptr
+ .data          0x10000480       0x7c c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+                0x100004a0                __mb_cur_max
+ .data          0x100004fc        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+ .data          0x100004fc        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+ .data          0x100004fc        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+ .data          0x100004fc        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+ .data          0x100004fc        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+ .data          0x100004fc        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+ .data          0x100004fc      0x410 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+                0x100004fc                __malloc_av_
+                0x10000904                __malloc_sbrk_base
+                0x10000908                __malloc_trim_threshold
+ .data          0x1000090c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+ .data          0x1000090c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+ .data          0x1000090c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+ .data          0x1000090c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_dvmd_tls.o)
+ .data          0x1000090c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+ .data          0x1000090c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+ .data          0x1000090c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+ .data          0x1000090c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixdfsi.o)
+ .data          0x1000090c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixunsdfsi.o)
+ .data          0x1000090c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_truncdfsf2.o)
+ .data          0x1000090c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+                0x1000090c                . = ALIGN (0x4)
+                0x1000090c                _edata = .
+
+.igot.plt       0x1000090c        0x0 load address 0x00011914
+ .igot.plt      0x00000000        0x0 ./src/main.o
+
+.data_RAM2      0x20000000        0x0 load address 0x1000090c
+ FILL mask 0xff
+ *(.data.$RAM2*)
+ *(.data.$RAM_8k*)
+                0x20000000                . = ALIGN (0x4)
+
+.bss            0x10000910      0x6bc load address 0x00011918
+                0x10000910                _bss = .
+ *(.bss*)
+ .bss           0x10000910       0x20 ./src/main.o
+                0x10000910                Initialized
+                0x10000911                persistant_config_used
+ .bss           0x10000930        0x4 ./src/gcc/syscalls.o
+ .bss           0x10000934        0x0 ./src/timer.o
+ .bss           0x10000934        0x1 ./src/can_user.o
+ *fill*         0x10000935        0x3 
+ .bss           0x10000938      0x148 ./src/MAX-7W.o
+ .bss           0x10000a80       0x40 ./src/MEMS_BMC050.o
+ .bss           0x10000ac0       0x2c ./src/MEMS_L3GD20.o
+ .bss           0x10000aec        0x0 ./src/ff/rtc.o
+ .bss           0x10000aec       0x34 ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+ .bss           0x10000b20        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+ .bss           0x10000b20        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+ .bss           0x10000b20       0x9c ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+ .bss           0x10000bbc        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(crc.o)
+ .bss           0x10000bbc       0x6c ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                0x10000bcc                pic_pwr_was_off
+ .bss           0x10000c28        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+ .bss           0x10000c28        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(interrupt.o)
+ .bss           0x10000c28        0x1 ./lib/libPCAN-GPS-GNU0.1.3.a(i2c.o)
+ .bss           0x10000c29        0x0 ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+ .bss           0x10000c29        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+ .bss           0x10000c29        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+ .bss           0x10000c29        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+ .bss           0x10000c29        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+ .bss           0x10000c29        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+ .bss           0x10000c29        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .bss           0x10000c29        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+ .bss           0x10000c29        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+ .bss           0x10000c29        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+ .bss           0x10000c29        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+ .bss           0x10000c29        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+ *fill*         0x10000c29        0x3 
+ .bss           0x10000c2c        0xc c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+                0x10000c2c                _PathLocale
+                0x10000c30                __mlocale_changed
+                0x10000c34                __nlocale_changed
+ .bss           0x10000c38        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+ .bss           0x10000c38        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+ .bss           0x10000c38        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+ .bss           0x10000c38        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+ .bss           0x10000c38        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+ .bss           0x10000c38        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+ .bss           0x10000c38       0x34 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+                0x10000c38                __malloc_top_pad
+                0x10000c3c                __malloc_current_mallinfo
+                0x10000c64                __malloc_max_sbrked_mem
+                0x10000c68                __malloc_max_total_mem
+ .bss           0x10000c6c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+ .bss           0x10000c6c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+ .bss           0x10000c6c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+ .bss           0x10000c6c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_dvmd_tls.o)
+ .bss           0x10000c6c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+ .bss           0x10000c6c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+ .bss           0x10000c6c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+ .bss           0x10000c6c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixdfsi.o)
+ .bss           0x10000c6c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixunsdfsi.o)
+ .bss           0x10000c6c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_truncdfsf2.o)
+ .bss           0x10000c6c        0x0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+ *(COMMON)
+ COMMON         0x10000c6c       0x24 ./src/main.o
+                0x10000c6c                cfg_data
+ COMMON         0x10000c90      0x180 ./src/can_user.o
+                0x10000c90                TxQueueCAN1
+                0x10000d90                RxQueueCAN1
+ COMMON         0x10000e10       0x38 ./src/MAX-7W.o
+                0x10000e10                MAX7W_Readings
+ COMMON         0x10000e48       0x36 ./src/MEMS_BMC050.o
+                0x10000e48                BMC050_Readings
+                0x10000e5c                BMC050_dbg_data_acc
+                0x10000e68                BMC050_dbg_data_cmp
+                0x10000e74                BMC050_AccCompensate
+ *fill*         0x10000e7e        0x2 
+ COMMON         0x10000e80        0xa ./src/MEMS_L3GD20.o
+                0x10000e80                L3GD20_Readings
+ *fill*         0x10000e8a        0x2 
+ COMMON         0x10000e8c       0x3c ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+                0x10000e8c                serPort
+ COMMON         0x10000ec8        0x1 ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+                0x10000ec8                E_EEPROM_Int_cmd
+ *fill*         0x10000ec9        0x3 
+ COMMON         0x10000ecc      0x100 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                0x10000ecc                __hexdig
+                0x10000fcc                . = ALIGN (0x4)
+                0x10000fcc                _ebss = .
+                0x10000fcc                PROVIDE (end, .)
+
+.bss_RAM2       0x20000000        0x0
+ *(.bss.$RAM2*)
+ *(.bss.$RAM_8k*)
+                0x20000000                . = ALIGN (0x4)
+                0x20000000                PROVIDE (_pvHeapStart, .)
+                0x10008000                PROVIDE (_vStackTop, (__TOP_RAM_32k - 0x0))
+OUTPUT(example_can.elf elf32-littlearm)
+
+.debug_info     0x00000000    0x10dfa
+ .debug_info    0x00000000      0x7c0 ./src/main.o
+ .debug_info    0x000007c0      0xdf8 ./src/gcc/syscalls.o
+ .debug_info    0x000015b8      0xa5c ./src/timer.o
+ .debug_info    0x00002014      0xf20 ./src/can_user.o
+ .debug_info    0x00002f34      0x808 ./src/MAX-7W.o
+ .debug_info    0x0000373c     0x1c1f ./src/MEMS_BMC050.o
+ .debug_info    0x0000535b      0x945 ./src/MEMS_L3GD20.o
+ .debug_info    0x00005ca0      0x96f ./src/ff/rtc.o
+ .debug_info    0x0000660f      0x118 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+ .debug_info    0x00006727      0x136 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+ .debug_info    0x0000685d      0x11c c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+ .debug_info    0x00006979      0x2d1 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+ .debug_info    0x00006c4a       0xfa c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+ .debug_info    0x00006d44     0x18a1 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .debug_info    0x000085e5      0xa86 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+ .debug_info    0x0000906b       0x71 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+ .debug_info    0x000090dc     0x1335 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+ .debug_info    0x0000a411      0x32c c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+ .debug_info    0x0000a73d      0x965 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+ .debug_info    0x0000b0a2      0xd0f c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+ .debug_info    0x0000bdb1     0x1760 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+ .debug_info    0x0000d511       0xdf c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+ .debug_info    0x0000d5f0       0xd2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+ .debug_info    0x0000d6c2       0xf0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+ .debug_info    0x0000d7b2       0xb9 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+ .debug_info    0x0000d86b      0xac2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+ .debug_info    0x0000e32d      0xe85 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+ .debug_info    0x0000f1b2      0x989 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+ .debug_info    0x0000fb3b      0xd0f c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+ .debug_info    0x0001084a       0xa1 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+ .debug_info    0x000108eb       0xa1 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_dvmd_tls.o)
+ .debug_info    0x0001098c       0xa2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+ .debug_info    0x00010a2e       0xa2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+ .debug_info    0x00010ad0       0xa2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+ .debug_info    0x00010b72       0xa2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixdfsi.o)
+ .debug_info    0x00010c14       0xa2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixunsdfsi.o)
+ .debug_info    0x00010cb6       0xa2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_truncdfsf2.o)
+ .debug_info    0x00010d58       0xa2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+
+.debug_abbrev   0x00000000     0x2fe4
+ .debug_abbrev  0x00000000      0x1cc ./src/main.o
+ .debug_abbrev  0x000001cc      0x207 ./src/gcc/syscalls.o
+ .debug_abbrev  0x000003d3      0x170 ./src/timer.o
+ .debug_abbrev  0x00000543      0x234 ./src/can_user.o
+ .debug_abbrev  0x00000777      0x1b5 ./src/MAX-7W.o
+ .debug_abbrev  0x0000092c      0x2c9 ./src/MEMS_BMC050.o
+ .debug_abbrev  0x00000bf5      0x1f7 ./src/MEMS_L3GD20.o
+ .debug_abbrev  0x00000dec      0x142 ./src/ff/rtc.o
+ .debug_abbrev  0x00000f2e       0x7f c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+ .debug_abbrev  0x00000fad       0xab c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+ .debug_abbrev  0x00001058       0x9f c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+ .debug_abbrev  0x000010f7      0x122 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+ .debug_abbrev  0x00001219       0x81 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+ .debug_abbrev  0x0000129a      0x3cb c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .debug_abbrev  0x00001665      0x1f6 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+ .debug_abbrev  0x0000185b       0x4e c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+ .debug_abbrev  0x000018a9      0x37a c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+ .debug_abbrev  0x00001c23      0x163 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+ .debug_abbrev  0x00001d86      0x162 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+ .debug_abbrev  0x00001ee8      0x2a1 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+ .debug_abbrev  0x00002189      0x378 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+ .debug_abbrev  0x00002501       0x6f c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+ .debug_abbrev  0x00002570       0x72 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+ .debug_abbrev  0x000025e2       0x8c c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+ .debug_abbrev  0x0000266e       0x70 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+ .debug_abbrev  0x000026de      0x1f5 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+ .debug_abbrev  0x000028d3      0x284 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+ .debug_abbrev  0x00002b57      0x17c c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+ .debug_abbrev  0x00002cd3      0x25d c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+ .debug_abbrev  0x00002f30       0x14 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+ .debug_abbrev  0x00002f44       0x14 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_dvmd_tls.o)
+ .debug_abbrev  0x00002f58       0x14 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+ .debug_abbrev  0x00002f6c       0x14 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+ .debug_abbrev  0x00002f80       0x14 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+ .debug_abbrev  0x00002f94       0x14 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixdfsi.o)
+ .debug_abbrev  0x00002fa8       0x14 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixunsdfsi.o)
+ .debug_abbrev  0x00002fbc       0x14 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_truncdfsf2.o)
+ .debug_abbrev  0x00002fd0       0x14 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+
+.debug_loc      0x00000000     0x89de
+ .debug_loc     0x00000000       0xf4 ./src/main.o
+ .debug_loc     0x000000f4      0x224 ./src/gcc/syscalls.o
+ .debug_loc     0x00000318      0x138 ./src/timer.o
+ .debug_loc     0x00000450      0x296 ./src/can_user.o
+ .debug_loc     0x000006e6      0x2e2 ./src/MAX-7W.o
+ .debug_loc     0x000009c8      0x7ec ./src/MEMS_BMC050.o
+ .debug_loc     0x000011b4      0x20c ./src/MEMS_L3GD20.o
+ .debug_loc     0x000013c0       0x9c ./src/ff/rtc.o
+ .debug_loc     0x0000145c      0x19f c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+ .debug_loc     0x000015fb      0x20d c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+ .debug_loc     0x00001808      0x205 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+ .debug_loc     0x00001a0d      0x46a c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+ .debug_loc     0x00001e77      0x21f c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+ .debug_loc     0x00002096     0x20c2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .debug_loc     0x00004158      0x3a7 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+ .debug_loc     0x000044ff     0x101f c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+ .debug_loc     0x0000551e      0x4e5 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+ .debug_loc     0x00005a03       0xf9 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+ .debug_loc     0x00005afc     0x19b5 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+ .debug_loc     0x000074b1       0x79 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+ .debug_loc     0x0000752a       0x21 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+ .debug_loc     0x0000754b       0x42 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+ .debug_loc     0x0000758d       0x21 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+ .debug_loc     0x000075ae      0x22a c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+ .debug_loc     0x000077d8      0xc03 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+ .debug_loc     0x000083db      0x603 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+
+.debug_aranges  0x00000000      0x4b0
+ .debug_aranges
+                0x00000000       0x20 ./src/main.o
+ .debug_aranges
+                0x00000020       0x20 ./src/gcc/syscalls.o
+ .debug_aranges
+                0x00000040       0x20 ./src/timer.o
+ .debug_aranges
+                0x00000060       0x20 ./src/can_user.o
+ .debug_aranges
+                0x00000080       0x20 ./src/MAX-7W.o
+ .debug_aranges
+                0x000000a0       0x20 ./src/MEMS_BMC050.o
+ .debug_aranges
+                0x000000c0       0x20 ./src/MEMS_L3GD20.o
+ .debug_aranges
+                0x000000e0       0x20 ./src/ff/rtc.o
+ .debug_aranges
+                0x00000100       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+ .debug_aranges
+                0x00000120       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+ .debug_aranges
+                0x00000140       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+ .debug_aranges
+                0x00000160       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+ .debug_aranges
+                0x00000180       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+ .debug_aranges
+                0x000001a0       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .debug_aranges
+                0x000001c0       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+ .debug_aranges
+                0x000001e0       0x18 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+ .debug_aranges
+                0x000001f8       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+ .debug_aranges
+                0x00000218       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+ .debug_aranges
+                0x00000238       0x18 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+ .debug_aranges
+                0x00000250       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+ .debug_aranges
+                0x00000270       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+ .debug_aranges
+                0x00000290       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+ .debug_aranges
+                0x000002b0       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+ .debug_aranges
+                0x000002d0       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+ .debug_aranges
+                0x000002f0       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+ .debug_aranges
+                0x00000310       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+ .debug_aranges
+                0x00000330       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+ .debug_aranges
+                0x00000350       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+ .debug_aranges
+                0x00000370       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+ .debug_aranges
+                0x00000390       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+ .debug_aranges
+                0x000003b0       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_dvmd_tls.o)
+ .debug_aranges
+                0x000003d0       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+ .debug_aranges
+                0x000003f0       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+ .debug_aranges
+                0x00000410       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+ .debug_aranges
+                0x00000430       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixdfsi.o)
+ .debug_aranges
+                0x00000450       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixunsdfsi.o)
+ .debug_aranges
+                0x00000470       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_truncdfsf2.o)
+ .debug_aranges
+                0x00000490       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+
+.debug_line     0x00000000     0x42a4
+ .debug_line    0x00000000      0x196 ./src/main.o
+ .debug_line    0x00000196      0x1e9 ./src/gcc/syscalls.o
+ .debug_line    0x0000037f      0x116 ./src/timer.o
+ .debug_line    0x00000495      0x261 ./src/can_user.o
+ .debug_line    0x000006f6      0x2d9 ./src/MAX-7W.o
+ .debug_line    0x000009cf      0x356 ./src/MEMS_BMC050.o
+ .debug_line    0x00000d25      0x17d ./src/MEMS_L3GD20.o
+ .debug_line    0x00000ea2      0x11d ./src/ff/rtc.o
+ .debug_line    0x00000fbf      0x151 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+ .debug_line    0x00001110      0x1a2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+ .debug_line    0x000012b2      0x16d c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+ .debug_line    0x0000141f      0x146 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+ .debug_line    0x00001565      0x179 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+ .debug_line    0x000016de      0x651 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .debug_line    0x00001d2f      0x1f2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+ .debug_line    0x00001f21       0x63 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+ .debug_line    0x00001f84      0x40e c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+ .debug_line    0x00002392      0x155 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+ .debug_line    0x000024e7      0x116 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+ .debug_line    0x000025fd      0x1af c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+ .debug_line    0x000027ac      0x614 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+ .debug_line    0x00002dc0      0x120 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+ .debug_line    0x00002ee0       0xb2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+ .debug_line    0x00002f92       0xca c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+ .debug_line    0x0000305c      0x117 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+ .debug_line    0x00003173      0x155 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+ .debug_line    0x000032c8      0x377 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+ .debug_line    0x0000363f      0x128 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+ .debug_line    0x00003767      0x24f c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+ .debug_line    0x000039b6       0x8a c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+ .debug_line    0x00003a40       0x67 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_dvmd_tls.o)
+ .debug_line    0x00003aa7      0x204 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+ .debug_line    0x00003cab      0x220 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+ .debug_line    0x00003ecb      0x106 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+ .debug_line    0x00003fd1       0x80 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixdfsi.o)
+ .debug_line    0x00004051       0x7c c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixunsdfsi.o)
+ .debug_line    0x000040cd       0x94 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_truncdfsf2.o)
+ .debug_line    0x00004161      0x143 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+
+.debug_str      0x00000000     0x332b
+ .debug_str     0x00000000      0x428 ./src/main.o
+                                0x4be (size before relaxing)
+ .debug_str     0x00000428      0x4da ./src/gcc/syscalls.o
+                                0x600 (size before relaxing)
+ .debug_str     0x00000902      0x500 ./src/timer.o
+                                0x623 (size before relaxing)
+ .debug_str     0x00000e02      0x2af ./src/can_user.o
+                                0x9b3 (size before relaxing)
+ .debug_str     0x000010b1      0x1a2 ./src/MAX-7W.o
+                                0x3d4 (size before relaxing)
+ .debug_str     0x00001253      0xd4a ./src/MEMS_BMC050.o
+                               0x1021 (size before relaxing)
+ .debug_str     0x00001f9d      0x1d2 ./src/MEMS_L3GD20.o
+                                0x4a2 (size before relaxing)
+ .debug_str     0x0000216f      0x1e3 ./src/ff/rtc.o
+                                0x4af (size before relaxing)
+ .debug_str     0x00002352       0x97 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+                                0x13c (size before relaxing)
+ .debug_str     0x000023e9       0xd0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+                                0x175 (size before relaxing)
+ .debug_str     0x000024b9       0x5a c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+                                0x150 (size before relaxing)
+ .debug_str     0x00002513       0xe7 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+                                0x19d (size before relaxing)
+ .debug_str     0x000025fa       0x48 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+                                0x13e (size before relaxing)
+ .debug_str     0x00002642      0x3d2 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                                0x90a (size before relaxing)
+ .debug_str     0x00002a14       0x7b c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+                                0x52f (size before relaxing)
+ .debug_str     0x00002a8f       0x96 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+                                 0xbe (size before relaxing)
+ .debug_str     0x00002b25      0x105 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                                0x891 (size before relaxing)
+ .debug_str     0x00002c2a       0x4d c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+                                0x279 (size before relaxing)
+ .debug_str     0x00002c77       0xad c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+                                0x506 (size before relaxing)
+ .debug_str     0x00002d24      0x177 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+                                0x763 (size before relaxing)
+ .debug_str     0x00002e9b       0xa5 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                0x612 (size before relaxing)
+ .debug_str     0x00002f40       0x45 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+                                0x166 (size before relaxing)
+ .debug_str     0x00002f85       0x3f c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+                                0x153 (size before relaxing)
+ .debug_str     0x00002fc4       0x58 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+                                0x153 (size before relaxing)
+ .debug_str     0x0000301c       0x47 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+                                0x149 (size before relaxing)
+ .debug_str     0x00003063       0x84 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+                                0x53f (size before relaxing)
+ .debug_str     0x000030e7      0x1bd c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+                                0x715 (size before relaxing)
+ .debug_str     0x000032a4       0x53 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+                                0x50f (size before relaxing)
+ .debug_str     0x000032f7       0x34 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+                                0x65f (size before relaxing)
+
+.comment        0x00000000       0x11
+ .comment       0x00000000       0x11 ./src/main.o
+                                 0x12 (size before relaxing)
+ .comment       0x00000000       0x12 ./src/gcc/syscalls.o
+ .comment       0x00000000       0x12 ./src/timer.o
+ .comment       0x00000000       0x12 ./src/can_user.o
+ .comment       0x00000000       0x12 ./src/MAX-7W.o
+ .comment       0x00000000       0x12 ./src/MEMS_BMC050.o
+ .comment       0x00000000       0x12 ./src/MEMS_L3GD20.o
+ .comment       0x00000000       0x12 ./src/ff/rtc.o
+ .comment       0x00000000       0x12 ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+ .comment       0x00000000       0x12 ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+ .comment       0x00000000       0x12 ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+ .comment       0x00000000       0x12 ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+ .comment       0x00000000       0x12 ./lib/libPCAN-GPS-GNU0.1.3.a(crc.o)
+ .comment       0x00000000       0x12 ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+ .comment       0x00000000       0x12 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+ .comment       0x00000000       0x12 ./lib/libPCAN-GPS-GNU0.1.3.a(interrupt.o)
+ .comment       0x00000000       0x12 ./lib/libPCAN-GPS-GNU0.1.3.a(i2c.o)
+ .comment       0x00000000       0x12 ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+ .comment       0x00000000       0x12 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+
+.ARM.attributes
+                0x00000000       0x33
+ .ARM.attributes
+                0x00000000       0x33 ./src/main.o
+ .ARM.attributes
+                0x00000033       0x33 ./src/gcc/syscalls.o
+ .ARM.attributes
+                0x00000066       0x33 ./src/timer.o
+ .ARM.attributes
+                0x00000099       0x33 ./src/can_user.o
+ .ARM.attributes
+                0x000000cc       0x33 ./src/MAX-7W.o
+ .ARM.attributes
+                0x000000ff       0x33 ./src/MEMS_BMC050.o
+ .ARM.attributes
+                0x00000132       0x33 ./src/MEMS_L3GD20.o
+ .ARM.attributes
+                0x00000165       0x33 ./src/ff/rtc.o
+ .ARM.attributes
+                0x00000198       0x33 ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+ .ARM.attributes
+                0x000001cb       0x33 ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+ .ARM.attributes
+                0x000001fe       0x33 ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+ .ARM.attributes
+                0x00000231       0x33 ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+ .ARM.attributes
+                0x00000264       0x33 ./lib/libPCAN-GPS-GNU0.1.3.a(crc.o)
+ .ARM.attributes
+                0x00000297       0x33 ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+ .ARM.attributes
+                0x000002ca       0x33 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+ .ARM.attributes
+                0x000002fd       0x33 ./lib/libPCAN-GPS-GNU0.1.3.a(interrupt.o)
+ .ARM.attributes
+                0x00000330       0x33 ./lib/libPCAN-GPS-GNU0.1.3.a(i2c.o)
+ .ARM.attributes
+                0x00000363       0x33 ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+ .ARM.attributes
+                0x00000396       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+ .ARM.attributes
+                0x000003bf       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+ .ARM.attributes
+                0x000003e8       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+ .ARM.attributes
+                0x00000411       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+ .ARM.attributes
+                0x0000043a       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+ .ARM.attributes
+                0x00000463       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .ARM.attributes
+                0x0000048c       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+ .ARM.attributes
+                0x000004b5       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+ .ARM.attributes
+                0x000004de       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+ .ARM.attributes
+                0x00000507       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+ .ARM.attributes
+                0x00000530       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+ .ARM.attributes
+                0x00000559       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+ .ARM.attributes
+                0x00000582       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+ .ARM.attributes
+                0x000005ab       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+ .ARM.attributes
+                0x000005d4       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+ .ARM.attributes
+                0x000005fd       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+ .ARM.attributes
+                0x00000626       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+ .ARM.attributes
+                0x0000064f       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+ .ARM.attributes
+                0x00000678       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+ .ARM.attributes
+                0x000006a1       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+ .ARM.attributes
+                0x000006ca       0x29 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+ .ARM.attributes
+                0x000006f3       0x19 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+ .ARM.attributes
+                0x0000070c       0x19 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_dvmd_tls.o)
+ .ARM.attributes
+                0x00000725       0x19 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+ .ARM.attributes
+                0x0000073e       0x19 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+ .ARM.attributes
+                0x00000757       0x19 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+ .ARM.attributes
+                0x00000770       0x19 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixdfsi.o)
+ .ARM.attributes
+                0x00000789       0x19 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixunsdfsi.o)
+ .ARM.attributes
+                0x000007a2       0x19 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_truncdfsf2.o)
+ .ARM.attributes
+                0x000007bb       0x19 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+
+.debug_frame    0x00000000     0x12b4
+ .debug_frame   0x00000000       0xa8 ./src/main.o
+ .debug_frame   0x000000a8      0x130 ./src/gcc/syscalls.o
+ .debug_frame   0x000001d8       0xb8 ./src/timer.o
+ .debug_frame   0x00000290      0x18c ./src/can_user.o
+ .debug_frame   0x0000041c      0x1b4 ./src/MAX-7W.o
+ .debug_frame   0x000005d0      0x4a4 ./src/MEMS_BMC050.o
+ .debug_frame   0x00000a74      0x140 ./src/MEMS_L3GD20.o
+ .debug_frame   0x00000bb4       0x64 ./src/ff/rtc.o
+ .debug_frame   0x00000c18       0x2c c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+ .debug_frame   0x00000c44       0x2c c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+ .debug_frame   0x00000c70       0x2c c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+ .debug_frame   0x00000c9c       0x34 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+ .debug_frame   0x00000cd0       0x2c c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+ .debug_frame   0x00000cfc       0x68 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .debug_frame   0x00000d64       0x50 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+ .debug_frame   0x00000db4       0x68 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+ .debug_frame   0x00000e1c       0x38 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+ .debug_frame   0x00000e54       0x98 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+ .debug_frame   0x00000eec      0x238 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+ .debug_frame   0x00001124       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+ .debug_frame   0x00001144       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+ .debug_frame   0x00001164       0x30 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+ .debug_frame   0x00001194       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+ .debug_frame   0x000011b4       0x28 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+ .debug_frame   0x000011dc       0x38 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+ .debug_frame   0x00001214       0x30 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+ .debug_frame   0x00001244       0x50 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+ .debug_frame   0x00001294       0x20 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+
+.debug_ranges   0x00000000      0x240
+ .debug_ranges  0x00000000       0x90 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+ .debug_ranges  0x00000090       0xa0 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+ .debug_ranges  0x00000130       0x50 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+ .debug_ranges  0x00000180       0x40 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+ .debug_ranges  0x000001c0       0x30 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+ .debug_ranges  0x000001f0       0x50 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+
+Cross Reference Table
+
+Symbol                                            File
+ADC_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+AccCalRdy                                         ./src/MEMS_BMC050.o
+Ahxoh1ai                                          ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+BMC050_AccCompensate                              ./src/MEMS_BMC050.o
+BMC050_Readings                                   ./src/MEMS_BMC050.o
+                                                  ./src/can_user.o
+                                                  ./src/main.o
+BMC050_dbg_data_acc                               ./src/MEMS_BMC050.o
+BMC050_dbg_data_cmp                               ./src/MEMS_BMC050.o
+BOD_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+BusFault_Handler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+C2F_Array                                         ./src/main.o
+CANActivity_IRQHandler                            ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+CAN_FilterAddId                                   ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+CAN_GetChannelInfo                                ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+CAN_GetIsrVector                                  ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+CAN_GetTransceiverType                            ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+CAN_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+CAN_InitChannel                                   ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_InitFilters                                   ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_ReInitChannel                                 ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+CAN_ReferenceRxQueue                              ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_ReferenceTxQueue                              ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_RxQueueGetNext                                ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_RxQueueReadNext                               ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_SetBusMode                                    ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_SetChannelInfo                                ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_SetErrorLimit                                 ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_SetFilterMode                                 ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_SetRxCallback                                 ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_SetTimestampHandler                           ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_SetTransceiverMode                            ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/can_user.o
+CAN_SetTxErrorCallback                            ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_SetUnatomicHandler                            ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+CAN_TxQueueGetNext                                ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_TxQueueWriteNext                              ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+CAN_UserInit                                      ./src/can_user.o
+                                                  ./src/main.o
+CAN_UserProcessMsg                                ./src/can_user.o
+CAN_UserRead                                      ./src/can_user.o
+CAN_UserResetPanelValues                          ./src/can_user.o
+                                                  ./src/main.o
+CAN_UserSendBMCData                               ./src/can_user.o
+                                                  ./src/main.o
+CAN_UserSendDioData                               ./src/can_user.o
+CAN_UserSendGPSData                               ./src/can_user.o
+CAN_UserSendL3GDData                              ./src/can_user.o
+                                                  ./src/main.o
+CAN_UserSendRTCTime                               ./src/can_user.o
+CAN_UserWrite                                     ./src/can_user.o
+CRC_CalcCRC                                       ./lib/libPCAN-GPS-GNU0.1.3.a(crc.o)
+                                                  ./src/can_user.o
+CRC_Init                                          ./lib/libPCAN-GPS-GNU0.1.3.a(crc.o)
+                                                  ./src/can_user.o
+CRC_Valid                                         ./lib/libPCAN-GPS-GNU0.1.3.a(crc.o)
+                                                  ./src/main.o
+DMA_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+DebugMon_Handler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+EEPROM_FlushCache                                 ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+                                                  ./src/can_user.o
+EEPROM_IRQHandler                                 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+EEPROM_Read                                       ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+                                                  ./src/main.o
+EEPROM_Write                                      ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+                                                  ./src/can_user.o
+EINT0_IRQHandler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+EINT1_IRQHandler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+EINT2_IRQHandler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+EINT3_IRQHandler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+EMCClock                                          ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+ENET_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+E_EEPROM_Int_cmd                                  ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+GPIO_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+GoToDeepSleep                                     ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+GoToSleep                                         ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+HW_BMC_CsAccelerationOff                          ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/MEMS_BMC050.o
+HW_BMC_CsAccelerationOn                           ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/MEMS_BMC050.o
+HW_BMC_CsMagnetometerOff                          ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/MEMS_BMC050.o
+HW_BMC_CsMagnetometerOn                           ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/MEMS_BMC050.o
+HW_GPS_GetPowerState                              ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/can_user.o
+HW_GPS_PowerOff                                   ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/can_user.o
+HW_GPS_PowerOn                                    ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/MAX-7W.o
+                                                  ./src/can_user.o
+HW_GetDIN                                         ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/can_user.o
+HW_GetDINn                                        ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+HW_GetDOUT                                        ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/can_user.o
+HW_GetModuleID                                    ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/can_user.o
+HW_Init                                           ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/main.o
+HW_JumpToBootloader                               ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+HW_L3GD20_CsOff                                   ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/MEMS_L3GD20.o
+HW_L3GD20_CsOn                                    ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/MEMS_L3GD20.o
+HW_SDCardPresent                                  ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/can_user.o
+HW_SD_PowerOff                                    ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+HW_SD_PowerOn                                     ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+HW_SetDOUT                                        ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+HW_SetDOUTn                                       ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/can_user.o
+HW_SetLED                                         ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./src/can_user.o
+                                                  ./src/main.o
+HW_SwitchOFF                                      ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./src/can_user.o
+HardFault_Handler                                 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+I2C0_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+I2C1_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+I2C2_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+I2C_Read                                          ./lib/libPCAN-GPS-GNU0.1.3.a(i2c.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+I2C_Start                                         ./lib/libPCAN-GPS-GNU0.1.3.a(i2c.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+I2C_Stop                                          ./lib/libPCAN-GPS-GNU0.1.3.a(i2c.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+I2C_Write                                         ./lib/libPCAN-GPS-GNU0.1.3.a(i2c.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(eeprom.o)
+I2S_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+Ident                                             ./src/main.o
+Init_CAN2                                         ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+Init_EEPROM                                       ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+Init_I2C                                          ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+Init_Interrupts                                   ./lib/libPCAN-GPS-GNU0.1.3.a(interrupt.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+Init_Timer0                                       ./src/timer.o
+                                                  ./src/main.o
+Init_UART2                                        ./src/MAX-7W.o
+Initialized                                       ./src/main.o
+IntDefaultHandler                                 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+L3GD20_Readings                                   ./src/MEMS_L3GD20.o
+                                                  ./src/can_user.o
+                                                  ./src/main.o
+LCD_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+MAX7W_Readings                                    ./src/MAX-7W.o
+                                                  ./src/can_user.o
+MCI_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+MCPWM_IRQHandler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+MEMS_BMC050_GetAccCalFiltValues                   ./src/MEMS_BMC050.o
+                                                  ./src/can_user.o
+MEMS_BMC050_GetAccCalRawValues                    ./src/MEMS_BMC050.o
+                                                  ./src/can_user.o
+MEMS_BMC050_GetAccCalTargets                      ./src/MEMS_BMC050.o
+                                                  ./src/can_user.o
+MEMS_BMC050_GetAccRange                           ./src/MEMS_BMC050.o
+                                                  ./src/can_user.o
+MEMS_BMC050_GetVertialAxis                        ./src/MEMS_BMC050.o
+MEMS_BMC050_ResetAccCompensation                  ./src/MEMS_BMC050.o
+MEMS_BMC050_SetAccCalTargets                      ./src/MEMS_BMC050.o
+                                                  ./src/can_user.o
+                                                  ./src/main.o
+MEMS_BMC050_SetAccRange                           ./src/MEMS_BMC050.o
+                                                  ./src/can_user.o
+                                                  ./src/main.o
+MEMS_BMC050_SetVertialAxis                        ./src/MEMS_BMC050.o
+MEMS_BMC050_StartFastAccCompensation              ./src/MEMS_BMC050.o
+                                                  ./src/can_user.o
+MEMS_BMC050_init_Accelerometer                    ./src/MEMS_BMC050.o
+                                                  ./src/main.o
+MEMS_BMC050_init_Magnetometer                     ./src/MEMS_BMC050.o
+                                                  ./src/main.o
+MEMS_BMC050_readAccCompValues                     ./src/MEMS_BMC050.o
+MEMS_BMC050_task                                  ./src/MEMS_BMC050.o
+                                                  ./src/main.o
+MEMS_L3GD20_GetRange                              ./src/MEMS_L3GD20.o
+                                                  ./src/can_user.o
+MEMS_L3GD20_SetRange                              ./src/MEMS_L3GD20.o
+                                                  ./src/can_user.o
+                                                  ./src/main.o
+MEMS_L3GD20_init                                  ./src/MEMS_L3GD20.o
+                                                  ./src/main.o
+MEMS_L3GD20_task                                  ./src/MEMS_L3GD20.o
+                                                  ./src/main.o
+MemManage_Handler                                 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+NMI_Handler                                       ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+PLL0_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+PLL1_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+PWM0_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+PWM1_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+PendSV_Handler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+PeripheralClock                                   ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+PostResetISR                                      ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+QEI_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+RIT_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+RTC_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+RTC_Init                                          ./lib/libPCAN-GPS-GNU0.1.3.a(hardware.o)
+ResetISR                                          ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+RxQueueCAN1                                       ./src/can_user.o
+SER_Initialize                                    ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+                                                  ./src/MAX-7W.o
+SER_Read                                          ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+                                                  ./src/MAX-7W.o
+                                                  ./src/gcc/syscalls.o
+SER_ResetRX                                       ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+SER_ResetTX                                       ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+SER_Write                                         ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+                                                  ./src/gcc/syscalls.o
+SPI_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+SSP0_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+SSP1_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+SSP2_IRQHandler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+SSP_Init                                          ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+                                                  ./src/MEMS_L3GD20.o
+                                                  ./src/MEMS_BMC050.o
+SSP_ReadWrite                                     ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+                                                  ./src/MEMS_L3GD20.o
+                                                  ./src/MEMS_BMC050.o
+SSP_SingleRead                                    ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+SSP_SingleWrite                                   ./lib/libPCAN-GPS-GNU0.1.3.a(ssp.o)
+SVC_Handler                                       ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+SysTick_Handler                                   ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+SystemCoreClock                                   ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+SystemCoreClockUpdate                             ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+SystemInit                                        ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+TIMER0_IRQHandler                                 ./src/timer.o
+TIMER1_IRQHandler                                 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+TIMER2_IRQHandler                                 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+TIMER3_IRQHandler                                 ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+Timer_1000usec                                    ./src/main.o
+                                                  ./src/timer.o
+TxQueueCAN1                                       ./src/can_user.o
+UART0_IRQHandler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+UART1_IRQHandler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+UART2_IRQHandler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+UART3_IRQHandler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+UART4_IRQHandler                                  ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+UBLOX_MAX7W_init                                  ./src/MAX-7W.o
+                                                  ./src/main.o
+UBLOX_MAX7W_task                                  ./src/MAX-7W.o
+USBActivity_IRQHandler                            ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+USBClock                                          ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+USB_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+UsageFault_Handler                                ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+WDT_IRQHandler                                    ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+Wait_Usec                                         ./src/timer.o
+                                                  ./src/MEMS_L3GD20.o
+                                                  ./src/MEMS_BMC050.o
+_Balloc                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+_Bfree                                            c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+_PathLocale                                       c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+__adddf3                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+__aeabi_cdcmpeq                                   c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+__aeabi_cdcmple                                   c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+__aeabi_cdrcmple                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+__aeabi_d2f                                       c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_truncdfsf2.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                                                  ./src/can_user.o
+__aeabi_d2iz                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixdfsi.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__aeabi_d2uiz                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixunsdfsi.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                                                  ./src/MAX-7W.o
+                                                  ./src/can_user.o
+__aeabi_dadd                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                                                  ./src/MAX-7W.o
+__aeabi_dcmpeq                                    c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__aeabi_dcmpge                                    c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+__aeabi_dcmpgt                                    c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__aeabi_dcmple                                    c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__aeabi_dcmplt                                    c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__aeabi_ddiv                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                                                  ./src/MAX-7W.o
+__aeabi_dmul                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__aeabi_drsub                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+__aeabi_dsub                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+__aeabi_f2d                                       c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+                                                  ./src/can_user.o
+__aeabi_fdiv                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+                                                  ./src/can_user.o
+__aeabi_fmul                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+                                                  ./src/can_user.o
+__aeabi_i2d                                       c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__aeabi_idiv0                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_dvmd_tls.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+__aeabi_l2d                                       c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+__aeabi_ldiv0                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_dvmd_tls.o)
+__aeabi_ui2d                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                                                  ./src/MAX-7W.o
+__aeabi_uidiv                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+__aeabi_uidivmod                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+__aeabi_ul2d                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+__any_on                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+__b2d                                             c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+__bss_section_table_end                           ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+__cmpdf2                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+__code_checksum                                   ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+__copybits                                        c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__ctype_ptr__                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+__d2b                                             c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__data_section_table                              ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+__data_section_table_end                          ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+__divdf3                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+__divsf3                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+__eqdf2                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+__extendsfdf2                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+__fixdfsi                                         c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixdfsi.o)
+__fixunsdfsi                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_fixunsdfsi.o)
+__floatdidf                                       c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+__floatsidf                                       c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+__floatundidf                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+__floatunsidf                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+__fpclassifyd                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_fpclassify.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__gedf2                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+__gethex                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__gtdf2                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+__hexdig                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+__hexdig_init                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+__hexnan                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-hexnan.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__hi0bits                                         c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+__i2b                                             c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__ledf2                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+__lo0bits                                         c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+__locale_charset                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+__locale_cjk_lang                                 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+__locale_mb_cur_max                               c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+__locale_msgcharset                               c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+__lshift                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__ltdf2                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+__malloc_av_                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+__malloc_current_mallinfo                         c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+__malloc_lock                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+__malloc_max_sbrked_mem                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+__malloc_max_total_mem                            c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+__malloc_sbrk_base                                c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+__malloc_top_pad                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+__malloc_trim_threshold                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+__malloc_unlock                                   c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mlock.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+__mb_cur_max                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+__mcmp                                            c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__mdiff                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__mlocale_changed                                 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+__mprec_bigtens                                   c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__mprec_tens                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__mprec_tinytens                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+__muldf3                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivdf3.o)
+__mulsf3                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_muldivsf3.o)
+__multadd                                         c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+__multiply                                        c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__nedf2                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_cmpdf2.o)
+__nlocale_changed                                 c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+__pow5mult                                        c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__ratio                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__s2b                                             c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+__subdf3                                          c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_addsubdf3.o)
+__truncdfsf2                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_arm_truncdfsf2.o)
+__udivsi3                                         c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/thumb/v7m\libgcc.a(_udivsi3.o)
+__ulp                                             c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+_calloc_r                                         c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+_close_r                                          ./src/gcc/syscalls.o
+_ctype_                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-ctype_.o)
+_exit                                             ./src/gcc/syscalls.o
+_free_r                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+_fstat_r                                          ./src/gcc/syscalls.o
+_getpid                                           ./src/gcc/syscalls.o
+_global_impure_ptr                                c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+_impure_ptr                                       c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-impure.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+_kill                                             ./src/gcc/syscalls.o
+_localeconv_r                                     c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+_lseek_r                                          ./src/gcc/syscalls.o
+_malloc_r                                         c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+_malloc_trim_r                                    c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+_mprec_log10                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+_read_r                                           ./src/gcc/syscalls.o
+_sbrk_r                                           ./src/gcc/syscalls.o
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-freer.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mallocr.o)
+_setlocale_r                                      c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+_strtod_r                                         c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+_strtoul_r                                        c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+_vStackTop                                        ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+_write_r                                          ./src/gcc/syscalls.o
+ahRaTahk6k                                        ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+bss_init                                          ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+cfg_data                                          ./src/MEMS_BMC050.o
+                                                  ./src/can_user.o
+                                                  ./src/main.o
+data_init                                         ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+end                                               ./src/gcc/syscalls.o
+fohSh5th                                          ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+fpu_init                                          ./lib/libPCAN-GPS-GNU0.1.3.a(system_LPC407x_8x_177x_8x.o)
+g_pfnVectors                                      ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+isatty                                            ./src/gcc/syscalls.o
+localeconv                                        c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+main                                              ./src/main.o
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(cr_startup_lpc40xx.o)
+memcmp                                            c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcmp.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+memcpy                                            c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memcpy-stub.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-mprec.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                                                  ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+memset                                            c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-memset.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-callocr.o)
+                                                  ./src/MAX-7W.o
+modf                                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-s_modf.o)
+                                                  ./src/can_user.o
+nanf                                              c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-sf_nan.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+persistant_config_used                            ./src/main.o
+pic_pwr_was_off                                   ./lib/libPCAN-GPS-GNU0.1.3.a(CAN.o)
+rtc_gettime                                       ./src/ff/rtc.o
+                                                  ./src/can_user.o
+rtc_initialize                                    ./src/ff/rtc.o
+                                                  ./src/main.o
+rtc_settime                                       ./src/ff/rtc.o
+                                                  ./src/can_user.o
+serPort                                           ./lib/libPCAN-GPS-GNU0.1.3.a(serial.o)
+setlocale                                         c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+strcmp                                            c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strcmp.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-locale.o)
+strlen                                            c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strlen.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+strncmp                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strncmp.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-gdtoa-gethex.o)
+                                                  c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                                                  ./src/MAX-7W.o
+strtod                                            c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+strtof                                            c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtod.o)
+                                                  ./src/MAX-7W.o
+strtoul                                           c:/tools/pcan-router/yagarto-20121222/bin/../lib/gcc/arm-none-eabi/4.7.2/../../../../arm-none-eabi/lib/thumb/v7m\libc.a(lib_a-strtoul.o)
+                                                  ./src/MAX-7W.o

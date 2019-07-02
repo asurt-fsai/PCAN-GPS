@@ -2,7 +2,7 @@
 LiesMich.txt
 
 PCAN-Flash
-Copyright (c) 2015 PEAK-System Technik GmbH Darmstadt
+Copyright (c) 2018 PEAK-System Technik GmbH Darmstadt
 Alle Rechte vorbehalten.
 ===============================================================================
 
